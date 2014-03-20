@@ -88,11 +88,17 @@ function patterns($from, $to)
 	$b2--;
     } else $a2=array();
 
-    $rr="[".$b1."-".$b2."]";
-    if(($b1=="0")&&($b2=="9")) $rr="X";
+    if($b1<=$b2)
+    {
+	$rr="[".$b1."-".$b2."]";
+	if(($b1=="0")&&($b2=="9")) $rr="X";
+	if($b1==$b2) $rr=$b1;
+    
 
-    $a3[]=$rr.substr($all_X,0,strlen($c1));
-
+	$a3[]=$rr.substr($all_X,0,strlen($c1));
+    } else {
+	$a3=array();
+    }
 
 
     $res=array_merge($a1,$a3,$a2);
