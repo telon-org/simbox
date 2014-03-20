@@ -1,0 +1,8 @@
+#!/bin/sh
+
+chmod 666 /sys/module/ehci_hcd/parameters/log2_irq_thresh 
+echo 6 > /sys/module/ehci_hcd/parameters/log2_irq_thresh 
+chmod 666 /sys/module/ehci_hcd/parameters/park 
+echo 3 > /sys/module/ehci_hcd/parameters/park 
+chmod 666 /sys/module/ehci_hcd/parameters/ignore_oc
+echo 1 > /sys/module/ehci_hcd/parameters/ignore_oc

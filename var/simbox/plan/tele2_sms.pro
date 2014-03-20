@@ -1,0 +1,1 @@
+Warning: file_put_contents(/var/simbox/plan/tele2_sms.pro): failed to open stream: Permission denied in /usr/simbox/www/simbox/head.php on line 41

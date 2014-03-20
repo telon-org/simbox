@@ -1,0 +1,13 @@
+#!/bin/sh
+
+sudo echo 8 > /proc/irq/16/smp_affinity
+sudo echo 4 > /proc/irq/17/smp_affinity
+sudo echo 2 > /proc/irq/18/smp_affinity
+sudo echo 1 > /proc/irq/19/smp_affinity
+
+sudo echo 1 > /proc/irq/23/smp_affinity
+
+sudo echo 1 > /proc/irq/47/smp_affinity
+sudo echo 1 > /proc/irq/55/smp_affinity
+
+

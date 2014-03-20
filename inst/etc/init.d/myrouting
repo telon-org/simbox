@@ -1,0 +1,19 @@
+#!/bin/sh
+echo "Starting routing"
+#route add 87.250.250.3 gw 10.0.0.1 dev eth1
+route add 67.205.115.89 gw 192.168.0.1 dev eth1
+#route add 188.120.241.4 gw 10.0.0.1 dev eth1
+
+
+#87.250.250.3
+#route add 87.250.250.3 gw 10.0.0.10 dev eth1
+#ip route flush
+#ip route add 10.0.0.10 dev eth1 src 10.0.0.10
+#ip route add 10.0.0.0/24 dev eth1 src 10.0.10
+#ip route add 67.205.115.89 dev eth1 via 10.0.0.1oute add 87.250.250.3 gw 10.0.0.1 dev eth1
+#ip route add 188.120.241.4 dev eth1 via 10.0.0.1
+#ip route add 213.180.204.3 dev eth1 via 10.0.0.1
+#ip route add 174.142.132.228 src 91.192.191.100 dev eth5 via 91.192.191.1
+#ip route add 10.40.0.0/16 src 10.40.153.196 dev eth4 via 10.40.153.5
+#ip route add 91.192.0.0/16 src 91.192.191.100 dev eth5 via 91.192.191.1
+

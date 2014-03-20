@@ -1,0 +1,10 @@
+#!/bin/sh
+
+. /usr/simbox/config.sh
+. /usr/simbox/nabor/kievstar/config.sh
+
+echo "-- Activating sim [fork]"
+
+sleep 80
+
+$MAKECALL $DONGLE 477

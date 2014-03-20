@@ -1,0 +1,51 @@
+WERT Sim-Card Scanner. Version 1.0.6.
+Special Svistok Simbox EDITION.
+Copyright (C) 2004-2005 by Wert (AKA Joda).
+
+WertScan comes with ABSOLUTELY NO WARRANTY;
+This is free software, and you are welcome to
+redistribute it under certain conditions.
+
+Using device : Dejian CardReader.
+Using port   : /dev/ttyUSB25 (use --port for change).
+Using speed  : 9600 (use --speed for change).
+
+CTS ignored. Device not checked.
+
+->ATR : 3B 17 95 80 65 D0 01 75 0E 9B
+
+ICCID=9807210036003254774
+CHV1 is disabled.
+PIN1 is enabled and remaining 3 numbers of verification.
+PUK1 is enabled and remaining 10 numbers of verification.
+PIN2 is enabled and remaining 3 numbers of verification.
+PUK2 is enabled and remaining 10 numbers of verification.
+ADM(4) is disabled.
+ADM(5) is disabled.
+ADM(6) is disabled.
+ADM(7) is disabled.
+ADM(8) is disabled.
+ADM(9) is disabled.
+ADM(10) is disabled.
+ADM(11) is disabled.
+
+IMSI=082905023390027232
+Using retrace file /var/svistok/sim/reader/9807210036003254774.gsm - OK.
+
+-------------------------------
+Starting 2R-attack on pair 0...
+-------------------------------
+
+-------------------------------
+2R-attack FAILED! This pair is non-collisions or SIM is not Comp128v1. Using 310
+44 GSM steps.
+-------------------------------
+
+Scan time = 0h 53m 17s.
+
+==========================================================
+KI   = 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00.
+IMSI=082905023390027232.
+==========================================================
+
+

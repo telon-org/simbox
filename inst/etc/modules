@@ -1,0 +1,2 @@
+usbserial vendor=0x12d1 product=0x1003
+ehci-hcd log2_irq_thresh=6 park=3 ignore_oc=1

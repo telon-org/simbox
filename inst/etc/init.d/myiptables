@@ -1,0 +1,136 @@
+#!/bin/sh
+# /etc/init.d/iptables
+
+IPTABLES=/sbin/iptables
+
+case "$1" in
+  start)
+  #exit 0
+    echo "Starting iptables"
+
+    # Обнуляем правила
+    $IPTABLES -F
+    $IPTABLES -X
+    $IPTABLES -F -t nat
+    $IPTABLES -X -t nat
+
+    # Политика по умолчанию
+    # Все запрещено
+    $IPTABLES -P INPUT DROP
+    $IPTABLES -P OUTPUT DROP
+    $IPTABLES -P FORWARD DROP
+
+    # Loopback
+    $IPTABLES -A INPUT -i lo -j ACCEPT
+    $IPTABLES -A OUTPUT -o lo -j ACCEPT
+    $IPTABLES -A INPUT ! -i lo -d 127.0.0.0/8 -j REJECT
+
+
+
+
+   $IPTABLES -A INPUT  -s 10.0.0.0/24 -j ACCEPT
+   $IPTABLES -A OUTPUT -d 10.0.0.0/24 -j ACCEPT
+
+   $IPTABLES -A INPUT  -s 10.2.0.0/24 -j ACCEPT
+   $IPTABLES -A OUTPUT -d 10.2.0.0/24 -j ACCEPT
+   $IPTABLES -A INPUT  -s 10.2.1.0/24 -j ACCEPT
+   $IPTABLES -A OUTPUT -d 10.2.1.0/24 -j ACCEPT
+   $IPTABLES -A INPUT  -s 10.2.2.0/24 -j ACCEPT
+   $IPTABLES -A OUTPUT -d 10.2.2.0/24 -j ACCEPT
+
+
+   $IPTABLES -A INPUT  -s 10.3.0.0/24 -j ACCEPT
+   $IPTABLES -A OUTPUT -d 10.3.0.0/24 -j ACCEPT
+   $IPTABLES -A INPUT  -s 10.3.1.0/24 -j ACCEPT
+   $IPTABLES -A OUTPUT -d 10.3.1.0/24 -j ACCEPT
+   $IPTABLES -A INPUT  -s 10.3.2.0/24 -j ACCEPT
+   $IPTABLES -A OUTPUT -d 10.3.2.0/24 -j ACCEPT
+
+   $IPTABLES -A INPUT  -s 10.4.0.0/24 -j ACCEPT
+   $IPTABLES -A OUTPUT -d 10.4.0.0/24 -j ACCEPT
+
+
+   $IPTABLES -A INPUT  -s 192.168.0.0/24 -j ACCEPT
+   $IPTABLES -A OUTPUT -d 192.168.0.0/24 -j ACCEPT
+
+   $IPTABLES -A INPUT  -s 192.168.88.0/0 -j ACCEPT
+   $IPTABLES -A OUTPUT -d 192.168.88.0/0 -j ACCEPT
+
+
+    # SSH
+    $IPTABLES -A INPUT -p tcp -m state --state NEW --dport 22 -j ACCEPT
+
+    # Openvpn
+    $IPTABLES -A INPUT -p tcp -m state --state NEW --dport 1194 -j ACCEPT
+    $IPTABLES -A INPUT -p udp -m state --state NEW --dport 1194 -j ACCEPT
+
+    # Openvpn
+    $IPTABLES -A INPUT -p tcp -m state --state NEW --dport 1200 -j ACCEPT
+    $IPTABLES -A INPUT -p udp -m state --state NEW --dport 1200 -j ACCEPT
+
+    $IPTABLES -A INPUT -p tcp -m state --state NEW --dport 1201 -j ACCEPT
+    $IPTABLES -A INPUT -p udp -m state --state NEW --dport 1201 -j ACCEPT
+
+    $IPTABLES -A INPUT -p tcp -m state --state NEW --dport 1202 -j ACCEPT
+    $IPTABLES -A INPUT -p udp -m state --state NEW --dport 1202 -j ACCEPT
+
+    $IPTABLES -A INPUT -p tcp -m state --state NEW --dport 1203 -j ACCEPT
+    $IPTABLES -A INPUT -p udp -m state --state NEW --dport 1203 -j ACCEPT
+
+    $IPTABLES -A INPUT -p tcp -m state --state NEW --dport 1204 -j ACCEPT
+    $IPTABLES -A INPUT -p udp -m state --state NEW --dport 1204 -j ACCEPT
+
+
+
+    #test
+    $IPTABLES -A INPUT -p tcp -m state --state NEW --dport 8123 -j ACCEPT
+
+    #www
+    $IPTABLES -A INPUT -p tcp -m state --state NEW --dport 8122 -j ACCEPT
+    $IPTABLES -A INPUT -p tcp -m state --state NEW --dport 8118 -j ACCEPT
+
+
+    # Логгируем
+    $IPTABLES -A INPUT -p tcp -m state --state NEW -j LOG --log-level debug --log-prefix 'iptables new: '
+    $IPTABLES -A INPUT -p udp -m state --state NEW -m multiport ! --dport '67,137,138,1947,17500' -j LOG --log-level debug --log-prefix 'iptables new: '
+
+    # Разрешаем весь исходящий трафик
+    $IPTABLES -A OUTPUT -p all -j ACCEPT
+
+ 
+   # Разрешаем установленные соединения
+    $IPTABLES -A INPUT -p all -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+    # Запрещаем forwarding
+    sysctl net.ipv4.ip_forward=1
+
+    # Нужные модули
+    modprobe nf_conntrack_ftp
+    modprobe nf_conntrack_pptp
+    modprobe nf_conntrack_proto_gre
+
+    # ip route add 91.192.191.100 src 188.120.245.161 dev eth0:1 via 188.120.247.254
+
+    ;;
+  stop)
+    echo "Stopping iptables"
+
+    # Обнуляем правила
+    $IPTABLES -F
+    $IPTABLES -X
+    $IPTABLES -F -t nat
+    $IPTABLES -X -t nat
+
+    # Политика по умолчанию
+    # Все разрешено
+    $IPTABLES -P INPUT ACCEPT
+    $IPTABLES -P OUTPUT ACCEPT
+    $IPTABLES -P FORWARD ACCEPT
+    ;;
+  *)
+    echo "Usage: /etc/init.d/iptables {start|stop}"
+    exit 1
+    ;;
+esac
+
+exit 0

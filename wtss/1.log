@@ -1,0 +1,30 @@
+WERT Sim-Card Scanner. Version 1.0.6.
+Copyright (C) 2004-2005 by Wert (AKA Joda).
+
+WertScan comes with ABSOLUTELY NO WARRANTY;
+This is free software, and you are welcome to
+redistribute it under certain conditions.
+
+Using retrace file 2.gsm - ERROR! Cannot open file. Continue without retracing...
+
+Using device : Dejian CardReader.
+Using port   : /dev/ttyUSB170 (use --port for change).
+Using speed  : 9600 (use --speed for change).
+
+CTS ignored. Device not checked.
+
+->ATR : 3B 3B 94 00 07 51 92 00 00 AC F1 33 33 90 00
+
+CHV1 is disabled.
+PIN1 is enabled and remaining 3 numbers of verification.
+PUK1 is enabled and remaining 10 numbers of verification.
+PIN2 is enabled and remaining 3 numbers of verification.
+PUK2 is enabled and remaining 10 numbers of verification.
+ADM(4) is enabled and remaining 10 numbers of verification.
+
+==========================================================
+IMSI=082905991259485076.
+==========================================================
+-------------------------------
+Starting 2R-attack on pair 0...
+-------------------------------

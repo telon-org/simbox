@@ -1,0 +1,1 @@
+Warning: file_put_contents(/var/simbox/plan/-----------.pro): failed to open stream: Permission denied in /usr/simbox/www/simbox/head.php on line 41

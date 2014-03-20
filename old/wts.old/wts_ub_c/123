@@ -1,0 +1,34 @@
+WERT Sim-Card Scanner. Version 1.0.6.
+Copyright (C) 2004-2005 by Wert (AKA Joda).
+
+WertScan comes with ABSOLUTELY NO WARRANTY;
+This is free software, and you are welcome to
+redistribute it under certain conditions.
+
+Using device : Dejian CardReader.
+Using port   : /dev/ttyUSB169 (use --port for change).
+Using speed  : 9600 (use --speed for change).
+
+CTS ignored. Device not checked.
+
+->ATR : 3B 3B 94 00 07 52 51 00 00 F7 C5 33 33 90 00
+
+CHV1 is disabled.
+PIN1 is enabled and remaining 3 numbers of verification.
+PUK1 is enabled and remaining 10 numbers of verification.
+PIN2 is enabled and remaining 3 numbers of verification.
+PUK2 is enabled and remaining 10 numbers of verification.
+ADM(4) is enabled and remaining 10 numbers of verification.
+
+-------------------------------
+Starting 2R-attack on pair 0...
+-------------------------------
+Collision found (F905,E85C).
+Calculating KI pair...
+Found KI pair = C26E.
+-------------------------------
+2R-attack OK. KI pair = C2 6E. Using 15886 GSM steps.
+-------------------------------
+
+That's all.
+

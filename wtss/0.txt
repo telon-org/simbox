@@ -1,0 +1,21 @@
+WERT Sim-Card Scanner. Version 1.0.6.
+Special Svistok Simbox EDITION.
+Copyright (C) 2004-2005 by Wert (AKA Joda).
+
+WertScan comes with ABSOLUTELY NO WARRANTY;
+This is free software, and you are welcome to
+redistribute it under certain conditions.
+
+Using device : Dejian CardReader.
+Using port   : /dev/ttyUSB0 (use --port for change).
+Using speed  : 9600 (use --speed for change).
+
+CTS ignored. Device not checked.
+
+->ATR : 3B 3B 94 00 07 52 51 00 00 F7 C5 33 33 90 00
+
+ERROR! Cannot read EF_ICCID. Invalid card answer after B0 command.
+
+ICCID=
+That's all.
+

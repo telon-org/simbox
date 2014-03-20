@@ -1,0 +1,244 @@
+WERT Sim-Card Scanner. Version 1.0.6.
+Copyright (C) 2004-2005 by Wert (AKA Joda).
+
+WertScan comes with ABSOLUTELY NO WARRANTY;
+This is free software, and you are welcome to
+redistribute it under certain conditions.
+
+Using device : Dejian CardReader.
+Using port   : /dev/ttyUSB170 (use --port for change).
+Using speed  : 9600 (use --speed for change).
+
+CTS ignored. Device not checked.
+
+->ATR : 3B 3B 94 00 07 51 92 00 00 AC F1 33 33 90 00
+
+CHV1 is disabled.
+PIN1 is enabled and remaining 3 numbers of verification.
+PUK1 is enabled and remaining 10 numbers of verification.
+PIN2 is enabled and remaining 3 numbers of verification.
+PUK2 is enabled and remaining 10 numbers of verification.
+ADM(4) is enabled and remaining 10 numbers of verification.
+
+-------------------------------
+Starting 2R-attack on pair 0...
+-------------------------------
+Collision found (ABEB,0CA1).
+Calculating KI pair...
+Found KI pair = AA82.
+-------------------------------
+2R-attack OK. KI pair = AA 82. Using 13500 GSM steps.
+-------------------------------
+
+-------------------------------
+Starting 3R-attack on pair 4...
+-------------------------------
+Calculating data for 3R-attack...
+Found 3099 possible 4-bytes pair groups.
+Found 8 (4,4) collision possible 4-bytes pair groups.
+Using two pair:
+ 1-st pair: 1872, 2R-result: 7C3E3A78
+ 2-nd pair: 335A, 2R-result: 7C3E3A57
+ Common byte=7A
+Found 1 collision (0065).
+Checking collision for 3R...OK.
+Found 2 collision (007D).
+Checking collision for 3R...OK.
+Calculating KI variation...4 found.
+Checking KI pair 095D...OK.
+Checking KI pair 4BA2...Wrong.
+Checking KI pair 84A2...Wrong.
+Checking KI pair F75D...Wrong.
+Found KI pair = 095D
+-------------------------------
+3R-attack OK. KI pair = 09 5D. Using 13764 GSM steps.
+-------------------------------
+
+-------------------------------
+Starting 4R-attack on pair 2...
+-------------------------------
+Calculating data for 4R-attack...
+Found 3099 possible 4-bytes pair groups (1).
+Found 3151 possible 4-bytes pair groups (2).
+Found 1526 collision possible 8-bytes pair groups.
+Using two data groups:
+ 1-st group: 096E 405C, 3R-result: 0D1B14092A17030E
+ 2-nd group: 096E 67F9, 3R-result: 0D3B14092A17030E
+Common bytes=0C,0D,1C,1D,2C,2D,3C,3D
+Found 1 collision (00000C00).
+Checking collision for 4R...OK.
+Found 2 collision (00001400).
+Checking collision for 4R...OK.
+Found 3 collision (00001C00).
+Checking collision for 4R...OK.
+Found 4 collision (00002000).
+Checking collision for 4R...OK.
+Found 5 collision (00002200).
+Checking collision for 4R...OK.
+Found 6 collision (00002300).
+Checking collision for 4R...OK.
+Found 7 collision (00002E00).
+Checking collision for 4R...OK.
+Found 8 collision (00003100).
+Checking collision for 4R...OK.
+Calculating KI variation...4 found.
+Checking KI pair F174...Wrong.
+Checking KI pair BFF5...Wrong.
+Checking KI pair F85B...Wrong.
+Checking KI pair 1D47...OK.
+Found KI pair = 1D47
+-------------------------------
+4R-attack OK. KI pair = 1D 47. Using 13888 GSM steps.
+-------------------------------
+
+-------------------------------
+Starting 3R-attack on pair 6...
+-------------------------------
+Calculating data for 3R-attack...
+Found 3159 possible 4-bytes pair groups.
+Found 23 (13,10) collision possible 4-bytes pair groups.
+Using two pair:
+ 1-st pair: 0070, 2R-result: 52785238
+ 2-nd pair: 1BDE, 2R-result: 523A5238
+ Common byte=78
+Found 1 collision (0038).
+Checking collision for 3R...OK.
+Found 2 collision (005D).
+Checking collision for 3R...OK.
+Calculating KI variation...2 found.
+Checking KI pair 1950...Wrong.
+Checking KI pair F550...OK.
+Found KI pair = F550
+-------------------------------
+3R-attack OK. KI pair = F5 50. Using 14084 GSM steps.
+-------------------------------
+
+-------------------------------
+Starting 5R-attack on pair 1...
+-------------------------------
+Calculating data for 5R-attack...
+Found 3099 possible 4-bytes pair groups (1).
+Found 3151 possible 4-bytes pair groups (2).
+Found 46 possible 8-bytes pair groups.
+Found 3159 possible 4-bytes pair groups (3).
+Found 3017 possible 4-bytes pair groups (4).
+Found 48 possible 8-bytes pair groups.
+Found 46 collision possible 16-bytes pair groups.
+Using two data groups:
+ 1-st group: 023D 32ED 25F1 ADD6, 4R-result: 1B05110E190B1E0E1411000A1E1F050C
+ 2-nd group: 06B5 32ED 78BB 0A49, 4R-result: 1B05110E190B1E0E1411001A1E1F050C
+Common bytes=07,0F,17,1F
+Found 1 collision (000000000C000000).
+Found 2 collision (0000000017000000).
+Found 3 collision (0000000019000000).
+Found 4 collision (0000000021000000).
+Found 5 collision (0000000022000000).
+Found 6 collision (0000000023000000).
+Found 7 collision (0000000027000000).
+Found 8 collision (000000002D000000).
+Found 9 collision (0000000045000000).
+Found 10 collision (0000000047000000).
+Found 11 collision (0000000048000000).
+Found 12 collision (000000004B000000).
+Found 13 collision (0000000052000000).
+Found 14 collision (0000000053000000).
+Found 15 collision (0000000057000000).
+Found 16 collision (0000000058000000).
+Calculating KI variation...  1 found.
+Checking KI pair F16D...OK.
+Found KI pair = F16D
+-------------------------------
+5R-attack OK. KI pair = F1 6D. Using 14264 GSM steps.
+-------------------------------
+
+-------------------------------
+Starting 3R-attack on pair 5...
+-------------------------------
+Calculating data for 3R-attack...
+Found 2989 possible 4-bytes pair groups.
+Found 32 (8,24) collision possible 4-bytes pair groups.
+Using two pair:
+ 1-st pair: 0E23, 2R-result: 364E4B78
+ 2-nd pair: 1C82, 2R-result: 364E4B57
+ Common byte=6A
+Found 1 collision (0037).
+Checking collision for 3R...OK.
+Found 2 collision (00EB).
+Checking collision for 3R...OK.
+Calculating KI variation...2 found.
+Checking KI pair 04FE...Wrong.
+Checking KI pair C5FE...OK.
+Found KI pair = C5FE
+-------------------------------
+3R-attack OK. KI pair = C5 FE. Using 14744 GSM steps.
+-------------------------------
+
+-------------------------------
+Starting 4R-attack on pair 3...
+-------------------------------
+Calculating data for 4R-attack...
+Found 2989 possible 4-bytes pair groups (1).
+Found 2985 possible 4-bytes pair groups (2).
+Found 1429 collision possible 8-bytes pair groups.
+Using two data groups:
+ 1-st group: 041C 3BF7, 3R-result: 28211D20191B0C3E
+ 2-nd group: 041C 6772, 3R-result: 28211D20193B0C3E
+Common bytes=0C,0D,1C,1D,2C,2D,3C,3D
+Found 1 collision (00000400).
+Checking collision for 4R...OK.
+Found 2 collision (00000900).
+Checking collision for 4R...OK.
+Found 3 collision (00001A00).
+Checking collision for 4R...OK.
+Found 4 collision (00002400).
+Checking collision for 4R...OK.
+Found 5 collision (00002900).
+Checking collision for 4R...OK.
+Found 6 collision (00002B00).
+Checking collision for 4R...OK.
+Found 7 collision (00003200).
+Checking collision for 4R...OK.
+Found 8 collision (00003B00).
+Checking collision for 4R...OK.
+Calculating KI variation...4 found.
+Checking KI pair 68A7...Wrong.
+Checking KI pair 8331...Wrong.
+Checking KI pair AFB1...OK.
+Checking KI pair B542...Wrong.
+Found KI pair = AFB1
+-------------------------------
+4R-attack OK. KI pair = AF B1. Using 14888 GSM steps.
+-------------------------------
+
+-------------------------------
+Starting brute force on pair 7...
+-------------------------------
+Found KI pair = E480
+-------------------------------
+Brute force OK. KI pair = E4 80. Using 14890 GSM steps.
+-------------------------------
+
+-------------------------------
+Checking KI...
+-------------------------------
+Pair 0 - AA82 - OK.
+Pair 1 - F16D - OK.
+Pair 2 - 1D47 - OK.
+Pair 3 - AFB1 - OK.
+Pair 4 - 095D - OK.
+Pair 5 - C5FE - OK.
+Pair 6 - F550 - OK.
+Pair 7 - E480 - OK.
+-------------------------------
+KI checking OK. Using 14906 GSM steps.
+-------------------------------
+
+Scan time = 0h 17m 26s.
+
+==========================================================
+KI   = AA F1 1D AF 09 C5 F5 E4 82 6D 47 B1 5D FE 50 80.
+IMSI = 08 29 05 99 12 59 48 50 76.
+==========================================================
+
+That's all.
+
