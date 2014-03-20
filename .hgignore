@@ -1,0 +1,4 @@
+# comments
+syntax: glob
+*.o
+*.o.d
