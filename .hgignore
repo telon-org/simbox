@@ -2,3 +2,6 @@
 syntax: glob
 *.o
 *.o.d
+programmator/fuall.sh
+programmator/unlock_all.sh
+programmator/u2diag_all.sh
