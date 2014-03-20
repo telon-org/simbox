@@ -1,0 +1,17 @@
+22,23c22,23
+< #define SERIAL_TTY_MINORS	1022	/* loads of devices :) */
+< #define SERIAL_TTY_NO_MINOR	1023	/* No minor was assigned */
+---
+> #define SERIAL_TTY_MINORS	254	/* loads of devices :) */
+> #define SERIAL_TTY_NO_MINOR	255	/* No minor was assigned */
+86,87c86
+< 	unsigned int		number;
+< //	unsigned char		number;
+---
+> 	unsigned char		number;
+163,165c162
+< 	unsigned int			minor;
+< //	unsigned char			minor;
+< 
+---
+> 	unsigned char			minor;

@@ -1021,10 +1021,14 @@ void pvt_select_stat(struct call_request *cr, struct pvt_select * pvt_select)
 
 	ast_verb (3, ">>> pvt_select_stat \n");
 
+	pvt->dsp_state=-1;
+
 	pvt->fas=cr->fas;
 	pvt->epdd=cr->epdd;
 	pvt->fpdd=cr->fpdd;
 	pvt->hem=cr->hem;
+
+	pvt->em_type=0;
 
 	PVT_STAT(pvt,limitnum)=cr->limitnum;
 	PVT_STAT(pvt,limittype)=cr->limittype;
@@ -1054,6 +1058,7 @@ void pvt_select_stat(struct call_request *cr, struct pvt_select * pvt_select)
 	putfilei("sim/state",pvt->imsi,"epdd",pvt->epdd);
 	putfilei("sim/state",pvt->imsi,"fpdd",pvt->fpdd);
 	putfilei("sim/state",pvt->imsi,"hem",pvt->hem);
+	putfilei("sim/state",pvt->imsi,"em_type",pvt->em_type);
 
 	putfiles("sim/state",pvt->imsi,"im",pvt->im);
 	putfiles("sim/state",pvt->imsi,"pro",pvt->procur);

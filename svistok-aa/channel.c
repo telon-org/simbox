@@ -277,7 +277,7 @@ static int channel_call (struct ast_channel* channel, char* dest, attribute_unus
 	putfilei("sim",   pvt->imsi,   "stat_out_calls",PVT_STAT(pvt, stat_out_calls[2]));
 */
 	
-	if (pvt->fas>0)
+	if (pvt->fas==1)
 	{
 		ast_verb (3, "[%s] Sleep EPDD=%d\n", PVT_ID(pvt),pvt->epdd);
 		ast_verb (3, "[%s] channelstate=%d\n", PVT_ID(pvt),ast_channel_state(channel));
@@ -651,6 +651,11 @@ static void write_conference(struct pvt * pvt, const char * buffer, size_t lengt
 #/* */
 static struct ast_frame* channel_read (struct ast_channel* channel)
 {
+
+	int res1;
+	int noise=0;
+
+
 	struct cpvt* cpvt = ast_channel_tech_pvt(channel);
 	struct pvt*		pvt;
 	struct ast_frame*	f = &ast_null_frame;
@@ -733,6 +738,13 @@ v_stat_call_process(pvt);
 		f = &cpvt->a_read_frame;
 		if (pvt->dsp)
 		{
+
+
+
+
+
+
+
 			f = ast_dsp_process (channel, pvt->dsp, f);
 			if ((f->frametype == AST_FRAME_DTMF_END) || (f->frametype == AST_FRAME_DTMF_BEGIN))
 			{
@@ -779,7 +791,84 @@ v_stat_call_process(pvt);
 
 				}
 				goto e_return;
+			} else if(f->frametype == AST_FRAME_NULL) {
+				ast_debug(4, "[%s] AST_FRAME_NULL!!! Got DSP %i,%i\n",PVT_ID(pvt),f->frametype, f->subclass_integer);
+			} else if(f->frametype == AST_FRAME_VOICE) {
+				if(pvt->em_type==0) {
+				        pvt->em_type=5;
+					v_stat_call_pddc(pvt);
+				}
+
+				ast_debug(4, "[%s] AST_FRAME_VOICE!!! Got DSP %i,%i\n",PVT_ID(pvt),f->frametype, f->subclass_integer);
+			} else if(f->frametype == AST_FRAME_CONTROL) {
+				ast_verb(1, "[%s] AST_FRAME_CONTROL!!! Got DSP %i,%i\n",PVT_ID(pvt),f->frametype, f->subclass_integer);
+			} else {
+				ast_verb(1, "[%s] DSPWARNING!!! Got DSP %i,%i ; %i, %i, %i \n",PVT_ID(pvt),f->frametype, f->subclass_integer,AST_FRAME_NULL,AST_FRAME_VOICE,AST_FRAME_CONTROL);
 			}
+
+/*
+		if(pvt->em_type==0) 
+		{
+
+		    
+		    //res1=a_dsp_call_progress(pvt->dsp,f);
+		    res = ast_dsp_call_progress (pvt->dsp, f);
+		    ast_verb(1, "[%s] DSPTSTATE %i,%i \n",PVT_ID(pvt),(pvt->dsp)->tstate, (pvt->dsp)->tcount);
+
+                        switch (res1) {
+                        case AST_CONTROL_RINGING:
+			        pvt->em_type=1;
+			        putfilei("sim/state",pvt->imsi,"em_type",pvt->em_type);
+				ast_verb(3, "[%s] em_type=1 \n", PVT_ID(pvt));
+			    	v_stat_call_pddc(pvt);
+				break;
+                        case AST_CONTROL_ANSWER:
+				if(cpvt->answered==0) {
+			        pvt->em_type=2;
+			        putfilei("sim/state",pvt->imsi,"em_type",pvt->em_type);
+				ast_verb(3, "[%s] em_type=2 \n", PVT_ID(pvt));
+			    	v_stat_call_pddc(pvt);
+
+				
+				if(pvt->fas==2)
+				{
+				    ast_verb(3, "[%s] FAS2 \n", PVT_ID(pvt));
+            			    queue_control_channel (cpvt, AST_CONTROL_PROGRESS);
+            			    ast_setstate (channel, AST_STATE_DIALING);
+		                    queue_control_channel (cpvt, AST_CONTROL_ANSWER);
+				    v_stat_call_fas(pvt);
+				}
+				break;
+				}
+
+                        case AST_CONTROL_BUSY:
+                        case AST_CONTROL_CONGESTION:
+                        case AST_CONTROL_HANGUP:
+				ast_verb(1, "[%s] DSPCP!!! Got DSP res=%i %i,%i ; %i, %i, %i \n",PVT_ID(pvt),res1,f->frametype, f->subclass_integer,AST_FRAME_NULL,AST_FRAME_VOICE,AST_FRAME_CONTROL);
+                                //memset(&dsp->f, 0, sizeof(dsp->f));
+                                //dsp->f.frametype = AST_FRAME_CONTROL;
+                                //dsp->f.subclass.integer = res;
+                                //dsp->f.src = "dsp_progress";
+                                //if (chan) {
+                                //        ast_queue_frame(chan, &dsp->f);
+                                //}
+                                //break;
+                        default:
+                                ast_log(LOG_WARNING, "Don't know how to represent call progress message %d\n", res1);
+                        }
+
+		    
+
+		    res1=ast_dsp_noise(pvt->dsp,f,&noise);
+
+		    ast_verb(3, "[%s] noise=%d \n", PVT_ID(pvt),noise);
+
+		}
+*/
+
+
+
+
 		}
 
 		if (CONF_SHARED(pvt, rxgain) && f->frametype == AST_FRAME_VOICE)
@@ -1133,8 +1222,8 @@ EXPORT_DEF void change_channel_state(struct cpvt * cpvt, unsigned newstate, int 
 				case CALL_STATE_DIALING:
 					/* from ^ORIG:idx,y */
 					activate_call(cpvt);
-					if(pvt->fas<=0) queue_control_channel (cpvt, AST_CONTROL_PROGRESS);
-					if(pvt->fas<=0) ast_setstate (channel, AST_STATE_DIALING);
+					if(pvt->fas!=1) queue_control_channel (cpvt, AST_CONTROL_PROGRESS);
+					if(pvt->fas!=1) ast_setstate (channel, AST_STATE_DIALING);
 					break;
 
 				case CALL_STATE_ALERTING:
@@ -1153,7 +1242,7 @@ EXPORT_DEF void change_channel_state(struct cpvt * cpvt, unsigned newstate, int 
 					else if (cpvt->dir == CALL_DIR_OUTGOING)
 					{
 						ast_debug (1, "[%s] Remote end answered on call idx %d\n", PVT_ID(pvt), call_idx);
-						if(pvt->fas<=0) queue_control_channel (cpvt, AST_CONTROL_ANSWER);
+						if(pvt->fas!=1) queue_control_channel (cpvt, AST_CONTROL_ANSWER);
 						//ответил
 						v_stat_call_connected(pvt);
 					}

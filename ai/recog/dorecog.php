@@ -15,9 +15,92 @@ $billsec=$argv[5];
 //if (strlen($uid)<=0) die("No uid");
 
 echo "uid=$uid imsi=$imsi\n";
-dorecog($uid,$dialstatus,$imsi,$numberb,$billsec);
+dorecog2($uid,$dialstatus,$imsi,$numberb,$billsec);
 
 die();
+
+function dorecog2($uid,$dialstatus,$imsi,$numberb,$billsec)
+{
+    $pre_in=rasp2($uid."-pre-in",$uid,1,$billsec);
+    $pre_out=rasp2($uid."-pre-out",$uid,0,$billsec);
+    $ans_in=rasp2($uid."-ans-in",$uid,2,$billsec);
+    $ans_out=rasp2($uid."-ans-out",$uid,2,$billsec);
+
+
+    $url='http://simserver:8122/recog/recog_save.php?uid='.$uid.'&pre_in='.urlencode($pre_in).'&pre_out='.urlencode($pre_out).'&ans_in='.urlencode($ans_in).'&ans_out='.urlencode($ans_out).'&pdds='.($pdds).'&billsec='.$billsec.'&numberb='.urlencode($numberb).'&dialstatus='.urlencode($dialstatus).'';
+    echo ($url."<<<\n\n");
+    $tmp=file_get_contents($url);
+    $tmp=trim($tmp);
+    echo(">>>".$tmp.">>>\n\n");
+
+
+    // v odin file imsi;
+    list($status,$recog_type)=explode(";",$tmp);
+    if($status=="OK")
+    {
+	file_put_contents("/var/svistok/sim/log/$imsi.rasp_imsi","$uid;$status;$recog_type;$pdds;$pre_in;$pre_out;$ans_in;$ans_out\n", FILE_APPEND | LOCK_EX);
+	file_put_contents("/tmp/rasp_imsi.full","$imsi;$uid;$billsec   $tmp    $status    $pdds;$pre_in;$pre_out;$ans_in;$ans_out\n", FILE_APPEND | LOCK_EX);
+    } else {
+	file_put_contents("/tmp/rasp_imsi.error","$imsi;$uid;$billsec   $tmp    $status    $pdds;$pre_in;$pre_out;$ans_in;$ans_out\n", FILE_APPEND | LOCK_EX);
+    }
+
+    history2($uid."-pre-in");
+    history2($uid."-pre-out");
+    history2($uid."-ans-in");
+    history2($uid."-ans-out");
+
+    require("/usr/simbox/ai/recog/parse/all.php");
+}
+
+
+function rasp2($filename, $uid,$pre, $billsec)
+{
+    $txt=raspwav2($filename,$pre);
+    return $txt;
+}
+
+
+function raspwav2($filename,$pre)
+{
+if(filesize("/var/spool/asterisk/monitor/$filename.wav")<50)
+{
+    unlink("/var/spool/asterisk/monitor/$filename.wav");
+    return "-";
+}
+
+
+
+$out = array();
+$res=exec("sox -V3 /var/spool/asterisk/monitor/$filename.wav /tmp/$filename.%1n.wav trim 0 10 : newfile : trim 0 10  2>&1", $out);
+print_r($out);
+
+system("flac -f -s /tmp/$filename.1.wav -o /tmp/$filename.1.flac");
+$result=googlespeech("/tmp/$filename.1.flac");
+if($pre==1) if($result=="") {sleep(3); $result=googlespeech("/tmp/$filename.1.flac");}
+if($pre==2) {
+  system("flac -f -s /tmp/$filename.2.wav -o /tmp/$filename.2.flac");
+  $result.="|".googlespeech("/tmp/$filename.2.flac");
+}
+
+	unlink("/tmp/$filename.1.wav");
+	unlink("/tmp/$filename.2.wav");
+	unlink("/tmp/$filename.1.flac");
+	unlink("/tmp/$filename.2.flac");
+
+//if($result=="") $result="[0]"
+    return "[]".$result;
+}
+
+function history2($filename) 
+{
+    system("sox /var/spool/asterisk/monitor/$filename.wav /tmp/$filename.min.wav trim 0 0:59");
+    system("flac -f -s /tmp/$filename.min.wav -o /var/spool/asterisk/monitor.flac/$filename.flac");
+    unlink("/tmp/$filename.min.wav");
+    unlink("/var/spool/asterisk/monitor/$filename.wav");
+}
+
+
+
 
 function dorecog($uid,$dialstatus,$imsi,$numberb,$billsec)
 {
@@ -69,7 +152,7 @@ function raspwav($filename,$billsec)
 {
 if(filesize("/var/spool/asterisk/monitor/$filename.wav")<50)
 {
-    unlink("/var/spool/asterisk/monitor/$filename.wav");
+    ///!!!unlink("/var/spool/asterisk/monitor/$filename.wav");
     return Array(-1,"-");
 }
 
@@ -136,7 +219,7 @@ unlink("/tmp/$filename.wav");
 unlink("/tmp/$filename.vad.wav");
 unlink("/tmp/$filename.min.wav");
 
-unlink("/var/spool/asterisk/monitor/$filename.wav");
+//unlink("/var/spool/asterisk/monitor/$filename.wav");
 
 return Array($silence,"[".$silence."]".$full_result);
 

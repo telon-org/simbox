@@ -9,7 +9,7 @@ list=`ls /var/svistok/sim/limits/*.limit.1`
 for imsi in $list
 do
 echo "$imsi"
-echo "9000" > $imsi
+echo "4000" > $imsi
 done
 
 
@@ -18,6 +18,6 @@ list=`ls /var/svistok/sim/limits/*.limit.2`
 for imsi in $list
 do
 echo "$imsi"
-echo "9000" > $imsi
+echo "0" > $imsi
 done
 

@@ -1,0 +1,2 @@
+sudo apt-get install build-essential fakeroot ncurses-dev
+sudo apt-get install linux-source

@@ -1,0 +1,31 @@
+#!/bin/bash
+
+#wget -c -q -O - "http://www.rossvyaz.ru/docs/articles/ABC-8x.html" | grep "^<tr>" | sed -e 's/<\/td>//g' -e 's/<tr>//g' -e 's/<\/tr>//g' -e 's/[\t]//g' -e 's/^<td>//g' -e 's/<td>/;/g' | iconv -c -f WINDOWS-1251 -t UTF8 > ./tmp/ABC-8x.csv
+#wget -c -q -O - "http://www.rossvyaz.ru/docs/articles/DEF-9x.html" | grep "^<tr>" | sed -e 's/<\/td>//g' -e 's/<tr>//g' -e 's/<\/tr>//g' -e 's/[\t]//g' -e 's/^<td>//g' -e 's/<td>/;/g' | iconv -c -f WINDOWS-1251 -t UTF8 > ./tmp/DEF-9x.csv
+
+
+rm ./res/codes.csv
+rm ./res/price.csv
+rm ./res/extensions_zones.conf
+
+./gen3.php "./tmp/ABC-8x.csv" "Ростелеком" "Санкт - Петербург" "rostel_spb_gor" "0.0045"
+./gen3.php "./tmp/DEF-9x.csv" "Ростелеком" "Санкт - Петербург" "rostel_spb_mob" "0.01"
+exit 0
+
+./gen3.php "./tmp/DEF-9x.csv" "Ростелеком" "Санкт - Петербург" "rostel_spb_mob" "0.01"
+./gen3.php "./tmp/DEF-9x.csv" "Вымпел-Коммуникации" "Санкт - Петербург" "beeline_spb" "0.01"
+./gen3.php "./tmp/DEF-9x.csv" "МегаФон" "Санкт - Петербург" "megafon_spb" "0.01"
+./gen3.php "./tmp/DEF-9x.csv" "Мобильные ТелеСистемы" "Санкт - Петербург" "mts_spb" "0.01"
+./gen3.php "./tmp/DEF-9x.csv" "Санкт-Петербург Телеком" "Санкт - Петербург" "tele2_spb" "0.01"
+
+./gen3.php "./tmp/DEF-9x.csv" "" "Санкт - Петербург" "all_spb" "0.01"
+
+./gen3.php "./tmp/DEF-9x.csv" "Вымпел-Коммуникации" "Санкт - Петербург" "beeline_sz" "999"
+./gen3.php "./tmp/DEF-9x.csv" "МегаФон" "Санкт - Петербург" "megafon_sz" "999"
+
+./gen3.php "./tmp/DEF-9x.csv" "Вымпел-Коммуникации" "Моск" "beeline_msk" "999"
+./gen3.php "./tmp/DEF-9x.csv" "МегаФон" "Моск" "megafon_msk" "999"
+./gen3.php "./tmp/DEF-9x.csv" "Мобильные ТелеСистемы" "Моск" "mts_msk" "999"
+
+./gen3.php "./tmp/DEF-9x.csv" "МегаФон" "Моск" "megafon_ru" "999"
+./gen3.php "./tmp/DEF-9x.csv" "Вымпел-Коммуникации" "" "beeline_ru" "999"

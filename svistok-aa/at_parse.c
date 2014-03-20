@@ -414,6 +414,7 @@ if(fp)
     fprintf(fp,"%s\n",*str);
     fclose(fp);
 }
+
 		return pdu_parse_cds(str, tpdu_length+8, oa, oa_len, oa_enc, msg, msg_enc);
 	}
 

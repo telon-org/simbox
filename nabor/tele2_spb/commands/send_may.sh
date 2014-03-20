@@ -9,4 +9,4 @@
 echo "-- Sending MAY"
 
 
-/usr/simbox/system/send.sh "ussd" "LO2" "$DONGLE" "*118*$PARAM#" ""
+/usr/simbox/system/send.sh "ussd" "LO2" "$DONGLE" "*118*+$PARAM#" ""

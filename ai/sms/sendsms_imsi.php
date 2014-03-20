@@ -79,7 +79,7 @@ if(($tryspam==2)&&($tosend==0))
 if($tosend==1)
 {
 echo ("  Send sms\n");
-$cmd='/usr/simbox/system/send.sh "sms" "FOR" "'.$dongle.'" "'.$numberb.'" "'.$text.'"';
+$cmd='/usr/simbox/system/send.sh "sms" "FOR" "'.$dongle.'" "+'.$numberb.'" "'.$text.'"';
 //$cmd='/usr/sbin/asterisk -rx "dongle sms '.$dongle.' '.$numberb.' '.$text.'"';
 echo($cmd."\n");
 $res=system ($cmd);

@@ -16,26 +16,40 @@ NUMBERMYe=$(echo "$NUMBERMY" | sed -e 's/%/%25/g' -e 's/ /%20/g' -e 's/!/%21/g' 
 DONGLES=`echo $5`
 DONGLENAME=`echo $6`
 IAXME=`echo $7`
-ANSWERED=`echo $8`
-TOTALSEC=`echo $9`
-BILLSEC=`echo $10`
-DONGLEIMEI=`echo $11`
-DONGLEIMSI=`echo $12`
-LAC=`echo $13`
-CELL=`echo $14`
-END_STATUS=`echo $15`
-CC_CAUSE=`echo $16`
-spec=`echo $17`
-qos=`echo $18`
-vip=`echo $19`
-pdd=`echo $20`
-pdds=`echo $21`
-naprstr=`echo $22`
-im=`echo $23`
-uid=`echo $24`
-pro=`echo $25`
-cap=`echo $26`
 
+TEPOCH=`echo $8`
+
+ANSWERED=`echo $9`
+TOTALSEC=`echo $10`
+BILLSEC=`echo $11`
+
+FASSEC=`echo $12`
+PDDCSEC=`echo $13`
+
+DONGLEIMEI=`echo $14`
+DONGLEIMSI=`echo $15`
+LAC=`echo $16`
+CELL=`echo $17`
+END_STATUS=`echo $18`
+CC_CAUSE=`echo $19`
+spec=`echo $20`
+qos=`echo $21`
+vip=`echo $22`
+pdd=`echo $23`
+pdds=`echo $24`
+naprstr=`echo $25`
+im=`echo $26`
+uid=`echo $27`
+pro=`echo $28`
+cap=`echo $29`
+
+fas=`echo $30`
+epdd=`echo $31`
+fpdd=`echo $32`
+hem=`echo $33`
+hoa=`echo $34`
+
+em_type=`echo $35`
 
 END_PARTY="-1"
 
@@ -176,15 +190,15 @@ fi
 
 
 
-URL="http://simserver:8122/svistok/callendout.php?numberb=$NUMBERBe&numbera=$NUMBERAe&numbermy=$NUMBERMYe&serial=$DONGLES&dongle=$DONGLENAME&gateway=$IAXME&duration=$TOTALSEC&billsec=$BILLSEC&dialstatus=$DIALSTATUS&imei=$DONGLEIMEI&imsi=$DONGLEIMSI&lac=$LAC&cell=$CELL&end_status=$END_STATUS&cc_cause=$CC_CAUSE&end_party=$END_PARTY&spec=$spec&vip=$vip&pdd=$pdd&pddc=$pdds&uid=$uid&pro=$pro"
+URL="http://simserver:8122/svistok/callendout.php?numberb=$NUMBERBe&numbera=$NUMBERAe&numbermy=$NUMBERMYe&serial=$DONGLES&dongle=$DONGLENAME&gateway=$IAXME&duration=$TOTALSEC&billsec=$BILLSEC&dialstatus=$DIALSTATUS&imei=$DONGLEIMEI&imsi=$DONGLEIMSI&lac=$LAC&cell=$CELL&end_status=$END_STATUS&cc_cause=$CC_CAUSE&end_party=$END_PARTY&spec=$spec&vip=$vip&pdd=$pdd&pddc=$pdds&uid=$uid&pro=$pro&fas=$fas&epdd=$epdd&fpdd=$fpdd&hem=$hem&hoa=$hoa&epoch=$TEPOCH&fassec=$FASSEC&pddcsec=$PDDCSEC&em_type=$em_type"
 echo $URL
 
 d=`date +"%Y-%m-%d %H:%M:%S"`
 echo "U$uid|$d >> |$pro|$im|$vip|$spec|$qos| $NUMBERA -> $NUMBERB $DIALSTATUS($END_STATUS,$CC_CAUSE,$END_PARTY) duration=$TOTALSEC connect=$pdds pdd=$pdd billsec=$BILLSEC" >> /var/svistok/sim/log/$DONGLEIMSI.calls
 
-echo "O|$uid|$d|$vip|$spec|$qos|$naprstr|$im|$NUMBERA|$NUMBERB|$DIALSTATUS|$END_STATUS|$CC_CAUSE|$END_PARTY|$TOTALSEC|$pdds|$pdd|$BILLSEC|$pro|$cap|" >> /var/svistok/sim/log/$DONGLEIMSI.calls2
-echo "O|$uid|$d|$vip|$spec|$qos|$naprstr|$im|$NUMBERA|$NUMBERB|$DIALSTATUS|$END_STATUS|$CC_CAUSE|$END_PARTY|$TOTALSEC|$pdds|$pdd|$BILLSEC|$pro|$cap|" >> /var/svistok/sim/log/calls.full
-echo "O|$uid|$d|$vip|$spec|$qos|$naprstr|$im|$NUMBERA|$NUMBERB|$DIALSTATUS|$END_STATUS|$CC_CAUSE|$END_PARTY|$TOTALSEC|$pdds|$pdd|$BILLSEC|$pro|$cap|" >> /var/svistok/sim/log/calls.$naprstr
+echo "O|$uid|$d|$vip|$spec|$qos|$naprstr|$im|$NUMBERA|$NUMBERB|$DIALSTATUS|$END_STATUS|$CC_CAUSE|$END_PARTY|$TOTALSEC|$PDDCSEC|$pdd|$BILLSEC|$pro|$cap|$fas|$epdd|$fpdd|$hem|$hoa|$TEPOCH|$FASSEC|$em_type|" >> /var/svistok/sim/log/$DONGLEIMSI.calls2
+echo "O|$uid|$d|$vip|$spec|$qos|$naprstr|$im|$NUMBERA|$NUMBERB|$DIALSTATUS|$END_STATUS|$CC_CAUSE|$END_PARTY|$TOTALSEC|$PDDCSEC|$pdd|$BILLSEC|$pro|$cap|$fas|$epdd|$fpdd|$hem|$hoa|$TEPOCH|$FASSEC|$em_type|" >> /var/svistok/sim/log/calls.full
+echo "O|$uid|$d|$vip|$spec|$qos|$naprstr|$im|$NUMBERA|$NUMBERB|$DIALSTATUS|$END_STATUS|$CC_CAUSE|$END_PARTY|$TOTALSEC|$PDDCSEC|$pdd|$BILLSEC|$pro|$cap|$fas|$epdd|$fpdd|$hem|$hoa|$TEPOCH|$FASSEC|$em_type|" >> /var/svistok/sim/log/calls.$naprstr
 
 #echo "$DONGLEIMSI" > /var/svistok/sim/state/$uid.imsi
 

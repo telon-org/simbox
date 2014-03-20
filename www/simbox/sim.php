@@ -192,7 +192,7 @@ if(isset($_POST['rotki']))
 
 	foreach($_POST['id'] as $v=>$imsi)
 	{
-		if($_POST['rot_owner']=="10")
+		if($_POST['rot_owner']>0)
 	        {
 		    $dongle=file_get_contents($path_svistok_sim_state.$imsi.'.dongle');
 		    $cmd='/usr/simbox/system/rot_ki.php "'.$dongle.'" "'.$_POST['rot_owner'].'"  "'.$_POST['rot_ki'].'"  "'.$_POST['rot_lo'].'" > /tmp/'.$dongle.'.rotator';
@@ -1463,6 +1463,10 @@ if($cap=="FAIL")
 			    echo(html_io($io));
 			    $qos=file_get_contents_def2($path_svistok_sim_state.$imsi.'.qos','0');
 			    echo(html_qos($qos,$io));
+
+			    $em_type=file_get_contents_def2($path_svistok_sim_state.$imsi.'.em_type','0');
+			    echo($em_type);
+
 			}
 			
 			?>
@@ -1471,6 +1475,7 @@ if($cap=="FAIL")
 			
 			 if ((file_get_contents_def2($path_svistok_sim_state.$imsi.'.state_dialing','0'))==1) 
 			 {
+
 			    echo("<img src=imgs/state_dial.png>");
 			    $dl=time()-file_get_contents($path_svistok_sim.$imsi.'.stat_call_start');
 			    echo ("<br><font size=1>( ".$dl." сек.)");

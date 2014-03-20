@@ -22,7 +22,23 @@ echo("pre_out=$txt_pre_out\n");
 echo("ans_in=$txt_ans_in\n");
 echo("ans_out=$txt_ans_out\n");
 
-$full_out=$txt_pre_out." ".$txt_ans_out;
+function upload_group ($imsi, $group)
+{
+    $group1=(int)$group;
+
+    $dongle=file_get_contents("/var/svistok/sim/state/$imsi.dongle");
+    $iccid=file_get_contents("/var/svistok/dongles/state/$dongle.iccid");
+    $iccid1=str_replace('"','',$iccid);
+    $imsi1="809".$imsi;
+
+
+    $url="http://simserver:8122/stat/upload_group.php?imsi=$imsi1&iccid=$iccid1&group=$group1";
+    echo("url=$url\n");
+    $res=file_get_contents($url);
+    echo("res=$res\n");
+}
+
+$full_out=$txt_pre_out." ".$txt_ans_out.$txt_pre_in." ".$txt_ans_in;
 
 // до-ре-ми абонент временно заблокирован
 
@@ -31,10 +47,11 @@ $full_out=$txt_pre_out." ".$txt_ans_out;
 if (strstr($full_out,"сожалению ваш номер")||strstr($full_out,"ваш номер временно заблокирован"))
 {
 echo "BLOCKED!";
-if (($group>=100)&&($group<290))
+if (($group>=100)&&($group<290)||($group==10))
 {
     echo ('/usr/sbin/asterisk -rx "dongle setgroupimsi '.$imsi.' 336"');
     system ('/usr/sbin/asterisk -rx "dongle setgroupimsi '.$imsi.' 336"');
+    upload_group ($imsi, 336);
 }
 }
 
@@ -42,10 +59,11 @@ if (($group>=100)&&($group<290))
 if (strstr($full_out,"номер заблокирован воспользуйтесь"))
 {
 echo "NOMONEY!";
-if (($group>=100)&&($group<290))
+if (($group>=100)&&($group<290)||($group==10))
 {
     echo ('/usr/sbin/asterisk -rx "dongle setgroupimsi '.$imsi.' 335"');
     system ('/usr/sbin/asterisk -rx "dongle setgroupimsi '.$imsi.' 335"');
+    upload_group ($imsi, 335);
 }
 }
 

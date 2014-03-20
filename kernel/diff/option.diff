@@ -1,0 +1,9 @@
+1465,1466d1464
+< //	char dp[32];
+< 
+1505d1502
+< 	{
+1507,1509d1503
+< //		usb_make_path(urb->dev,dp,sizeof(dp));
+< //		err("%s: error %d (device=%s)", __func__, status,dp);
+< 	}

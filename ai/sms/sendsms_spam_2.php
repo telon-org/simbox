@@ -45,7 +45,7 @@ echo("=>$action\n  smsoutid:$smsoutid\n  to:$numberb\n  text:$text\n");
 echo ("  Send sms\n");
 $smsdone="/var/svistok/sim/state/$imsi.smsdone";
 @unlink($smsdone);
-$cmd='/usr/simbox/system/send.sh "sms" "LO2" "'.$dongle.'" "'.$numberb.'" "'.$text.'"';
+$cmd='/usr/simbox/system/send.sh "sms" "LO2" "'.$dongle.'" "+'.$numberb.'" "'.$text.'"';
 echo($cmd."\n");
 $res=system ($cmd);
 echo ($res."\n");

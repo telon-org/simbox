@@ -931,6 +931,7 @@ static int at_response_cend (struct pvt * pvt, const char* str)
 	int cc_cause   = 0;
 	struct cpvt * cpvt;
 	struct ast_channel * chan;
+	long int fassec,pddcsec;
 
 	//long duration_total;
 
@@ -1113,15 +1114,28 @@ static int at_response_cend (struct pvt * pvt, const char* str)
 
 ast_verb(3,"PDDCHECK2 : pdd=%d, pdds=%d", pdd,pdds);
 
+if (PVT_STAT(pvt,stat_call_fas)>0)
+    fassec=(long)time(NULL)-PVT_STAT(pvt,stat_call_fas);
+else
+   fassec=0;
+
+if (PVT_STAT(pvt,stat_call_pddc)>0)
+    pddcsec=(long)time(NULL)-PVT_STAT(pvt,stat_call_pddc);
+else
+    pddcsec=(long)time(NULL)-PVT_STAT(pvt,stat_call_start);
+
 			callendout(pvt->imsi,
 				pvt->numbera,
 				pvt->numberb,
 				"NUMBERMY",
 				pvt->serial,
 				PVT_ID(pvt),
+				PVT_STAT(pvt,stat_call_start),
 				cpvt->answered,
 				duration_total,
 				duration,
+				fassec,
+				pddcsec,
 				pvt->imei,
 				pvt->imsi,
 				pvt->location_area_code,
@@ -1137,8 +1151,16 @@ ast_verb(3,"PDDCHECK2 : pdd=%d, pdds=%d", pdd,pdds);
 				pvt->im,
 				pvt->uid,
 				pvt->procur,
-				pvt->capcur
+				pvt->capcur,
+
+				pvt->fas,
+				pvt->epdd,
+				pvt->fpdd,
+				pvt->hem,
+				pvt->hoa,
+				pvt->em_type
 			);
+
 			*pvt->procur=0;
 			*pvt->capcur=0;
 
@@ -1337,6 +1359,7 @@ static int at_response_conn (struct pvt* pvt, const char* str)
 			cpvt->answered=1;
 			change_channel_state(cpvt, CALL_STATE_ACTIVE, 0);
 
+// answer
 			if(CONF_SHARED(pvt,group)==295)
 			{
 				ast_debug (1, "[%s] ^CONN&group==295\n", PVT_ID(pvt));
@@ -1915,6 +1938,8 @@ static int at_response_cds (struct pvt* pvt, const char * str, size_t len)
 	char		text_base64[16384];
 	size_t		msg_len;
 
+
+
 	//const struct at_queue_cmd * ecmd = at_queue_head_cmd (pvt);
 	//manager_event_message("DongleNewCMGR", PVT_ID(pvt), str);
 	//if (ecmd)
@@ -1927,6 +1952,16 @@ static int at_response_cds (struct pvt* pvt, const char * str, size_t len)
 
 		cmgr = err_pos = ast_strdupa (str);
 		err = at_parse_cds (&err_pos, len, oa, sizeof(oa), &oa_enc, &msg, &msg_enc);
+
+/*
+	FILE * fp;
+	fp=fopen("/var/log/cds.log","a");
+	if(fp)
+	{
+	    fprintf(fp,"%s\n",err_pos);
+	    fclose(fp);
+	}*/
+
 		if (err)
 		{
 			ast_log (LOG_WARNING, "[%s] Error parsing incoming CDS message '%s' at possition %d: %s\n", PVT_ID(pvt), str, (int)(err_pos - cmgr), err);

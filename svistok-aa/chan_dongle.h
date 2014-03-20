@@ -155,13 +155,26 @@ typedef struct pvt_stat
 	char tarif[64];
 	
 
-	long int stat_call_start;
+	long int stat_call_start;     //dial
 	long int stat_call_response;
-	long int stat_call_process;
+	long int stat_call_process;   // когда записано
 
-	long int stat_call_connected;
+	long int stat_call_pddc;
+	long int stat_call_fas;
+
+	long int stat_call_connected; //answer
 	long int stat_call_end;
 	long int stat_call_saved;
+
+
+/*	long int epoch_dial;
+	long int epoch_connect;
+	long int epoch_pddc;
+	long int epoch_fas;
+	long int epoch_answer;
+	long int epoch_end;*/
+
+
 	
 	long int stat_call_sf;
 
@@ -301,6 +314,8 @@ typedef struct pvt
 	unsigned int		sim_start;
 
 
+
+
 	int 			diagmode;
 	int 			changeimei;
 	char			newimei[64];
@@ -316,10 +331,17 @@ typedef struct pvt
 	int simst;
 	int srvst;
 
+	int em_type;
+
+
+
 	int fas;
 	int epdd;
 	int fpdd;
 	int hem;
+	int hoa;
+
+	int dsp_state;
 
 	int time_work_wake;
 	int time_work_sleep;

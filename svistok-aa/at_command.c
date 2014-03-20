@@ -158,7 +158,7 @@ static int __attribute__ ((format(printf, 4, 5))) at_enque_generic (struct cpvt*
 EXPORT_DEF int at_enque_initialization_modem(struct cpvt* cpvt)
 {
 	static const at_queue_cmd_t st_cmds1[] = {
-		ATQ_CMD_DECLARE_ST(CMD_AT, cmd_at),
+//		ATQ_CMD_DECLARE_ST(CMD_AT, cmd_at),
 		ATQ_CMD_DECLARE_ST(CMD_AT_Z, cmd2),		/* optional,  reload configuration */
 		ATQ_CMD_DECLARE_ST(CMD_AT_E, cmd3),		/* disable echo */
 

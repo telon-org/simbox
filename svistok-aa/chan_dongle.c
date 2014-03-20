@@ -71,6 +71,7 @@ ASTERISK_FILE_VERSION(__FILE__, "$Rev: " PACKAGE_REVISION " $")
 #include "pdiscovery.h"			/* pdiscovery_lookup() pdiscovery_init() pdiscovery_fini() */
 
 #include "simnode/adiscovery_svistok.c"
+//include "dsp.c"
 
 
 //include "share.c"
@@ -1469,8 +1470,18 @@ static void pvt_dsp_setup(struct pvt * pvt, const pvt_config_t * settings)
 			if(SCONFIG(settings, dtmf) == DC_DTMF_SETTING_RELAX)
 				digitmode |= DSP_DIGITMODE_RELAXDTMF;
 
-			ast_dsp_set_features(pvt->dsp, DSP_FEATURE_DIGIT_DETECT);
+			//ast_dsp_set_features(pvt->dsp, DSP_FEATURE_DIGIT_DETECT); //!! original
+			//ast_dsp_set_features(pvt->dsp, DSP_FEATURE_DIGIT_DETECT | DSP_FEATURE_SILENCE_SUPPRESS | DSP_FEATURE_BUSY_DETECT | DSP_FEATURE_FAX_DETECT | DSP_FEATURE_CALL_PROGRESS); //!! was only DSP_FEATURE_DIGIT_DETECT
+			// DSP_FEATURE_SILENCE_SUPPRESS |
+			//ast_dsp_set_features(pvt->dsp, DSP_FEATURE_DIGIT_DETECT | DSP_FEATURE_CALL_PROGRESS | DSP_PROGRESS_TALK | DSP_PROGRESS_RINGING ); //!! test
+			ast_dsp_set_features(pvt->dsp, DSP_FEATURE_DIGIT_DETECT | DSP_PROGRESS_TALK | DSP_PROGRESS_RINGING ); //!! test
+
 			ast_dsp_set_digitmode(pvt->dsp, digitmode);
+			//ast_dsp_set_faxmode(pvt->dsp, DSP_FAXMODE_DETECT_ALL);
+
+                        ast_dsp_set_call_progress_zone(pvt->dsp, "cr");
+                        //ast_dsp_set_busy_count(pvt->dsp, 3);
+
 		}
 		else
 		{

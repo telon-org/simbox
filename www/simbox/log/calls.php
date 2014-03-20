@@ -51,6 +51,7 @@ include("/usr/simbox/www/simbox/modules/html.php");
 <td><font size=1>cap</td>
 <td><font size=1>im</td>
 <td><font size=1>qos</td>
+<td><font size=1>fas</td>
 <td><font size=1>spec</td>
 <td><font size=1>NUM</td>
 <td><font size=1>n</td>
@@ -59,6 +60,7 @@ include("/usr/simbox/www/simbox/modules/html.php");
 <td><font size=1>C</td>
 <td><font size=1>+D</td>
 <td><font size=1>+B</td>
+<td><font size=1>!F</td>
 <td><font size=1>rt</td>
 <td width=250><font size=1>rec</td>
 <td><font size=1>uid</td>
@@ -86,7 +88,7 @@ if(substr($line,0,2)=="I|")
 }
 
 
-		@list($uid,$d,$vip,$spec,$qos,$naprstr,$im,$NUMBERA,$NUMBERB,$DIALSTATUS,$END_STATUS,$CC_CAUSE,$END_PARTY,$TOTALSEC,$pdds,$pdd,$BILLSEC,$pro,$cap)=explode("|",$line);
+		@list($uid,$d,$vip,$spec,$qos,$naprstr,$im,$NUMBERA,$NUMBERB,$DIALSTATUS,$END_STATUS,$CC_CAUSE,$END_PARTY,$TOTALSEC,$pdds,$pdd,$BILLSEC,$pro,$cap,$fas,$epdd,$fpdd,$hem,$hoa,$tepoch,$FASSEC,$em_type)=explode("|",$line);
 $cap=trim($cap);
 
 //echo $line;
@@ -124,6 +126,12 @@ $txt_ans_out=mb_substr($txt_ans_out,0,120);
 <?
 //echo($d);
 @list($dat,$tim)=explode(" ",$d);
+if($tepoch>0)
+{
+//echo($tepoch);
+$tim=date("H:i:s",$tepoch);
+$dat=date("d-m-Y",$tepoch);
+}
 echo($tim);
 echo("<br><font color='#cccccc'>");
 echo($dat);
@@ -181,6 +189,9 @@ if($cap=="FAIL")
 
 
 <td>
+<?=html_fas($fas)?>
+</td>
+<td>
 <?=html_spec($spec)?>
 </td>
 
@@ -234,6 +245,7 @@ if($cap=="FAIL")
 
 <td>
 <?=html_endparty($END_PARTY)?>
+<?=@$em_type?>
 <?=html_dialstatus($DIALSTATUS)?>
 <?
 	echo("<font size=1>($END_STATUS,$CC_CAUSE,$END_PARTY)");
@@ -243,6 +255,7 @@ if($cap=="FAIL")
 <td><?=$pdds?></td>
 <td><?=$pdd?></td>
 <td><?=$BILLSEC?></td>
+<td><?=$FASSEC-$BILLSEC?></td>
 <td><?=html_recog_type(@$recog[$uid]["recog_type"])?></td>
 <? if ($BILLSEC<=0) { ?>
 <td><font size=1>
@@ -251,8 +264,8 @@ if($cap=="FAIL")
 </td>
 <? } else { ?>
 <td><font size=1>
-<a href="monitor/<?=$uid?>-ans-out.flac">&gt;&gt;</a><?=$txt_ans_out?><br>
-<a href="monitor/<?=$uid?>-ans-in.flac">&lt;&lt;</a><?=$txt_ans_in?><br>
+<a href="monitor/<?=$uid?>-pre-in.flac">&gt;&gt;</a> <a href="monitor/<?=$uid?>-ans-out.flac">&gt;</a><?=$txt_pre_in?><?=$txt_ans_out?><br>
+<a href="monitor/<?=$uid?>-pre-out.flac">&lt;&lt;</a> <a href="monitor/<?=$uid?>-ans-in.flac">&lt;</a></a><?=$txt_pre_out?><?=$txt_ans_in?><br>
 </td>
 <? } ?>
 <td><font size=1><?=$uid?></td>
