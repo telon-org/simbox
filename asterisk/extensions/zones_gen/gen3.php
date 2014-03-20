@@ -147,9 +147,9 @@ if(!$f) die("no file");
 $f1 = fopen("$RESDIR/zones/extensions_$EXTEN.conf", "w");
 $f2 = fopen("$RESDIR/price.csv", "a");
 $f3 = fopen("$RESDIR/extensions_zones.conf", "a");
-$f4 = fopen("$RESDIR/codes.csv", "a");
+$f4 = fopen("$RESDIR/codes.csv", "w");
 
-fputs($f3,"#include \"/etc/asterisk/extensions/zones/extensions_$EXTEN.conf\"\n");
+fputs($f3,"#include \"extensions/zones/extensions_$EXTEN.conf\"\n");
 
 
 
@@ -170,8 +170,8 @@ while(!feof($f))
 	//echo("$op $reg");
 	//echo("$reg $reg");
 
-	if($OPER=="") $u1=true; else if ((strpos($op,$OPER)!=false)||($op==$OPER)) $u1=true;
-	if($REGION=="") $u2=true; else if((strpos($reg,$REGION)!=false)||($reg==$REGION)) $u2=true;
+	if($OPER=="") $u1=true; else if ((strstr($op,$OPER)!=FALSE)) $u1=true;
+	if($REGION=="") $u2=true; else if((strstr($reg,$REGION)!=FALSE)) $u2=true;
 	//$u1=true;
 
 	//echo("($op,$OPER) ($reg,$REGION) $u1&&$u2 \n");
