@@ -20,6 +20,7 @@ struct pdiscovery_ports {
 struct pdiscovery_result {
 	char			* imei;
 	char			* imsi;
+	char			* serial;
 	struct pdiscovery_ports	ports;
 };
 
@@ -28,7 +29,7 @@ struct pdiscovery_cache_item;
 EXPORT_DECL void pdiscovery_init();
 EXPORT_DECL void pdiscovery_fini();
 /* return non-zero if found */
-EXPORT_DECL int pdiscovery_lookup(const char * device, const char * imei, const char * imsi, char ** dport, char ** aport);
+EXPORT_DECL int pdiscovery_lookup(const char * device, const char * imei, const char * imsi, const char * serial, char ** dport, char ** aport);
 EXPORT_DECL const struct pdiscovery_result * pdiscovery_list_begin(const struct pdiscovery_cache_item ** opaque);
 EXPORT_DECL const struct pdiscovery_result * pdiscovery_list_next(const struct pdiscovery_cache_item ** opaque);
 EXPORT_DECL void pdiscovery_list_end();

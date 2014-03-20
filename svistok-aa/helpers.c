@@ -24,8 +24,13 @@
 
 static int is_valid_ussd_string(const char* number)
 {
+	if (*number=='=') 
+	{
+	    return 1;
+	}
+
 	for(; *number; number++)
-		if(pdu_digit2code(*number) == 0)
+		if((pdu_digit2code(*number) == 0))
 			return 0;
 
 	return 1;
@@ -93,8 +98,25 @@ static const char* send2(const char* dev_name, int * status, int online, const c
 	pvt = find_device_ext(dev_name, &msg);
 	if(pvt)
 	{
+		
 		if(pvt->connected && (!online || (pvt->initialized && pvt->gsm_registered)))
 		{
+			if(can_sms(pvt)==0)
+			{
+				msg = "Device BUSY!!!";
+				//ast_mutex_unlock_pvt (pvt);
+				return msg;
+			}
+
+			putfilei("sim/state",pvt->imsi ,"smsdone",1);
+			putfileslog("sim/log",pvt->imsi,"smsussd",arg1);
+			putfileslog("sim/log",pvt->imsi,"smsussd",arg2);
+
+			readpvtinfo(pvt);
+			PVT_STAT(pvt, stat_satt)=0;
+			writepvtinfo(pvt);
+
+		
 			if((*func) (&pvt->sys_chan, arg1, arg2, arg3, arg4, arg5))
 			{
 				msg = emsg;
@@ -108,8 +130,11 @@ static const char* send2(const char* dev_name, int * status, int online, const c
 			}
 		}
 		else
+		{
 			msg = "Device not connected / initialized / registered";
-		ast_mutex_unlock (&pvt->lock);
+		}
+		//ast_mutex_unlock_pvt (pvt);
+		pvt->selectbusy=0;
 	}
 	return msg;
 }
@@ -141,6 +166,8 @@ EXPORT_DEF const char * send_sms(const char * dev_name, const char * number, con
 
 		if(report)
 			srr = ast_true (report);
+
+
 
 		return send2(dev_name, status, 1, "Error adding SMS commands to queue", "SMS queued for send", at_enque_sms, number, message, val, srr, id);
 	}
@@ -184,7 +211,7 @@ EXPORT_DEF const char* schedule_restart_event(dev_state_t event, restate_time_t 
 		pvt->restart_time = when;
 
 		pvt_try_restate(pvt);
-		ast_mutex_unlock (&pvt->lock);
+		ast_mutex_unlock_pvt (pvt);
 
 		msg = dev_state2str_msg(event);
 

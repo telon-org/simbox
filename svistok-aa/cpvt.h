@@ -50,6 +50,7 @@ typedef struct cpvt {
 	AST_LIST_ENTRY (cpvt)	entry;				/*!< linked list pointers */
 
 	struct ast_channel*	channel;			/*!< Channel pointer */
+	struct ast_channel*	requestor;			/*!< Channel pointer */
 	struct pvt		*pvt;				/*!< pointer to device structure */
 
 	short			call_idx;			/*!< device call ID */
@@ -76,6 +77,9 @@ typedef struct cpvt {
 //	size_t			used;				/*!< bytes used in pvt->a_write_buf */
 //	char			a_write_buf[FRAME_SIZE * 5];	/*!< audio write buffer */
 //	struct ringbuffer	a_write_rb;			/*!< audio ring buffer */
+
+
+	long int answered;
 } cpvt_t;
 
 #define CPVT_SET_FLAGS(cpvt, flag)	do { (cpvt)->flags |= (flag); } while(0)

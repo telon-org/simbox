@@ -37,8 +37,10 @@ RM = @RM@ -fr
 INSTALL = @INSTALL@
 CHMOD = chmod
 
-# -DAST_MODULE=\"$(PROJM)\" -D_THREAD_SAFE
-CFLAGS  = @CFLAGS@ -I$(srcdir) @CPPFLAGS@ @DEFS@ @AC_CFLAGS@
+DEFS    = -DASTERISK_VERSION_NUM=110000
+CFLAGS  = @CFLAGS@ -I$(srcdir) @CPPFLAGS@ $(DEFS) @DEFS@ @AC_CFLAGS@
+
+#CFLAGS  =  -I$(srcdir) @DEFS@
 LDFLAGS = @LDFLAGS@ 
 SOLINK  = @SOLINK@
 LIBS    = @LIBS@
@@ -50,7 +52,7 @@ VPATH = @srcdir@
 all: @TARGET@
 
 install: all
-	$(STRIP) $(PROJM)
+#	$(STRIP) $(PROJM)
 	$(INSTALL) -m 755 $(PROJM) @DESTDIR@
 
 $(PROJM): $(chan_donglem_so_OBJS) Makefile

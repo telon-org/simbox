@@ -13,14 +13,40 @@
 #include <asterisk/lock.h>
 #include <asterisk/linkedlists.h>
 
+
+//include "share.h"
 #include "mixbuffer.h"				/* struct mixbuffer */
 //#include "ringbuffer.h"				/* struct ringbuffer */
 #include "cpvt.h"				/* struct cpvt */
 #include "export.h"				/* EXPORT_DECL EXPORT_DEF */
 #include "dc_config.h"				/* pvt_config_t */
 
+#include "select.h"
+
 #define MODULE_DESCRIPTION	"Huawei 3G Dongle Channel Driver"
+/*define MAXDONGLEDEVICES	512*/
 #define MAXDONGLEDEVICES	256
+
+#define ACDL	10
+#define ASRL	20
+#define PDDL	20
+
+#define ACDL_BS	50
+#define ASRL_BS	50
+#define PDDL_BS	50
+
+
+#define ACDLINIT	120
+#define ASRLINIT	50000
+#define PDDLINIT	10000
+
+
+#define STAT_SESSION	0
+#define STAT_DONGLE	1
+#define STAT_IMSI	2
+
+int nosim2offline;
+
 
 INLINE_DECL const char * dev_state2str(dev_state_t state)
 {
@@ -33,7 +59,9 @@ INLINE_DECL const char * dev_state2str_msg(dev_state_t state)
 	return enum2str(state, states, ITEMS_OF(states));
 }
 
-
+/* Only linear is allowed */
+EXPORT_DECL struct ast_format chan_dongle_format;
+EXPORT_DECL struct ast_format_cap * chan_dongle_format_cap;
 typedef enum {
 	RESTATE_TIME_NOW	= 0,
 	RESTATE_TIME_GRACEFULLY,
@@ -45,6 +73,8 @@ typedef struct pvt_state
 {
 	char			audio_tty[DEVPATHLEN];		/*!< tty for audio connection */
 	char			data_tty[DEVPATHLEN];		/*!< tty for AT commands */
+	char			dev[DEVPATHLEN];
+
 	uint32_t		at_tasks;			/*!< number of active tasks in at_queue */
 	uint32_t		at_cmds;			/*!< number of active commands in at_queue */
 	uint32_t		chansno;			/*!< number of channels in channels list */
@@ -84,17 +114,109 @@ typedef struct pvt_stat
 
 	uint32_t		calls_answered[2];		/*!< number of outgoing and incoming/waiting calls answered */
 	uint32_t		calls_duration[2];		/*!< seconds of outgoing and incoming/waiting calls */
+
+	uint32_t		stat_calls_answered[3];
+	uint32_t		stat_calls_duration[3];
+
+
+	uint32_t		stat_in_answered;
+	uint32_t		stat_in_duration;
+	
+	uint32_t		stat_out_calls[3];
+	uint32_t		stat_wait_duration[3];		/* Длительность ожиданий для PDD    */
+	uint32_t		stat_acdl[3];			/* Последние ACD для ACDL звонков   */
+	uint32_t		stat_asrl[3];			/* Последние ACD для ACDL звонков   */
+	uint32_t		stat_pddl[2][3];			/* Последние PDD для PDDL звонков   */
+						// 0 - bez otveta, 1 - s otvetom
+	uint32_t		stat_datt[3];			/* Когда последний раз дозванивался */
+	uint32_t		stat_iatt;			/* Количество подряд исходящих */
+	uint32_t		stat_satt;			/* Количество подряд исходящих без смс */
+
+	uint32_t		limitnum; //Tekushiy limit
+	uint32_t		limittype; 
+	
+	char		billing_direction[3];
+	int		billing_pay;  // 0 - sou 1-pay
+	
+	int		limit[10];
+
+	int		limit_soft[10];
+	int		limit_hard[10];
+
+	int		alg[10];
+	int		nodiff[10];
+
+	long int stat_errors[3];
+	
+	char number[16];
+	char balance[64];
+	char ballast[64];
+	
+	char tarif[64];
+	
+
+	long int stat_call_start;
+	long int stat_call_response;
+	long int stat_call_process;
+
+	long int stat_call_connected;
+	long int stat_call_end;
+	long int stat_call_saved;
+	
+	long int stat_call_sf;
+
+	
+	int priority;
+
+	int diff_min;
+
+	int diff_min_out;
+
+	int diff_min_vip;
+	int diff_min_goo;
+	int diff_min_nor;
+
+	int diff_min_sout;
+	int diff_min_imode;
+
+	int in_imode;
+	
+	int active;
+	
+	int igoo,ibad,inor,inew,inos,imode;
+	int ine0,inec,inem;
+
+	int iblo,irob,ivip;
+	int notvip;
+	int ima,imb,imc,imd,ime,imn;
+	int can_in,can_out,can_sout;
+	int capnew,capfail,capok;
+	
 } pvt_stat_t;
+
+	uint32_t		total_stat_acdl;			/* Последние ACD для ACDL звонков   */
+	uint32_t		total_stat_pddl[2];			/* Последние PDD для PDDL звонков   */
+						// 0 - bez otveta, 1 - s otvetom
+	uint32_t		total_stat_datt;			/* Когда последний раз дозванивался */
+
 
 #define PVT_STAT_T(stat, name)			((stat)->name)
 
 struct at_queue_task;
+
+typedef struct soupri
+{
+    char imsi[17];
+    long sou_diff_start;
+} soupri_t;
 
 typedef struct pvt
 {
 	AST_LIST_ENTRY (pvt)	entry;				/*!< linked list pointers */
 
 	ast_mutex_t		lock;				/*!< pvt lock */
+	long			lock_start;
+
 	AST_LIST_HEAD_NOLOCK (, at_queue_task) at_queue;	/*!< queue for commands to modem */
 
 	AST_LIST_HEAD_NOLOCK (, cpvt)		chans;		/*!< list of channels */
@@ -108,9 +230,7 @@ typedef struct pvt
 	char			* alock;			/*!< name of lockfile for audio */
 	char			* dlock;			/*!< name of lockfile for data */
 
-	struct ast_dsp*		dsp;				/*!< silence/DTMF detector - FIXME: must be in cpvt */
-	dc_dtmf_setting_t	real_dtmf;			/*!< real DTMF setting */
-
+	struct ast_dsp*		dsp;				/*!< silence/DTMF detector */
 	struct ast_timer*	a_timer;			/*!< audio write timer */
 
 	char			a_write_buf[FRAME_SIZE * 5];	/*!< audio write buffer */
@@ -139,26 +259,88 @@ typedef struct pvt
 	/* device state */
 	int			gsm_reg_status;
 	int			rssi;
+	int			srna;
+	int			srnb;
 	int			linkmode;
 	int			linksubmode;
 	char			provider_name[32];
+	char			provider_name2[32];
 	char			manufacturer[32];
 	char			model[32];
 	char			firmware[32];
 	char			imei[17];
 	char			imsi[17];
+	char			iccid[64];
+	int			freqlock;
+	
+	char			numbera[64];
+	char			numberb[64];
+	char			numberb_before[64];
+
+	char			spec[64];
+	char			qos[64];
+	char			vip[64];
+	char			naprstr[1024];
+	char			im[1024];
+	char			uid[1024];
+
+	char			serial[SERIAL_SIZE+2];
 	char			subscriber_number[128];
 	char			location_area_code[8];
 	char			cell_id[8];
 	char			sms_scenter[20];
 
+	unsigned int		pinrequired; // Vvod pina
+	unsigned int		nosim; // NOSIM
+	unsigned int		eerror; 
+	unsigned int		cardlock; // cardlock
+	unsigned int		novoice; //
+
+
+	unsigned int		sim_ready;
+	unsigned int		sim_start;
+
+
+	int 			diagmode;
+	int 			changeimei;
+	char			newimei[64];
+
+	int ima_count;
+	int imb_count;
+
+	char pro[256];
+	char procur[256];
+	char capcur[256];
+
+	int cfun;
+	int simst;
+	int srvst;
+
+	int fas;
+	int epdd;
+	int fpdd;
+	int hem;
+
+	int time_work_wake;
+	int time_work_sleep;
+
+	int time_holiday_wake;
+	int time_holiday_sleep;
+	
+	struct soupri soupri[MAXDONGLEDEVICES*2];
+	int soupri_count;
+
 	volatile unsigned int	connected:1;			/*!< do we have an connection to a device */
 	unsigned int		initialized:1;			/*!< whether a service level connection exists or not */
 	unsigned int		gsm_registered:1;		/*!< do we have an registration to a GSM */
+
+	unsigned int		selectbusy; 			//true from select-found until old unlock
+
 	unsigned int		dialing;			/*!< HW state; true from ATD response OK until CEND or CONN for this call idx */
 	unsigned int		ring:1;				/*!< HW state; true if has incoming call from first RING until CEND or CONN */
 	unsigned int		cwaiting:1;			/*!< HW state; true if has incoming call waiting from first CCWA until CEND or CONN for */
 	unsigned int		outgoing_sms:1;			/*!< outgoing sms */
+	unsigned int		outgoing_ussd:1;		/*!< outgoing sms */
 	unsigned int		incoming_sms:1;			/*!< incoming sms */
 	unsigned int		volume_sync_step:2;		/*!< volume synchronized stage */
 #define VOLUME_SYNC_BEGIN	0
@@ -180,6 +362,10 @@ typedef struct pvt
 	unsigned int		has_subscriber_number:1;	/*!< subscriber_number field is valid */
 //	unsigned int		monitor_running:1;		/*!< true if monitor thread is running */
 	unsigned int		must_remove:1;			/*!< mean must removed from list: NOT FULLY THREADSAFE */
+
+
+	unsigned int		must_cfun1;
+	unsigned int		must_cfun5;
 
 	volatile dev_state_t	desired_state;			/*!< desired state */
 	volatile restate_time_t	restart_time;			/*!< time when change state */
@@ -208,6 +394,8 @@ typedef struct public_state
 	volatile int			unloading_flag;			/* no need mutex or other locking for protect this variable because no concurent r/w and set non-0 atomically */
 	ast_mutex_t			round_robin_mtx;
 	struct pvt			* round_robin[MAXDONGLEDEVICES];
+	struct pvt			* random_select[MAXDONGLEDEVICES];
+	struct pvt			* limit_select[MAXDONGLEDEVICES];
 	struct dc_gconfig		global_settings;
 } public_state_t;
 
@@ -243,7 +431,6 @@ INLINE_DECL struct pvt * find_device (const char* name)
 
 EXPORT_DECL struct pvt * find_device_ext(const char* name, const char ** reason);
 EXPORT_DECL struct pvt * find_device_by_resource_ex(struct public_state * state, const char * resource, int opts, const struct ast_channel * requestor, int * exists);
-EXPORT_DECL void pvt_dsp_setup(struct pvt * pvt, const char * id, dc_dtmf_setting_t dtmf_new);
 
 INLINE_DECL struct pvt * find_device_by_resource(const char * resource, int opts, const struct ast_channel * requestor, int * exists)
 {
@@ -251,6 +438,9 @@ INLINE_DECL struct pvt * find_device_by_resource(const char * resource, int opts
 }
 
 EXPORT_DECL struct ast_module * self_module();
+
+static struct pvt * pvt_create(const pvt_config_t * settings);
+static void pvt_destroy(struct pvt * pvt);
 
 #define PVT_NO_CHANS(pvt)		(PVT_STATE(pvt, chansno) == 0)
 

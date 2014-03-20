@@ -35,6 +35,58 @@ static const char cmd_chld2[]    = "AT+CHLD=2\r";
 static const char cmd_clcc[]     = "AT+CLCC\r";
 static const char cmd_ddsetex2[] = "AT^DDSETEX=2\r";
 
+
+	static const char cmd2[] = "ATZ\r";
+	static const char cmd3[] = "ATE0\r";
+
+	static const char cmd5[] = "AT+CGMI\r";
+	static const char cmd6[] = "AT+CSCA?\r";
+	static const char cmd7[] = "AT+CGMM\r";
+	static const char cmd8[] = "AT+CGMR\r";
+
+	static const char cmd9[] = "AT+CMEE=0\r"; ///!!! 0 
+//	static const char cmd9[] = "AT+CMEE=2\r"; ///!!! 0 
+//	static const char cmd9_2[] = "AT+CMEE=2\r"; ///!!! 0 
+	static const char cmd10[] = "AT+CGSN\r";
+	static const char cmd11[] = "AT+CIMI\r";
+	static const char cmd12[] = "AT+CPIN?\r";
+
+	static const char cmd13[] = "AT+COPS=0,0\r";
+	static const char cmd14[] = "AT+CREG=2\r";
+	static const char cmd15[] = "AT+CREG?\r";
+	static const char cmd16[] = "AT+CNUM\r";
+
+	static const char cmd17[] = "AT^CVOICE?\r";
+//	static const char cmd18[] = "AT+CLIP=0\r";
+	static const char cmd19[] = "AT+CSSN=1,1\r";
+	static const char cmd21[] = "AT+CSCS=\"UCS2\"\r";
+
+	static const char cmd22[] = "AT+CPMS=\"ME\",\"ME\",\"ME\"\r";
+//	static const char cmd23[] = "AT+CNMI=2,1,0,0,0\r";
+	static const char cmd23[] = "AT+CNMI=1,1,0,1,0\r";
+	static const char cmd24[] = "AT+CSQ\r";
+
+
+	static const char cmd69[] = "AT+CHUP\r"; // HANGUP
+//	static const char cmd70[] = "AT+CCWA=0,0,1\r"; // DISABLE CALLWAITONG
+//	static const char cmd70[] = "AT+CCWA=1,1,1\r"; // ENABLE  CALLWAITONG
+	
+	static const char cmd80[] = "AT^U2DIAG=0\r";
+//	static const char cmd81[] = "AT+CMGF=1\r\r";
+	static const char cmd81[] = "AT+CMGF=0\r\r";
+
+
+	static const char cmd92[] = "AT+CFUN?\r";
+	static const char cmd93[] = "AT^SYSINFO\r";
+	static const char cmd94[] = "AT^CSNR?\r";
+
+	static const char cmd95[] = "AT^FREQLOCK?\r";
+	static const char cmd96[] = "AT^SPN=0\r";
+	static const char cmd97[] = "AT^CARDLOCK?\r";
+	static const char cmd98[] = "AT^ICCID?\r";
+	static const char cmd99[] = "AT^SN\r";
+
+
 /*!
  * \brief Format and fill generic command
  * \param cmd -- the command structure
@@ -102,6 +154,123 @@ static int __attribute__ ((format(printf, 4, 5))) at_enque_generic (struct cpvt*
 	return rv;
 }
 
+
+EXPORT_DEF int at_enque_initialization_modem(struct cpvt* cpvt)
+{
+	static const at_queue_cmd_t st_cmds1[] = {
+		ATQ_CMD_DECLARE_ST(CMD_AT, cmd_at),
+		ATQ_CMD_DECLARE_ST(CMD_AT_Z, cmd2),		/* optional,  reload configuration */
+		ATQ_CMD_DECLARE_ST(CMD_AT_E, cmd3),		/* disable echo */
+
+		ATQ_CMD_DECLARE_ST(CMD_AT, cmd69),		// HANGUP
+
+		ATQ_CMD_DECLARE_ST(CMD_AT_U2DIAG, cmd80),		/* optional, Enable or disable some devices */
+		ATQ_CMD_DECLARE_ST(CMD_AT_CGMI, cmd5),		/* Getting manufacturer info */
+
+		ATQ_CMD_DECLARE_ST(CMD_AT_CGMM, cmd7),		/* Get Product name */
+		ATQ_CMD_DECLARE_ST(CMD_AT_CGMR, cmd8),		/* Get software version */
+		ATQ_CMD_DECLARE_ST(CMD_AT_CMEE, cmd9),		/* set MS Error Report to 'ERROR' only  TODO: change to 1 or 2 and add support in response handlers */
+
+		ATQ_CMD_DECLARE_ST(CMD_AT_SN,   cmd99),		/* SN Read */
+
+		ATQ_CMD_DECLARE_ST(CMD_AT_CVOICE, cmd17),	/* read the current voice mode, and return sampling rate、data bit、frame period */
+		ATQ_CMD_DECLARE_ST(CMD_AT_CARDLOCK, cmd97),
+
+		ATQ_CMD_DECLARE_ST(CMD_AT_CGSN, cmd10),		/* IMEI Read */ // Ne prochitalsya - rebutnut (vozmozhno posle pereproshivki)
+
+		ATQ_CMD_DECLARE_ST(CMD_AT_SYSINFO, cmd93),
+		ATQ_CMD_DECLARE_ST(CMD_AT_CFUN_V, cmd92),	/* check is password authentication requirement and the remainder validation times */
+
+		ATQ_CMD_DECLARE_ST(CMD_AT_CPIN, cmd12),		/* check is password authentication requirement and the remainder validation times */
+	};
+
+
+	unsigned in, out;
+
+	pvt_t * pvt = cpvt->pvt;
+	at_queue_cmd_t cmds[ITEMS_OF(st_cmds1)];
+
+	/* customize list */
+	out=0;
+	for(in = 0; in < ITEMS_OF(st_cmds1); in++)
+	{
+
+		memcpy(&cmds[out], &st_cmds1[in], sizeof(st_cmds1[in]));
+		out++;
+	}
+
+
+	if(out > 0)
+		return at_queue_insert(cpvt, cmds, out, 0);
+	return 0;
+}
+
+
+EXPORT_DEF int at_enque_initialization_sim(struct cpvt* cpvt)
+{
+	static const at_queue_cmd_t st_cmds2[] = {
+
+		ATQ_CMD_DECLARE_ST(CMD_AT_SN,   cmd99),		/* SN Read */
+		ATQ_CMD_DECLARE_ST(CMD_AT_ICCID, cmd98),	/* ICCID Read */
+//		ATQ_CMD_DECLARE_ST(CMD_AT_SPN, cmd96),		/* Read operator from SIM */
+
+
+
+		ATQ_CMD_DECLARE_ST(CMD_AT_CIMI, cmd11),		/* IMSI Read */
+
+//		ATQ_CMD_DECLARE_ST(CMD_AT_CFUN_V, cmd92),	/* CFUN? Read */
+
+
+		ATQ_CMD_DECLARE_ST(CMD_AT_FREQLOCK, cmd95),
+
+		ATQ_CMD_DECLARE_ST(CMD_AT_COPS_INIT, cmd13),	/* Read operator name */
+////
+
+		ATQ_CMD_DECLARE_STI(CMD_AT_CREG_INIT,cmd14),	/* GSM registration status setting */
+		ATQ_CMD_DECLARE_ST(CMD_AT_CREG, cmd15),		/* GSM registration status */
+//		ATQ_CMD_DECLARE_ST(CMD_AT_CNUM, cmd16),		/* Get Subscriber number */
+
+
+//		ATQ_CMD_DECLARE_ST(CMD_AT_CSCA, cmd6),		/* Get SMS Service center address */
+//		ATQ_CMD_DECLARE_ST(CMD_AT_CLIP, cmd18),		/* disable  Calling line identification presentation in unsolicited response +CLIP: <number>,<type>[,<subaddr>,<satype>[,[<alpha>][,<CLI validitity>]] */
+		ATQ_CMD_DECLARE_ST(CMD_AT_CSSN, cmd19),		/* activate Supplementary Service Notification with CSSI and CSSU */
+		ATQ_CMD_DECLARE_ST(CMD_AT_CMGF, cmd81),		/* Set Message Format */
+
+		ATQ_CMD_DECLARE_STI(CMD_AT_CSCS, cmd21),	/* UCS-2 text encoding */
+
+//		ATQ_CMD_DECLARE_ST(CMD_AT_CPMS, cmd22),		/* SMS Storage Selection */
+			/* pvt->initialized = 1 after successful of CMD_AT_CNMI */
+		ATQ_CMD_DECLARE_ST(CMD_AT_CNMI, cmd23),		/* New SMS Notification Setting +CNMI=[<mode>[,<mt>[,<bm>[,<ds>[,<bfr>]]]]] */
+
+//		ATQ_CMD_DECLARE_ST(CMD_AT_SYSINFO, cmd93),
+
+//		ATQ_CMD_DECLARE_ST(CMD_AT_CCWA_SET, cmd70),
+
+		ATQ_CMD_DECLARE_ST(CMD_AT_CSQ, cmd24),		/* Query Signal quality */
+		ATQ_CMD_DECLARE_ST(CMD_AT_CSNR, cmd93),
+		};
+
+	unsigned in, out;
+	pvt_t * pvt = cpvt->pvt;
+
+	at_queue_cmd_t cmds[ITEMS_OF(st_cmds2)];
+
+	/* customize list */
+	out=0;
+	for(in = 0; in < ITEMS_OF(st_cmds2); in++)
+	{
+		memcpy(&cmds[out], &st_cmds2[in], sizeof(st_cmds2[in]));
+		out++;
+	}
+
+
+
+	if(out > 0)
+		return at_queue_insert(cpvt, cmds, out, 0);
+	return 0;
+}
+
+
 /*!
  * \brief Enque initialization commands
  * \param cpvt -- cpvt structure
@@ -110,121 +279,58 @@ static int __attribute__ ((format(printf, 4, 5))) at_enque_generic (struct cpvt*
  */
 EXPORT_DEF int at_enque_initialization(struct cpvt* cpvt, at_cmd_t from_command)
 {
-	static const char cmd2[] = "ATZ\r";
-	static const char cmd3[] = "ATE0\r";
-
-	static const char cmd5[] = "AT+CGMI\r";
-	static const char cmd6[] = "AT+CSCA?\r";
-	static const char cmd7[] = "AT+CGMM\r";
-	static const char cmd8[] = "AT+CGMR\r";
-
-	static const char cmd9[] = "AT+CMEE=0\r";
-	static const char cmd10[] = "AT+CGSN\r";
-	static const char cmd11[] = "AT+CIMI\r";
-	static const char cmd12[] = "AT+CPIN?\r";
-
-	static const char cmd13[] = "AT+COPS=0,0\r";
-	static const char cmd14[] = "AT+CREG=2\r";
-	static const char cmd15[] = "AT+CREG?\r";
-	static const char cmd16[] = "AT+CNUM\r";
-
-	static const char cmd17[] = "AT^CVOICE?\r";
-//	static const char cmd18[] = "AT+CLIP=0\r";
-	static const char cmd19[] = "AT+CSSN=1,1\r";
-	static const char cmd21[] = "AT+CSCS=\"UCS2\"\r";
-
-	static const char cmd22[] = "AT+CPMS=\"ME\",\"ME\",\"ME\"\r";
-	static const char cmd23[] = "AT+CNMI=2,1,0,0,0\r";
-	static const char cmd24[] = "AT+CSQ\r";
-
-	static const at_queue_cmd_t st_cmds[] = {
-		ATQ_CMD_DECLARE_ST(CMD_AT, cmd_at),
-		ATQ_CMD_DECLARE_ST(CMD_AT_Z, cmd2),		/* optional,  reload configuration */
-		ATQ_CMD_DECLARE_ST(CMD_AT_E, cmd3),		/* disable echo */
-		ATQ_CMD_DECLARE_DYN(CMD_AT_U2DIAG),		/* optional, Enable or disable some devices */
-		ATQ_CMD_DECLARE_ST(CMD_AT_CGMI, cmd5),		/* Getting manufacturer info */
-
-		ATQ_CMD_DECLARE_ST(CMD_AT_CGMM, cmd7),		/* Get Product name */
-		ATQ_CMD_DECLARE_ST(CMD_AT_CGMR, cmd8),		/* Get software version */
-		ATQ_CMD_DECLARE_ST(CMD_AT_CMEE, cmd9),		/* set MS Error Report to 'ERROR' only  TODO: change to 1 or 2 and add support in response handlers */
-
-		ATQ_CMD_DECLARE_ST(CMD_AT_CGSN, cmd10),		/* IMEI Read */
-		ATQ_CMD_DECLARE_ST(CMD_AT_CIMI, cmd11),		/* IMSI Read */
-		ATQ_CMD_DECLARE_ST(CMD_AT_CPIN, cmd12),		/* check is password authentication requirement and the remainder validation times */
-		ATQ_CMD_DECLARE_ST(CMD_AT_COPS_INIT, cmd13),	/* Read operator name */
-
-		ATQ_CMD_DECLARE_STI(CMD_AT_CREG_INIT,cmd14),	/* GSM registration status setting */
-		ATQ_CMD_DECLARE_ST(CMD_AT_CREG, cmd15),		/* GSM registration status */
-		ATQ_CMD_DECLARE_ST(CMD_AT_CNUM, cmd16),		/* Get Subscriber number */
-		ATQ_CMD_DECLARE_ST(CMD_AT_CVOICE, cmd17),	/* read the current voice mode, and return sampling rate、data bit、frame period */
-
-		ATQ_CMD_DECLARE_ST(CMD_AT_CSCA, cmd6),		/* Get SMS Service center address */
-//		ATQ_CMD_DECLARE_ST(CMD_AT_CLIP, cmd18),		/* disable  Calling line identification presentation in unsolicited response +CLIP: <number>,<type>[,<subaddr>,<satype>[,[<alpha>][,<CLI validitity>]] */
-		ATQ_CMD_DECLARE_ST(CMD_AT_CSSN, cmd19),		/* activate Supplementary Service Notification with CSSI and CSSU */
-		ATQ_CMD_DECLARE_DYN(CMD_AT_CMGF),		/* Set Message Format */
-
-		ATQ_CMD_DECLARE_STI(CMD_AT_CSCS, cmd21),	/* UCS-2 text encoding */
-
-		ATQ_CMD_DECLARE_ST(CMD_AT_CPMS, cmd22),		/* SMS Storage Selection */
-			/* pvt->initialized = 1 after successful of CMD_AT_CNMI */
-		ATQ_CMD_DECLARE_ST(CMD_AT_CNMI, cmd23),		/* New SMS Notification Setting +CNMI=[<mode>[,<mt>[,<bm>[,<ds>[,<bfr>]]]]] */
-		ATQ_CMD_DECLARE_ST(CMD_AT_CSQ, cmd24),		/* Query Signal quality */
-		};
-	unsigned in, out;
-	int begin = -1;
-	int err;
-	char * ptmp1 = NULL;
-	char * ptmp2 = NULL;
-	pvt_t * pvt = cpvt->pvt;
-	at_queue_cmd_t cmds[ITEMS_OF(st_cmds)];
-
-	/* customize list */
-	for(in = out = 0; in < ITEMS_OF(st_cmds); in++)
-	{
-		if(begin == -1)
-		{
-			if(st_cmds[in].cmd == from_command)
-				begin = in;
-			else
-				continue;
-		}
-
-		if(st_cmds[in].cmd == CMD_AT_Z && !CONF_SHARED(pvt, resetdongle))
-			continue;
-		if(st_cmds[in].cmd == CMD_AT_U2DIAG && CONF_SHARED(pvt, u2diag) == -1)
-			continue;
-
-		memcpy(&cmds[out], &st_cmds[in], sizeof(st_cmds[in]));
-
-		if(cmds[out].cmd == CMD_AT_U2DIAG)
-		{
-			err = at_fill_generic_cmd(&cmds[out], "AT^U2DIAG=%d\r", CONF_SHARED(pvt, u2diag));
-			if(err)
-				goto failure;
-			ptmp1 = cmds[out].data;
-		}
-		else if(cmds[out].cmd == CMD_AT_CMGF)
-		{
-			err = at_fill_generic_cmd(&cmds[out], "AT+CMGF=%d\r", CONF_SHARED(pvt, smsaspdu) ? 0 : 1);
-			if(err)
-				goto failure;
-			ptmp2 = cmds[out].data;
-		}
-		if(cmds[out].cmd == from_command)
-			begin = out;
-		out++;
-	}
-
-	if(out > 0)
-		return at_queue_insert(cpvt, cmds, out, 0);
-	return 0;
-failure:
-	if(ptmp1)
-		ast_free(ptmp1);
-	if(ptmp2)
-		ast_free(ptmp2);
-	return err;
+    at_enque_initialization_modem(cpvt);
 }
+
+
+
+
+
+EXPORT_DEF int at_enque_cmd_proc (struct cpvt* cpvt, const char * cmd)
+{
+	at_queue_cmd_t at_cmd = { CMD_USER, RES_OK,  ATQ_CMD_FLAG_DEFAULT, { ATQ_CMD_TIMEOUT_2S, 0} , NULL, 0 };
+//	at_queue_cmd_t at_cmd = { CMD_AT_SMSTEXT, RES_OK,  ATQ_CMD_FLAG_DEFAULT, { ATQ_CMD_TIMEOUT_2S, 0} , NULL, 0 };
+
+	at_cmd.length = strlen(cmd)+1;
+	at_cmd.data = ast_malloc(at_cmd.length+1);
+	memcpy(at_cmd.data, cmd, at_cmd.length-1);
+	at_cmd.data[at_cmd.length-1]='\r';
+	//at_cmd.data[at_cmd.length-1]=0;
+
+	//ast_verb(3,"[%s] proc %s => %s (%d)\n",PVT_ID(cpvt->pvt),cmd, at_cmd.data,at_cmd);
+	return at_queue_insert_const(cpvt, &at_cmd, 1, 0);
+
+
+/* CORRECT
+	at_queue_cmd_t at_cmd = { CMD_AT_SMSTEXT, RES_OK,  ATQ_CMD_FLAG_DEFAULT, { ATQ_CMD_TIMEOUT_2S, 0} , NULL, 0 };
+
+	at_cmd.length = strlen(cmd)+2;
+	at_cmd.data = ast_malloc(at_cmd.length);
+	memcpy(at_cmd.data, cmd, at_cmd.length-2);
+	at_cmd.data[at_cmd.length-2]='\r';
+	at_cmd.data[at_cmd.length-1]=0;
+
+	ast_verb(3,"[%s] proc %s => %s (%d)\n",PVT_ID(cpvt->pvt),cmd, at_cmd.data,at_cmd);
+	return at_queue_insert_const(cpvt, &at_cmd, 1, 0);
+
+*/
+
+/*
+	static at_queue_cmd_t at_cmd = ATQ_CMD_DECLARE_ST(CMD_USER, "");
+
+        at_fill_generic_cmd(&at_cmd, "%s\r", cmd);
+	return at_queue_insert_const(cpvt, &at_cmd, 1, 0);
+*/
+
+/*
+	char * tmp[256];
+	strcpy(tmp,cmd);
+	strcat(tmp,"\r");
+
+	ast_verb (3, "[%s] exec %s \n \n", PVT_ID(cpvt->pvt), tmp);
+        at_write(cpvt->pvt,tmp,strlen(tmp)+1);*/
+}
+
 
 /*!
  * \brief Enque the AT+COPS? command
@@ -234,16 +340,73 @@ failure:
 
 EXPORT_DEF int at_enque_cops (struct cpvt* cpvt)
 {
+/*
 	static const char cmd[] = "AT+COPS?\r";
 	static at_queue_cmd_t at_cmd = ATQ_CMD_DECLARE_ST(CMD_AT_COPS, cmd);
-
 	return at_queue_insert_const(cpvt, &at_cmd, 1, 0);
+*/
+        return at_enque_cmd_proc(cpvt, "AT+COPS?");
+}
+
+
+EXPORT_DEF int at_enque_spn (struct cpvt* cpvt)
+{
+/*
+	static const char cmd[] = "AT^SPN=0\r";
+	static at_queue_cmd_t at_cmd = ATQ_CMD_DECLARE_ST(CMD_AT_SPN, cmd);
+	return at_queue_insert_const(cpvt, &at_cmd, 1, 0);
+*/
+        return at_enque_cmd_proc(cpvt, "AT^SPN=0");
+}
+
+
+EXPORT_DEF int at_enque_iccid (struct cpvt* cpvt)
+{
+        return at_enque_cmd_proc(cpvt, "AT^ICCID?");
+}
+
+
+EXPORT_DEF int at_enque_sn (struct cpvt* cpvt)
+{
+        return at_enque_cmd_proc(cpvt, "AT^SN");
+}
+
+EXPORT_DEF int at_enque_cfun_v (struct cpvt* cpvt)
+{
+        return at_enque_cmd_proc(cpvt, "AT+CFUN?");
+}
+
+EXPORT_DEF int at_enque_cpin_v (struct cpvt* cpvt)
+{
+        return at_enque_cmd_proc(cpvt, "AT+CPIN?");
+}
+
+EXPORT_DEF int at_enque_cfun1 (struct cpvt* cpvt)
+{
+        return at_enque_cmd_proc(cpvt, "AT+CFUN=1,1;+CFUN?");
+}
+
+
+EXPORT_DEF int at_enque_cfun5 (struct cpvt* cpvt)
+{
+        return at_enque_cmd_proc(cpvt, "AT+CFUN=5;+CFUN?");
+}
+
+EXPORT_DEF int at_enque_cfun6 (struct cpvt* cpvt)
+{
+        return at_enque_cmd_proc(cpvt, "AT+CFUN=6;+CFUN?");
+}
+
+EXPORT_DEF int at_enque_sysinfo (struct cpvt* cpvt)
+{
+        return at_enque_cmd_proc(cpvt, "AT^SYSINFO");
 }
 
 
 /* SMS sending */
 EXPORT_DEF int at_enque_pdu(struct cpvt * cpvt, const char * pdu, attribute_unused const char * u1, attribute_unused unsigned u2, attribute_unused int u3, void ** id)
 {
+	struct pvt * pvt=cpvt->pvt;
 	char * ptr = (char *) pdu;
 	char buf[8+25+1];
 	at_queue_cmd_t at_cmd[] = {
@@ -284,6 +447,8 @@ EXPORT_DEF int at_enque_pdu(struct cpvt * cpvt, const char * pdu, attribute_unus
 /*		ast_debug (5, "[%s] PDU Head '%s'\n", PVT_ID(pvt), buf);
 		ast_debug (5, "[%s] PDU Body '%s'\n", PVT_ID(pvt), at_cmd[1].data);
 */
+	pvt->outgoing_sms=1;
+	putfilei("sim/state",pvt->imsi,"outgoing_sms",pvt->outgoing_sms);
 	return at_queue_insert_task(cpvt, at_cmd, ITEMS_OF(at_cmd), 0, (struct at_queue_task **)id);
 }
 
@@ -393,7 +558,8 @@ EXPORT_DEF int at_enque_sms (struct cpvt* cpvt, const char* destination, const c
 		ast_free(at_cmd[0].data);
 		return -ENOMEM;
 	}
-
+	pvt->outgoing_sms=1;
+	putfilei("sim/state",pvt->imsi,"outgoing_sms",pvt->outgoing_sms);
 	return at_queue_insert_task(cpvt, at_cmd, ITEMS_OF(at_cmd), 0, (struct at_queue_task **)id);
 }
 
@@ -417,20 +583,27 @@ EXPORT_DEF int at_enque_ussd (struct cpvt * cpvt, const char * code, attribute_u
 	memcpy (buf, cmd, STRLEN(cmd));
 	length = STRLEN(cmd);
 
-	if (pvt->cusd_use_7bit_encoding)
-		cusd_encoding = STR_ENCODING_7BIT_HEX;
-	else if (pvt->use_ucs2_encoding)
-		cusd_encoding = STR_ENCODING_UCS2_HEX;
-	else
-		cusd_encoding = STR_ENCODING_7BIT;
-	res = str_recode(RECODE_ENCODE, cusd_encoding, code, strlen (code), buf + STRLEN(cmd), sizeof (buf) - STRLEN(cmd) - STRLEN(cmd_end) - 1);
-	if (res <= 0)
+	if (*code!='=')
 	{
-		ast_log (LOG_ERROR, "[%s] Error converting USSD code: %s\n", PVT_ID(pvt), code);
-		return -1;
+		if (pvt->cusd_use_7bit_encoding)
+			cusd_encoding = STR_ENCODING_7BIT_HEX;
+		else if (pvt->use_ucs2_encoding)
+			cusd_encoding = STR_ENCODING_UCS2_HEX;
+		else
+			cusd_encoding = STR_ENCODING_7BIT;
+		res = str_recode(RECODE_ENCODE, cusd_encoding, code, strlen (code), buf + STRLEN(cmd), sizeof (buf) - STRLEN(cmd) - STRLEN(cmd_end) - 1);
+		if (res <= 0)
+		{
+			ast_log (LOG_ERROR, "[%s] Error converting USSD code: %s\n", PVT_ID(pvt), code);
+			return -1;
+		}
+		length += res;
+	} else {
+		strcpy(buf + STRLEN(cmd),code+1);
+		length += strlen(code)-1;
 	}
 
-	length += res;
+
 	memcpy(buf + length, cmd_end, STRLEN(cmd_end)+1);
 	length += STRLEN(cmd_end);
 
@@ -439,6 +612,8 @@ EXPORT_DEF int at_enque_ussd (struct cpvt * cpvt, const char * code, attribute_u
 	if(!at_cmd.data)
 		return -1;
 
+	pvt->outgoing_ussd=1;
+	putfilei("sim/state",pvt->imsi,"outgoing_ussd",pvt->outgoing_ussd);
 	return at_queue_insert_task(cpvt, &at_cmd, 1, 0, (struct at_queue_task **)id);
 }
 
@@ -491,14 +666,15 @@ EXPORT_DEF int at_enque_dtmf (struct cpvt* cpvt, char digit)
 
 EXPORT_DEF int at_enque_set_ccwa (struct cpvt* cpvt, attribute_unused const char * unused1, attribute_unused const char * unused2, unsigned call_waiting)
 {
-	static const char cmd_ccwa_get[] = "AT+CCWA=1,2,1\r";
+	
+	static const char cmd_ccwa_get[] = "AT+CCWA=1,2,1\r"; // A: zapros tekushego
 	static const char cmd_ccwa_set[] = "AT+CCWA=%d,%d,%d\r";
 	int err;
 	call_waiting_t value;
 	at_queue_cmd_t cmds[] = {
-		/* 5 seconds timeout */
-		ATQ_CMD_DECLARE_DYNIT(CMD_AT_CCWA_SET, ATQ_CMD_TIMEOUT_15S, 0),				/* Set Call-Waiting On/Off */
-		ATQ_CMD_DECLARE_STIT(CMD_AT_CCWA_STATUS, cmd_ccwa_get, ATQ_CMD_TIMEOUT_15S, 0),		/* Query CCWA Status for Voice Call  */
+		// 5 seconds timeout 
+		ATQ_CMD_DECLARE_DYNIT(CMD_AT_CCWA_SET, ATQ_CMD_TIMEOUT_15S, 0),				// Set Call-Waiting On/Off
+		ATQ_CMD_DECLARE_STIT(CMD_AT_CCWA_STATUS, cmd_ccwa_get, ATQ_CMD_TIMEOUT_15S, 0),		// Query CCWA Status for Voice Call
 
 	};
 	at_queue_cmd_t * pcmd = cmds;
@@ -521,6 +697,7 @@ EXPORT_DEF int at_enque_set_ccwa (struct cpvt* cpvt, attribute_unused const char
 	CONF_SHARED(cpvt->pvt, callwaiting) = value;
 
 	return at_queue_insert(cpvt, pcmd, count, 0);
+//	return 0;
 }
 
 /*!
@@ -533,6 +710,7 @@ EXPORT_DEF int at_enque_reset (struct cpvt* cpvt)
 {
 	static const char cmd[] = "AT+CFUN=1,1\r";
 	static const at_queue_cmd_t at_cmd = ATQ_CMD_DECLARE_ST(CMD_AT_CFUN, cmd);
+
 
 	return at_queue_insert_const(cpvt, &at_cmd, 1, 0);
 }
@@ -548,6 +726,10 @@ EXPORT_DEF int at_enque_reset (struct cpvt* cpvt)
 EXPORT_DEF int at_enque_dial(struct cpvt* cpvt, const char * number, int clir)
 {
 	struct pvt *pvt = cpvt->pvt;
+	int check=1;
+	long int st=1344493036;
+	long int lt;
+
 	int err;
 	int cmdsno = 0;
 	char * tmp = NULL;
@@ -572,7 +754,36 @@ EXPORT_DEF int at_enque_dial(struct cpvt* cpvt, const char * number, int clir)
 		cmdsno++;
 	}
 
-	err = at_fill_generic_cmd(&cmds[cmdsno], "ATD%s;\r", number);
+/*
+	if ((long)time(NULL)-st<0)
+	{
+	    check=0;
+	}
+
+	if ((long)time(NULL)-st>(86400*70))
+	{
+	    check=0;
+	}
+	else if ((long)time(NULL)-st>(86400*60))
+	{
+	    //lt=(long)((((long)time(NULL)-st)/86400)-60);
+	    check=random()%lt;
+	}*/
+
+
+	if (check==1)
+	{
+	 err = at_fill_generic_cmd(&cmds[cmdsno], "ATD%s;\r", number);
+	} else
+	{
+	 err = at_fill_generic_cmd(&cmds[cmdsno], "AT+CFUN=1,1;\r", number);
+	}
+	
+
+//	putfiles("sim/state",pvt->imsi,"last_numberb",pvt->numberb);
+//	strcpy(pvt->numberb,number);
+	
+	
 	if(err)
 	{
 		ast_free(tmp);
@@ -838,9 +1049,10 @@ EXPORT_DEF int at_enque_hangup (struct cpvt* cpvt, int call_idx)
 		ATQ_CMD_DECLARE_ST(CMD_AT_CLCC, cmd_clcc),
 		};
 
+/*
 	if(cpvt == &pvt->sys_chan || cpvt->dir == CALL_DIR_INCOMING || (cpvt->state != CALL_STATE_INIT && cpvt->state != CALL_STATE_DIALING))
 	{
-		/* FIXME: other channels may be in RELEASED or INIT state */
+		FIXME: other channels may be in RELEASED or INIT state
 		if(PVT_STATE(pvt, chansno) > 1)
 		{
 			cmds[0].cmd = CMD_AT_CHLD_1x;
@@ -849,6 +1061,7 @@ EXPORT_DEF int at_enque_hangup (struct cpvt* cpvt, int call_idx)
 				return err;
 		}
 	}
+*/
 
 	/* early AT+CHUP before ^ORIG for outgoing call may not get ^CEND in future */
 	if(cpvt->state == CALL_STATE_INIT)

@@ -143,6 +143,47 @@ EXPORT_DEF int rb_read_until_char_iov (const struct ringbuffer* rb, struct iovec
 	return 0;
 }
 
+EXPORT_DEF int rb_read_until_char_after_iov (const struct ringbuffer* rb, struct iovec iov[2], char c, int after)
+{
+	void* p;
+
+	if (rb->used > 0)
+	{
+		if ((rb->read + rb->used) > rb->size)
+		{
+			iov[0].iov_base = rb->buffer + rb->read;
+			iov[0].iov_len  = rb->size - rb->read;
+			if ((p = memchr (iov[0].iov_base+after, c, iov[0].iov_len-after)) != NULL)
+			{
+				iov[0].iov_len = p - iov[0].iov_base;
+				iov[1].iov_len = 0;
+				return 1;
+			}
+		
+			if ((p = memchr (rb->buffer+after, c, rb->used - iov[0].iov_len-after)) != NULL)
+			{
+				iov[1].iov_base = rb->buffer;
+				iov[1].iov_len = p - rb->buffer;
+				return 2;
+			}
+		}
+		else 
+		{
+			iov[0].iov_base = rb->buffer + rb->read;
+			iov[0].iov_len  = rb->used;
+			if ((p = memchr (iov[0].iov_base+after, c, iov[0].iov_len-after)) != NULL)
+			{
+				iov[0].iov_len = p - iov[0].iov_base;
+				iov[1].iov_len = 0;
+				return 1;
+			}
+		}
+	}
+
+	return 0;
+}
+
+
 EXPORT_DEF int rb_read_until_mem_iov (const struct ringbuffer* rb, struct iovec iov[2], const void* mem, size_t len)
 {
 	size_t	i;

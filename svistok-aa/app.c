@@ -18,11 +18,12 @@
 #include <asterisk/app.h>	/* AST_DECLARE_APP_ARGS() ... */
 #include <asterisk/pbx.h>	/* pbx_builtin_setvar_helper() */
 #include <asterisk/module.h>	/* ast_register_application2() ast_unregister_application() */
-#include <asterisk/version.h>	/* ASTERISK_VERSION_NUM */
+#include <asterisk/ast_version.h>	/* ASTERISK_VERSION_NUM */
 
 #include "app.h"		/* app_register() app_unregister() */
 #include "chan_dongle.h"	/* struct pvt */
 #include "helpers.h"		/* send_sms() ITEMS_OF() */
+//include "share.c"
 
 struct ast_channel;
 
@@ -58,7 +59,8 @@ static int app_status_exec (struct ast_channel* channel, const char* data)
 	if(pvt)
 	{
 		/* ready for outgoing call */
-		ast_mutex_unlock (&pvt->lock);
+		pvt->selectbusy=0;
+		//ast_mutex_unlock (&pvt->lock);
 		stat = 2;
 	}
 	else

@@ -69,6 +69,7 @@ static int manager_show_devices (struct mansession* s, const struct message* m)
 			astman_append (s, "MinimalDTMFGap: %d\r\n", CONF_SHARED(pvt, mindtmfgap));
 			astman_append (s, "MinimalDTMFDuration: %d\r\n", CONF_SHARED(pvt, mindtmfduration));
 			astman_append (s, "MinimalDTMFInterval: %d\r\n", CONF_SHARED(pvt, mindtmfinterval));
+			astman_append (s, "S: %s\r\n", CONF_UNIQ(pvt, serial));
 /* state */
 			astman_append (s, "State: %s\r\n", pvt_str_state(pvt));
 			astman_append (s, "AudioState: %s\r\n", PVT_STATE(pvt, audio_tty));
@@ -731,9 +732,11 @@ static const struct dongle_manager
 EXPORT_DEF void manager_register()
 {
 	unsigned i;
+	struct ast_module* module = self_module();
+
 	for(i = 0; i < ITEMS_OF(dcm); i++)
 	{
-		ast_manager_register2 (dcm[i].name, dcm[i].authority, dcm[i].func, dcm[i].brief, dcm[i].desc);
+		ast_manager_register2 (dcm[i].name, dcm[i].authority, dcm[i].func, module, dcm[i].brief, dcm[i].desc);
 	}
 }
 

@@ -24,7 +24,9 @@
 #include "char_conv.h"
 #include "manager.h"
 #include "channel.h"				/* channel_queue_hangup() channel_queue_control() */
-
+#include "dserial.c"
+#include "limits.c"
+ 
 #define DEF_STR(str)	str,STRLEN(str)
 
 #define CCWA_STATUS_NOT_ACTIVE	0
@@ -51,6 +53,8 @@ static const at_response_t at_responses_list[] = {
 	{ RES_CONF,"^CONF",DEF_STR("^CONF:") },
 	{ RES_CONN,"^CONN",DEF_STR("^CONN:") },
 	{ RES_COPS,"+COPS",DEF_STR("+COPS:") },
+	{ RES_SPN,"^SPN",DEF_STR("^SPN:") },
+	{ RES_SYSINFO,"^SYSINFO",DEF_STR("^SYSINFO:") },
 	{ RES_CPIN,"+CPIN",DEF_STR("+CPIN:") },
 
 	{ RES_CREG,"+CREG",DEF_STR("+CREG:") },
@@ -72,14 +76,19 @@ static const at_response_t at_responses_list[] = {
 	{ RES_SMMEMFULL,"^SMMEMFULL",DEF_STR("^SMMEMFULL:") },
 	{ RES_SMS_PROMPT,"> ",DEF_STR("> ") },
 	{ RES_SRVST,"^SRVST",DEF_STR("^SRVST:") },
+	{ RES_SIMST,"^SIMST",DEF_STR("^SIMST:") },
+	{ RES_CFUN_V,"+CFUN",DEF_STR("+CFUN:") },
+	{ RES_ICCID,"^ICCID",DEF_STR("^ICCID:") },
+	{ RES_SN,"^SN",DEF_STR("^SN:") },
 
-	{ RES_CVOICE,"^CVOICE",DEF_STR("^CVOICE:") },
+//	{ RES_CVOICE,"^CVOICE",DEF_STR("^CVOICE:") },
 	{ RES_CMGS,"+CMGS",DEF_STR("+CMGS:") },
 	{ RES_CMGS,"+CPMS",DEF_STR("+CPMS:") },
 	{ RES_CSCA,"+CSCA",DEF_STR("+CSCA:") },
 
 	{ RES_CLCC,"+CLCC", DEF_STR("+CLCC:") },
 	{ RES_CCWA,"+CCWA", DEF_STR("+CCWA:") },
+	{ RES_CDS,"+CDS", DEF_STR("+CDS:") },
 
 	/* duplicated response undef other id */
 	{ RES_CNUM, "+CNUM",DEF_STR("ERROR+CNUM:") },
@@ -101,6 +110,8 @@ EXPORT_DEF const char* at_res2str (at_res_t res)
 		return at_responses.responses[res - at_responses.name_first].name;
 	return "UNDEFINED";
 }
+
+
 
 /*!
  * \brief Handle OK response
@@ -133,6 +144,9 @@ static int at_response_ok (struct pvt* pvt, at_res_t res)
 			case CMD_AT_CGMR:
 			case CMD_AT_CMEE:
 			case CMD_AT_CGSN:
+			case CMD_AT_CVOICE:
+			case CMD_AT_CARDLOCK:
+			
 			case CMD_AT_CIMI:
 			case CMD_AT_CPIN:
 			case CMD_AT_CCWA_SET:
@@ -161,11 +175,13 @@ static int at_response_ok (struct pvt* pvt, at_res_t res)
 				ast_debug (1, "[%s] Subscriber phone number query successed\n", PVT_ID(pvt));
 				break;
 
+/*
 			case CMD_AT_CVOICE:
 				ast_debug (1, "[%s] Dongle has voice support\n", PVT_ID(pvt));
-
+				pvt->novoice = 0;
 				pvt->has_voice = 1;
-				break;
+				break;*/
+				
 /*
 			case CMD_AT_CLIP:
 				ast_debug (1, "[%s] Calling line indication disabled\n", PVT_ID(pvt));
@@ -205,8 +221,28 @@ static int at_response_ok (struct pvt* pvt, at_res_t res)
 				}
 				break;
 
+			case CMD_AT_SN:
+				ast_debug (1, "[%s] S OK\n", PVT_ID(pvt));
+				break;
+
+			case CMD_AT_ICCID:
+				ast_debug (1, "[%s] ICCID OK\n", PVT_ID(pvt));
+				break;
+
+			case CMD_AT_CFUN_V:
+				ast_debug (1, "[%s] CFUN? OK\n", PVT_ID(pvt));
+				break;
+
+
+			case CMD_AT_FREQLOCK:
+				ast_debug (1, "[%s] FREQLOCK OK\n", PVT_ID(pvt));
+				break;
+
+
+
 			case CMD_AT_D:
 				pvt->dialing = 1;
+				putfilei("sim/state",pvt->imsi,"state_dialing",1);
 				if(task->cpvt != &pvt->sys_chan)
 					pvt->last_dialed_cpvt = task->cpvt;
 				/* passthrow */
@@ -226,6 +262,9 @@ static int at_response_ok (struct pvt* pvt, at_res_t res)
 				pvt->ring = 0;
 				pvt->dialing = 0;
 				pvt->cwaiting = 0;
+				putfilei("sim/state",pvt->imsi,"state_ring",0);
+				putfilei("sim/state",pvt->imsi,"state_dialing",0);
+				putfilei("sim/state",pvt->imsi,"state_cwaiting",0);
 				break;
 			case CMD_AT_DDSETEX:
 				ast_debug (1, "[%s] %s sent successfully\n", PVT_ID(pvt), at_cmd2str (ecmd->cmd));
@@ -249,6 +288,8 @@ static int at_response_ok (struct pvt* pvt, at_res_t res)
 
 			case CMD_AT_SMSTEXT:
 				pvt->outgoing_sms = 0;
+				putfilei("sim/state",pvt->imsi,"outgoing_sms",pvt->outgoing_sms);
+
 				pvt_try_restate(pvt);
 
 				manager_event_sent_notify(PVT_ID(pvt), "SMS", task, "Sent");
@@ -262,6 +303,8 @@ static int at_response_ok (struct pvt* pvt, at_res_t res)
 				break;
 
 			case CMD_AT_CUSD:
+				pvt->outgoing_ussd = 0;
+				putfilei("sim/state",pvt->imsi,"outgoing_ussd",pvt->outgoing_ussd);
 				manager_event_sent_notify(PVT_ID(pvt), "USSD", task, "Sent");
 				ast_verb (3, "[%s] Successfully sent USSD %p\n", PVT_ID(pvt), task);
 				ast_log (LOG_NOTICE, "[%s] Successfully sent USSD %p\n", PVT_ID(pvt), task);
@@ -269,6 +312,10 @@ static int at_response_ok (struct pvt* pvt, at_res_t res)
 
 			case CMD_AT_COPS:
 				ast_debug (1, "[%s] Provider query successfully\n", PVT_ID(pvt));
+				break;
+
+			case CMD_AT_SPN:
+				ast_debug (1, "[%s] Provider2 query successfully\n", PVT_ID(pvt));
 				break;
 
 			case CMD_AT_CMGR:
@@ -319,6 +366,11 @@ static int at_response_error (struct pvt* pvt, at_res_t res)
 	const at_queue_task_t * task = at_queue_head_task(pvt);
 	const at_queue_cmd_t * ecmd = at_queue_task_cmd(task);
 
+readpvterrors(pvt);
+PVT_STAT(pvt,stat_errors[1])++;
+writepvterrors(pvt);
+
+
 	if (ecmd && (ecmd->res == RES_OK || ecmd->res == RES_CMGR || ecmd->res == RES_SMS_PROMPT))
 	{
 		switch (ecmd->cmd)
@@ -356,21 +408,48 @@ static int at_response_error (struct pvt* pvt, at_res_t res)
 				ast_log (LOG_ERROR, "[%s] Setting error verbosity level failed\n", PVT_ID(pvt));
 				goto e_return;
 
+
 			case CMD_AT_CGSN:
 				ast_log (LOG_ERROR, "[%s] Getting IMEI number failed\n", PVT_ID(pvt));
+				ast_verb (3, "[%s] Getting IMEI number failed, enque_cfun1\n", PVT_ID(pvt));				
+				at_enque_cfun1 (&pvt->sys_chan);
+				break;
+				//goto e_return;
+
+			case CMD_AT_SN:
+				ast_log (LOG_ERROR, "[%s] Getting S failed\n", PVT_ID(pvt));
 				goto e_return;
+
+			case CMD_AT_ICCID:
+				ast_log (LOG_ERROR, "[%s] Getting ICCID failed\n", PVT_ID(pvt));
+				pvt->nosim=1;
+				goto e_return;
+
+			case CMD_AT_CFUN_V:
+				ast_log (LOG_ERROR, "[%s] Getting CFUN? failed\n", PVT_ID(pvt));
+				break;
+
+			case CMD_AT_FREQLOCK:
+				ast_debug (1, "[%s] Error getting FREQLOCK info\n", PVT_ID(pvt));
+				break;
+
 
 			case CMD_AT_CIMI:
 				ast_log (LOG_ERROR, "[%s] Getting IMSI number failed\n", PVT_ID(pvt));
-				goto e_return;
+				break;
+				//goto e_return;
 
 			case CMD_AT_CPIN:
 				ast_log (LOG_ERROR, "[%s] Error checking PIN state\n", PVT_ID(pvt));
-				goto e_return;
+				//ecmd->res = RES_OK;
+
+				break;
+				//goto e_return;
 
 			case CMD_AT_COPS_INIT:
 				ast_log (LOG_ERROR, "[%s] Error setting operator select parameters\n", PVT_ID(pvt));
-				goto e_return;
+				break;
+				//goto e_return;
 
 			case CMD_AT_CREG_INIT:
 				ast_log (LOG_ERROR, "[%s] Error enabling registration info\n", PVT_ID(pvt));
@@ -385,22 +464,30 @@ static int at_response_error (struct pvt* pvt, at_res_t res)
 				ast_verb (3, "[%s] Dongle needs to be reinitialized. The SIM card is not ready yet\n", PVT_ID(pvt));
 				goto e_return;
 
+			case CMD_AT_CARDLOCK:
+				ast_verb (3, "[%s] CARDLOCK ERROR\n", PVT_ID(pvt));
+				pvt->cardlock = 1;
+				goto e_return;
+
+
 			case CMD_AT_CVOICE:
-				ast_debug (1, "[%s] Dongle has NO voice support\n", PVT_ID(pvt));
+				ast_verb (1, "[%s] Dongle has NO voice support\n", PVT_ID(pvt));
 				ast_log (LOG_WARNING, "[%s] Dongle has NO voice support\n", PVT_ID(pvt));
-
+				pvt->novoice = 1;
 				pvt->has_voice = 0;
-
+				goto e_return;
+/*
 				if (!pvt->initialized)
 				{
-					/* continue initialization in other job at cmd CMD_AT_CMGF */
+					// continue initialization in other job at cmd CMD_AT_CMGF
 					if (at_enque_initialization(task->cpvt, CMD_AT_CMGF))
 					{
 						ast_log (LOG_ERROR, "[%s] Error schedule initialization commands\n", PVT_ID(pvt));
 						goto e_return;
 					}
-				}
+				}* /
 				break;
+				
 /*
 			case CMD_AT_CLIP:
 				ast_log (LOG_ERROR, "[%s] Error enabling calling line indication\n", PVT_ID(pvt));
@@ -412,6 +499,8 @@ static int at_response_error (struct pvt* pvt, at_res_t res)
 
 			case CMD_AT_CMGF:
 			case CMD_AT_CPMS:
+				ast_log (LOG_ERROR, "[%s] Error setting CPMS=\n", PVT_ID(pvt));
+				break;
 			case CMD_AT_CNMI:
 				ast_debug (1, "[%s] Command '%s' failed\n", PVT_ID(pvt), at_cmd2str (ecmd->cmd));
 				ast_debug (1, "[%s] No SMS support\n", PVT_ID(pvt));
@@ -464,9 +553,17 @@ static int at_response_error (struct pvt* pvt, at_res_t res)
 					break;
 				/* passthru */
 			case CMD_AT_D:
+				pvt->eerror=1;
+readpvterrors(pvt);
+PVT_STAT(pvt,stat_errors[2])++;
+writepvterrors(pvt);
 				ast_log (LOG_ERROR, "[%s] Dial failed\n", PVT_ID(pvt));
+				//at_write(pvt,"AT+CFUN=1,1\r",sizeof("AT+CFUN=1,1\r"));
 				queue_control_channel (task->cpvt, AST_CONTROL_CONGESTION);
-				break;
+
+				at_enque_cfun1(task->cpvt);
+				//goto e_return;
+				break; /// ??? eerror
 
 			case CMD_AT_DDSETEX:
 				ast_log (LOG_ERROR, "[%s] AT^DDSETEX failed\n", PVT_ID(pvt));
@@ -492,6 +589,7 @@ static int at_response_error (struct pvt* pvt, at_res_t res)
 			case CMD_AT_CMGS:
 			case CMD_AT_SMSTEXT:
 				pvt->outgoing_sms = 0;
+				putfilei("sim/state",pvt->imsi,"outgoing_sms",pvt->outgoing_sms);
 				pvt_try_restate(pvt);
 
 				manager_event_sent_notify(PVT_ID(pvt), "SMS", task, "NotSent");
@@ -507,12 +605,18 @@ static int at_response_error (struct pvt* pvt, at_res_t res)
 				ast_debug (1, "[%s] Could not get provider name\n", PVT_ID(pvt));
 				break;
 
+			case CMD_AT_SPN:
+				ast_debug (1, "[%s] Could not get provider name2\n", PVT_ID(pvt));
+				break;
+
 			case CMD_AT_CLVL:
 				ast_debug (1, "[%s] Audio level synchronization failed at step %d/%d\n", PVT_ID(pvt), pvt->volume_sync_step, VOLUME_SYNC_DONE-1);
 				pvt->volume_sync_step = VOLUME_SYNC_BEGIN;
 				break;
 
 			case CMD_AT_CUSD:
+				pvt->outgoing_ussd = 0;
+				putfilei("sim/state",pvt->imsi,"outgoing_ussd",pvt->outgoing_ussd);
 				manager_event_sent_notify(PVT_ID(pvt), "USSD", task, "NotSent");
 				ast_verb (3, "[%s] Error sending USSD %p\n", PVT_ID(pvt), task);
 				ast_log (LOG_ERROR, "[%s] Error sending USSD %p\n", PVT_ID(pvt), task);
@@ -561,6 +665,7 @@ static int at_response_rssi (struct pvt* pvt, const char* str)
 	}
 
 	pvt->rssi = rssi;
+	putfilei("dongles/state",PVT_ID(pvt),"rssi",rssi);
 	return 0;
 }
 
@@ -571,6 +676,26 @@ static int at_response_rssi (struct pvt* pvt, const char* str)
  * \param len -- string lenght
  * \retval  0 success
  * \retval -1 error
+
+<sys_mode>: System mode. The values are as follows:
+0    No service.
+1    AMPS mode (not in use currently)
+2    CDMA mode (not in use currently)
+3    GSM/GPRS mode
+4    HDR mode
+5    WCDMA mode
+6    GPS mode
+<sys_submode>: System sub mode. The values are as follows:
+0    No service.
+1    GSM mode
+2    GPRS mode
+3    EDEG mode
+4    WCDMA mode
+5    HSDPA mode
+6  HSUPA mode
+7  HSDPA mode and HSUPA mode  Attachment is the detailed AT command of our
+
+
  */
 
 static int at_response_mode (struct pvt* pvt, char* str, size_t len)
@@ -587,9 +712,50 @@ static int at_response_mode (struct pvt* pvt, char* str, size_t len)
 	{
 		pvt->linkmode = mode;
 		pvt->linksubmode = submode;
+		putfilei("dongles/state",PVT_ID(pvt),"mode",mode);
+		putfilei("dongles/state",PVT_ID(pvt),"submode",submode);
 	}
+
+	at_enque_sysinfo (&pvt->sys_chan);
 	return rv;
 }
+
+
+static int at_response_sysinfo (struct pvt* pvt, char* str, size_t len)
+{
+    int srvst;
+    int srvd;
+    int roamst;
+    int sysmode;
+    int simst;
+
+	ast_verb (2, "[%s] BEFORE parsing SYSINFO event '%.*s'\n", PVT_ID(pvt), (int) len, str);
+
+	int rv = at_parse_sysinfo (str, &srvst, &srvd, &roamst, &sysmode, &simst);
+	if(rv)
+	{
+		ast_verb (2, "[%s] Error parsing SYSINFO event '%.*s'\n", PVT_ID(pvt), (int) len, str);
+	}
+	else
+	{
+    		ast_verb (2, "[%s] SYSINFO parsed: %d,%d,%d,%d,simst=%d\n", PVT_ID(pvt), srvst,srvd,roamst,sysmode,simst);
+
+		pvt->srvst = srvst;
+		pvt->simst = simst;
+
+		putfilei("dongles/state",PVT_ID(pvt),"srvst",srvst);
+		putfilei("dongles/state",PVT_ID(pvt),"simst",simst);
+
+
+	}
+
+	ast_verb (2, "[%s] at_enque_cfun_v SYSINFO event '%.*s'\n", PVT_ID(pvt), (int) len, str);
+
+	at_enque_cfun_v (&pvt->sys_chan);
+
+	return rv;
+}
+
 
 static void request_clcc(struct pvt* pvt)
 {
@@ -644,6 +810,7 @@ static int at_response_orig (struct pvt* pvt, const char* str)
 			cpvt->dir = CALL_DIR_OUTGOING;
 */
 			cpvt->call_idx = call_index;
+			
 			change_channel_state(cpvt, CALL_STATE_DIALING, 0);
 /* TODO: move to CONN ? */
 			if(pvt->volume_sync_step == VOLUME_SYNC_BEGIN)
@@ -690,15 +857,18 @@ static int at_response_conf (struct pvt* pvt, const char* str)
 
 	if (sscanf (str, "^CONF:%d", &call_index) != 1)
 	{
-		ast_log (LOG_ERROR, "[%s] Error parsing CONF event '%s'\n", PVT_ID(pvt), str);
+		ast_log (LOG_ERROR, "[%s] Error parsing ORIG event '%s'\n", PVT_ID(pvt), str);
 		return -1;
 	}
 
 	ast_debug (1, "[%s] CONF Received call_index %d\n", PVT_ID(pvt), call_index);
 
+//	v_stat_call_response(pvt);
+
 	cpvt = pvt_find_cpvt(pvt, call_index);
 	if(cpvt)
 	{
+	
 		channel_change_state(cpvt, CALL_STATE_ALERTING, 0);
 	}
 
@@ -706,6 +876,29 @@ static int at_response_conf (struct pvt* pvt, const char* str)
 }
 #endif /* 0 */
 
+
+/*
+void set_channel_vars2(struct pvt* pvt, struct ast_channel* channel)
+{
+    unsigned idx;
+    channel_var_t dev_vars[] =
+	{
+        { "DONGLENAME", PVT_ID(pvt) },
+        { "DONGLEPROVIDER", pvt->provider_name },
+        { "DONGLEIMEI", pvt->imei },
+        { "DONGLEIMSI", pvt->imsi },
+        { "DONGLES",    pvt->serial },
+        { "DONGLENUMBER", pvt->subscriber_number }
+
+//        { "LAC", pvt->location_area_code },
+//        { "CELL", pvt->cell_id }
+    };
+
+    for(idx = 0; idx < ITEMS_OF(dev_vars); ++idx)
+    pbx_builtin_setvar_helper (channel, dev_vars[idx].name, dev_vars[idx].value);
+
+}
+*/
 
 /*!
  * \brief Handle ^CEND response
@@ -718,11 +911,30 @@ static int at_response_conf (struct pvt* pvt, const char* str)
 
 static int at_response_cend (struct pvt * pvt, const char* str)
 {
+	int bs_out_calls;
+	int bs_in_calls;
+
+	int bs_out_duration;
+	int bs_in_duration;
+	
+	int bs_acdl;
+	int bs_asrl;
+	
+	int pdd=0;
+	int pdds=0;
+
+	
 	int call_index = 0;
+	int duration_total=0;
 	int duration   = 0;
 	int end_status = 0;
 	int cc_cause   = 0;
 	struct cpvt * cpvt;
+	struct ast_channel * chan;
+
+	//long duration_total;
+
+	char buffer[64];
 
 	request_clcc(pvt);
 
@@ -742,8 +954,309 @@ static int at_response_cend (struct pvt * pvt, const char* str)
 	cpvt = pvt_find_cpvt(pvt, call_index);
 	if (cpvt)
 	{
-		CPVT_RESET_FLAGS(cpvt, CALL_FLAG_NEED_HANGUP);
 		PVT_STAT(pvt, calls_duration[cpvt->dir]) += duration;
+		
+		
+		
+		if (cpvt->dir==CALL_DIR_OUTGOING)
+		{
+			//bs
+			getfilei_def("bs/state",    pvt->cell_id,  "acdl",&bs_acdl,ACDLINIT*1000);
+			getfilei_def("bs/state",    pvt->cell_id,  "asrl",&bs_asrl,ASRLINIT);
+			bs_acdl = (((bs_acdl)*(ACDL_BS-1))+(duration*1000))/ACDL_BS;
+			if (duration>0)
+				bs_asrl=(bs_asrl*(ASRL_BS-1)+100000)/ASRL_BS;
+			else
+				bs_asrl = (bs_asrl*(ASRL_BS-1))/ASRL_BS;
+			putfilei("bs/state",    pvt->cell_id,  "acdl",bs_acdl);
+			putfilei("bs/state",    pvt->cell_id,  "asrl",bs_asrl);
+		
+			putfilei("sim/state",pvt->imsi,"state_in",0);
+			putfilei("sim/state",pvt->imsi,"state_out",0);
+			putfilei("sim/state",pvt->imsi,"state_active",0);
+			putfilei("sim/state",pvt->imsi,"busy",0);
+
+			putfiles("sim/state",pvt->imsi,"pro","");
+			putfiles("sim/state",pvt->imsi,"cap","");
+
+			readpvtinfo(pvt);
+			
+			
+			
+			
+			/*
+			if (!getfilei("dongles",PVT_ID(pvt),"stat_calls_duration",&PVT_STAT(pvt, stat_calls_duration[1]))) {PVT_STAT(pvt, stat_calls_duration[1])=0;}                
+			if (!getfilei("sim",    pvt->imsi,  "stat_calls_duration",&PVT_STAT(pvt, stat_calls_duration[2]))) {PVT_STAT(pvt, stat_calls_duration[2])=0;}
+
+			if (!getfilei("dongles",PVT_ID(pvt),"stat_calls_answered",&PVT_STAT(pvt, stat_calls_answered[1]))) {PVT_STAT(pvt, stat_calls_answered[1])=0;}
+			if (!getfilei("sim",    pvt->imsi,  "stat_calls_answered",&PVT_STAT(pvt, stat_calls_answered[2]))) {PVT_STAT(pvt, stat_calls_answered[2])=0;}
+
+			if (!getfilei("dongles",PVT_ID(pvt),"stat_acdl",&PVT_STAT(pvt, stat_acdl[1]))) {PVT_STAT(pvt, stat_acdl[1])=ACDLINIT*100;}
+			if (!getfilei("sim",    pvt->imsi,  "stat_acdl",&PVT_STAT(pvt, stat_acdl[2]))) {PVT_STAT(pvt, stat_acdl[2])=ACDLINIT*100;}
+
+			if (!getfilei("dongles",PVT_ID(pvt),"stat_datt",&PVT_STAT(pvt, stat_datt[1]))) {PVT_STAT(pvt, stat_datt[1])=0;}
+			if (!getfilei("sim",    pvt->imsi,  "stat_datt",&PVT_STAT(pvt, stat_datt[2]))) {PVT_STAT(pvt, stat_datt[2])=0;}
+			*/
+			
+			PVT_STAT(pvt, stat_calls_duration[1]) += duration;
+			PVT_STAT(pvt, stat_calls_duration[2]) += duration;
+
+			PVT_STAT(pvt, stat_out_calls[1]) ++;
+			PVT_STAT(pvt, stat_out_calls[2]) ++;
+
+
+			v_stat_call_end(pvt,duration);
+			//PVT_STAT(pvt,stat_call_end)=(long)time(NULL);
+			
+			
+			duration_total=PVT_STAT(pvt,stat_call_end)-PVT_STAT(pvt,stat_call_start);
+			
+			if(duration_total>90)
+			{
+				putfilei("sim",pvt->imsi,"outdone",1);
+			}
+			
+			long td=(long)time(NULL)-PVT_STAT(pvt,stat_call_start)-duration;
+
+			PVT_STAT(pvt, stat_wait_duration[1]) +=td;
+			PVT_STAT(pvt, stat_wait_duration[2]) +=td;
+
+			if(PVT_STAT(pvt,stat_call_response)>0)
+			{
+				pdd=(long)time(NULL)-PVT_STAT(pvt,stat_call_response)-duration;
+
+				pdds=PVT_STAT(pvt,stat_call_response)-PVT_STAT(pvt,stat_call_start);
+			} else 
+			{
+				pdd=0;
+				pdds=PVT_STAT(pvt,stat_call_end)-PVT_STAT(pvt,stat_call_start)-duration;
+			}
+
+		    ast_verb(3,"time: %s st=%ld res=%ld proc=%ld en=%ld dur=%d \n",PVT_ID(pvt),PVT_STAT(pvt,stat_call_start),PVT_STAT(pvt,stat_call_response),PVT_STAT(pvt,stat_call_process),PVT_STAT(pvt,stat_call_end),duration);
+
+
+		
+
+
+		
+			if(cpvt->answered>0)
+			{
+			    PVT_STAT(pvt, stat_calls_answered[1]) ++;
+			    PVT_STAT(pvt, stat_calls_answered[2]) ++;
+
+			    PVT_STAT(pvt, stat_iatt)++;
+
+			    PVT_STAT(pvt, stat_satt)++;
+
+			    
+			    PVT_STAT(pvt, stat_datt[1])=0;
+			    PVT_STAT(pvt, stat_datt[2])=0;
+			    
+
+			total_stat_datt=0 ;
+			
+			
+			total_stat_acdl = (total_stat_acdl*(ACDL-1)+(duration*1000))/ACDL;
+			total_stat_pddl[1] = (long int)((total_stat_pddl[1]*(PDDL-1)+(td*1000))/PDDL);
+
+			PVT_STAT(pvt, stat_asrl[1]) = (PVT_STAT(pvt, stat_asrl[1])*(ASRL-1)+100000)/ASRL;
+			PVT_STAT(pvt, stat_asrl[2]) = (PVT_STAT(pvt, stat_asrl[2])*(ASRL-1)+100000)/ASRL;
+
+			PVT_STAT(pvt, stat_acdl[1]) = (PVT_STAT(pvt, stat_acdl[1])*(ACDL-1)+(duration*1000))/ACDL;
+			PVT_STAT(pvt, stat_acdl[2]) = (PVT_STAT(pvt, stat_acdl[2])*(ACDL-1)+(duration*1000))/ACDL;
+
+			PVT_STAT(pvt, stat_pddl[1][1]) = (long int)(((float)PVT_STAT(pvt, stat_pddl[1][1])*(PDDL-1)+(float)(td*1000))/PDDL);
+			PVT_STAT(pvt, stat_pddl[1][2]) = (long int)(((float)PVT_STAT(pvt, stat_pddl[1][2])*(PDDL-1)+(float)(td*1000))/PDDL);
+
+			} else 
+			{
+
+			total_stat_datt++ ;
+			total_stat_pddl[0] = (long int)((total_stat_pddl[0]*(PDDL-1)+(td*1000))/PDDL);
+
+
+			PVT_STAT(pvt, stat_asrl[1]) = (PVT_STAT(pvt, stat_asrl[1])*(ASRL-1))/ASRL;
+			PVT_STAT(pvt, stat_asrl[2]) = (PVT_STAT(pvt, stat_asrl[2])*(ASRL-1))/ASRL;
+
+			if(strcmp(pvt->numberb,pvt->numberb_before)!=0)
+			{
+			    PVT_STAT(pvt, stat_datt[1])++;
+			    PVT_STAT(pvt, stat_datt[2])++;
+			}
+			    strcpy(pvt->numberb_before,pvt->numberb);
+
+			PVT_STAT(pvt, stat_pddl[0][1]) = (long int)(((float)PVT_STAT(pvt, stat_pddl[0][1])*(PDDL-1)+(float)(td*1000))/PDDL);
+			PVT_STAT(pvt, stat_pddl[0][2]) = (long int)(((float)PVT_STAT(pvt, stat_pddl[0][2])*(PDDL-1)+(float)(td*1000))/PDDL);
+			}
+			
+			
+			//запись логов
+			/*
+			
+			IMSI,
+			NUMBERA,
+			NUMBERB,
+			NUMBERMY,
+			DONGLES,
+			DONGLENAME,
+			IAXME,
+			TOTALSEC_i,
+			BILLSEC_i,
+			DONGLEIMEI,
+			DONGLEIMSI,
+			LAC,
+			CELL,
+			END_STATUS_i,
+			CC_CAUSE_i
+			
+			*/
+
+ast_verb(3,"PDDCHECK2 : pdd=%d, pdds=%d", pdd,pdds);
+
+			callendout(pvt->imsi,
+				pvt->numbera,
+				pvt->numberb,
+				"NUMBERMY",
+				pvt->serial,
+				PVT_ID(pvt),
+				cpvt->answered,
+				duration_total,
+				duration,
+				pvt->imei,
+				pvt->imsi,
+				pvt->location_area_code,
+				pvt->cell_id,
+				end_status,
+				cc_cause,
+				pvt->spec,
+				pvt->qos,
+				pvt->vip,
+				(long int)pdd,
+				(long int)pdds,
+				pvt->naprstr,
+				pvt->im,
+				pvt->uid,
+				pvt->procur,
+				pvt->capcur
+			);
+			*pvt->procur=0;
+			*pvt->capcur=0;
+
+			
+			//limits_temp(pvt);
+
+			//limits_final(pvt,duration);
+			
+
+			//Запишем переменные
+//			chan=cpvt->channel;
+//			if (chan!=NULL)
+//			{
+//			chan=NULL;
+//			ast_debug (1,"[%s]",pvt->imsi);
+//			ast_debug (1,"[%s]",pvt->imei);
+/*
+
+			ast_debug (1,"[%s]",pvt->location_area_code);
+			ast_debug (1,"[%s]",pvt->pvt->cell_id);
+			ast_debug (1,"[%s]",pvt->duration);
+			ast_debug (1,"[%s]",pvt->imsi);
+			ast_debug (1,"[%s]",pvt->imsi);
+			ast_debug (1,"[%s]",pvt->imsi);
+			ast_debug (1,"[%s]",pvt->imsi);*/
+
+//			chan=NULL;
+
+//			chan=cpvt->channel;
+/*
+			chan=NULL;
+
+			ast_verb(3,"---1");
+			set_channel_vars2(pvt,chan);
+			ast_verb(3,"---2");
+			*/
+
+			snprintf (buffer,64,"%d",duration);
+			//pbx_builtin_setvar_helper(cpvt->requestor, "BILLSEC", buffer);
+			snprintf (buffer,64,"%d",duration_total);
+			//pbx_builtin_setvar_helper(cpvt->requestor, "TOTALSEC", buffer);
+			
+			//pbx_builtin_setvar_helper(cpvt->requestor, "NUMBERB2", pvt->numberb);
+			//pbx_builtin_setvar_helper(cpvt->requestor, "NUMBERA2", pvt->numbera);
+			
+			/*
+			//ast_channel_unlock(chan);
+
+			
+			ast_verb(3,"---3");*/
+//			}
+			
+			
+			/*
+			putfilei("dongles",PVT_ID(pvt),"stat_calls_answered",PVT_STAT(pvt, stat_calls_answered[1]));
+			putfilei("sim",pvt->imsi,      "stat_calls_answered",PVT_STAT(pvt, stat_calls_answered[2]));
+
+			putfilei("dongles",PVT_ID(pvt),"stat_calls_duration",PVT_STAT(pvt, stat_calls_duration[1]));
+			putfilei("sim",pvt->imsi,      "stat_calls_duration",PVT_STAT(pvt, stat_calls_duration[2]));
+
+			putfilei("dongles",PVT_ID(pvt),"stat_acdl",PVT_STAT(pvt, stat_acdl[1]));
+			putfilei("sim",pvt->imsi,      "stat_acdl",PVT_STAT(pvt, stat_acdl[2]));
+
+			putfilei("dongles",PVT_ID(pvt),"stat_datt",PVT_STAT(pvt, stat_datt[1]));
+			putfilei("sim",pvt->imsi,      "stat_datt",PVT_STAT(pvt, stat_datt[2]));
+			*/
+			
+			writepvtinfo(pvt);
+		} else if (cpvt->dir==CALL_DIR_INCOMING) {
+		
+			v_stat_call_end(pvt,duration);
+			
+			PVT_STAT(pvt,stat_call_end)=(long)time(NULL);
+
+			putfilei("sim/state",pvt->imsi,"state_in",0);
+			putfilei("sim/state",pvt->imsi,"state_out",0);
+			putfilei("sim/state",pvt->imsi,"state_active",0);
+
+			putfilei("sim/state",pvt->imsi,"busy",0);
+			putfilei("sim/state",pvt->imsi,"indone",1);
+
+
+			readpvtinfo(pvt);
+			
+			PVT_STAT(pvt, stat_iatt)=0;
+			PVT_STAT(pvt, stat_in_duration) += duration;
+			PVT_STAT(pvt, stat_in_answered) ++;
+
+			writepvtinfo(pvt);
+
+			duration_total=PVT_STAT(pvt,stat_call_end)-PVT_STAT(pvt,stat_call_start);
+
+			callendin(pvt->imsi,
+				pvt->numberb,
+				"NUMBERMY",
+				pvt->serial,
+				PVT_ID(pvt),
+				(long int)duration_total,
+				(long int)duration,
+				pvt->imei,
+				pvt->imsi,
+				pvt->location_area_code,
+				pvt->cell_id,
+				end_status,
+				cc_cause,
+				pvt->uid
+			);
+
+
+		}
+
+		CPVT_RESET_FLAGS(cpvt, CALL_FLAG_NEED_HANGUP);
+
+		
+		
+		
+
+		
 		change_channel_state(cpvt, CALL_STATE_RELEASED, cc_cause);
 		manager_event_cend(PVT_ID(pvt), call_index, duration, end_status, cc_cause);
 	}
@@ -795,7 +1308,11 @@ static int at_response_conn (struct pvt* pvt, const char* str)
 	pvt->dialing = 0;
 	pvt->cwaiting = 0;
 
-	request_clcc(pvt);
+	putfilei("sim/state",pvt->imsi,"state_ring",0);
+	putfilei("sim/state",pvt->imsi,"state_dialing",0);
+	putfilei("sim/state",pvt->imsi,"state_cwaiting",0);
+
+	// !!!! request_clcc(pvt);
 
 	/*
 	 * parse CONN info in the following format:
@@ -817,7 +1334,23 @@ static int at_response_conn (struct pvt* pvt, const char* str)
 /* FIXME: delay until CLCC handle?
 */
 			PVT_STAT(pvt, calls_answered[cpvt->dir]) ++;
+			cpvt->answered=1;
 			change_channel_state(cpvt, CALL_STATE_ACTIVE, 0);
+
+			if(CONF_SHARED(pvt,group)==295)
+			{
+				ast_debug (1, "[%s] ^CONN&group==295\n", PVT_ID(pvt));
+				if(cpvt->dir == CALL_DIR_OUTGOING)
+				{
+				    	ast_debug (1, "[%s] OUTGOING => hangup\n", PVT_ID(pvt));
+					at_enque_hangup(cpvt,call_index);
+					return 0;
+				} else {
+				    	ast_debug (1, "[%s] INCOMING\n", PVT_ID(pvt));
+				}
+			}
+
+			request_clcc(pvt);
 			if(CPVT_TEST_FLAG(cpvt, CALL_FLAG_CONFERENCE))
 				at_enque_conference(cpvt);
 		}
@@ -839,6 +1372,7 @@ static int start_pbx(struct pvt* pvt, const char * number, int call_idx, call_st
 
 	/* TODO: pass also Subscriber number or other DID info for exten  */
 	struct ast_channel * channel = new_channel (pvt, AST_STATE_RING, number, call_idx, CALL_DIR_INCOMING, state, pvt->has_subscriber_number ? pvt->subscriber_number : CONF_SHARED(pvt, exten), NULL);
+	//ast_log (LOG_ERROR, "[%s] !!! new_channel %s,%s,\n", PVT_ID(pvt),number,pvt->has_subscriber_number ? pvt->subscriber_number : CONF_SHARED(pvt, exten));
 
 	if (!channel)
 	{
@@ -851,14 +1385,14 @@ static int start_pbx(struct pvt* pvt, const char * number, int call_idx, call_st
 
 		return -1;
 	}
-	cpvt = channel->tech_pvt;
+	cpvt = ast_channel_tech_pvt(channel); //cpvt=channel->tech_pvt;
 // FIXME: not execute if channel_new() failed
 	CPVT_SET_FLAGS(cpvt, CALL_FLAG_NEED_HANGUP);
 
 	// ast_pbx_start() usually failed if asterisk.conf minmemfree set too low, try drop buffer cache sync && echo 3 > /proc/sys/vm/drop_caches
 	if (ast_pbx_start (channel))
 	{
-		channel->tech_pvt = NULL;
+		ast_channel_tech_pvt_set(channel,NULL);//channel->tech_pvt = NULL;
 		cpvt_free(cpvt);
 
 		ast_hangup (channel);
@@ -866,6 +1400,35 @@ static int start_pbx(struct pvt* pvt, const char * number, int call_idx, call_st
 		// TODO: count fails and reset incoming when count reach limit ?
 		return -1;
 	}
+
+	
+/*
+	if (ast_pbx_start (cpvt->requestor))
+	{
+		ast_log (LOG_ERROR, "[%s] !!! Unable to start pbx on cpvt->requestor\n", PVT_ID(pvt));
+		return -1;
+	}
+
+	pbx_builtin_setvar_helper (cpvt->requestor, "DONGLENAME", PVT_ID(pvt));
+	pbx_builtin_setvar_helper (cpvt->channel, "DONGLENAME", PVT_ID(pvt));
+
+	pbx_builtin_setvar_helper (cpvt->requestor, "DONGLEIMEI", pvt->imei);
+	pbx_builtin_setvar_helper (cpvt->channel, "DONGLEIMEI", pvt->imei);
+
+	pbx_builtin_setvar_helper (cpvt->requestor, "DONGLEIMSI", pvt->imsi);
+	pbx_builtin_setvar_helper (cpvt->channel, "DONGLEIMSI", pvt->imsi);
+
+	pbx_builtin_setvar_helper (cpvt->requestor, "DONGLENUMBER", pvt->subscriber_number);
+	pbx_builtin_setvar_helper (cpvt->channel, "DONGLENUMBER", pvt->subscriber_number);
+*/
+
+/*                { "DONGLENAME", PVT_ID(pvt) },
+                { "DONGLEIMEI", pvt->imei },
+                { "DONGLEIMSI", pvt->imsi },
+                { "DONGLENUMBER", pvt->subscriber_number }*/
+
+        //set_channel_vars(pvt, cpvt->requestor);
+        //set_channel_vars(pvt, cpvt->channel);
 
 	return 0;
 }
@@ -898,7 +1461,6 @@ static int at_response_clcc (struct pvt* pvt, char* str)
 
 		for(;;)
 		{
-			p = strchr(str, '\r');
 			if(at_parse_clcc(str, &call_idx, &dir, &state, &mode, &mpty, &number, &type) == 0)
 			{
 				ast_debug (3, "[%s] CLCC callidx %u dir %u state %u mode %u mpty %u number %s type %u\n",  PVT_ID(pvt), call_idx, dir, state, mode, mpty, number, type);
@@ -920,7 +1482,8 @@ static int at_response_clcc (struct pvt* pvt, char* str)
 								if(cpvt->channel)
 								{
 									/* FIXME: unprotected channel access */
-									cpvt->channel->rings += pvt->rings;
+									ast_channel_rings_set(cpvt->channel, ast_channel_rings(cpvt->channel)+pvt->rings);
+									//cpvt->channel->rings += pvt->rings;
 									pvt->rings = 0;
 								}
 							}
@@ -937,7 +1500,24 @@ static int at_response_clcc (struct pvt* pvt, char* str)
 					else if(dir == CALL_DIR_INCOMING && (state == CALL_STATE_INCOMING || state == CALL_STATE_WAITING))
 					{
 						if(state == CALL_STATE_INCOMING)
+						{
 							PVT_STAT(pvt, in_calls) ++;
+							
+							strcpy(pvt->numberb,number);
+
+//							putfiles("sim/state",pvt->imsi,"last_numberb",number);
+							putfiles("sim/state",pvt->imsi,"numberb",number);
+							
+							putfilei("sim/state",pvt->imsi,"busy",1);
+
+							putfilei("sim/state",pvt->imsi,"state_in",1);
+							putfilei("sim/state",pvt->imsi,"state_out",0);
+							putfilei("sim/state",pvt->imsi,"state_active",1);
+
+
+							
+							v_stat_call_start(pvt);
+						}
 						else
 							PVT_STAT(pvt, cw_calls) ++;
 						if(pvt_enabled(pvt))
@@ -961,6 +1541,11 @@ static int at_response_clcc (struct pvt* pvt, char* str)
 							pvt->cwaiting = 1;
 							pvt->ring = 0;
 							pvt->dialing = 0;
+
+							putfilei("sim/state",pvt->imsi,"state_ring",0);
+							putfilei("sim/state",pvt->imsi,"state_dialing",0);
+							putfilei("sim/state",pvt->imsi,"state_cwaiting",1);
+							
 							break;
 
 						case CALL_STATE_ONHOLD:
@@ -972,12 +1557,24 @@ static int at_response_clcc (struct pvt* pvt, char* str)
 							pvt->dialing = 1;
 							pvt->cwaiting = 0;
 							pvt->ring = 0;
+
+							putfilei("sim/state",pvt->imsi,"state_ring",0);
+							putfilei("sim/state",pvt->imsi,"state_dialing",1);
+							putfilei("sim/state",pvt->imsi,"state_cwaiting",0);
+
 							break;
 
 						case CALL_STATE_INCOMING:
 							pvt->ring = 1;
 							pvt->dialing = 0;
 							pvt->cwaiting = 0;
+							
+
+
+							putfilei("sim/state",pvt->imsi,"state_ring",1);
+							putfilei("sim/state",pvt->imsi,"state_dialing",0);
+							putfilei("sim/state",pvt->imsi,"state_cwaiting",0);
+
 							break;
 						default:;
 					}
@@ -987,6 +1584,7 @@ static int at_response_clcc (struct pvt* pvt, char* str)
 			{
 				ast_log (LOG_ERROR, "[%s] can't parse CLCC line '%s'\n", PVT_ID(pvt), str);
 			}
+			p = strchr(str, '\r');
 			if(p)
 			{
 				++p;
@@ -1099,6 +1697,10 @@ static int at_response_ring (struct pvt* pvt)
 		pvt->ring = 1;
 		pvt->dialing = 0;
 		pvt->cwaiting = 0;
+
+		putfilei("sim/state",pvt->imsi,"state_ring",1);
+		putfilei("sim/state",pvt->imsi,"state_dialing",0);
+		putfilei("sim/state",pvt->imsi,"state_cwaiting",0);
 
 		pvt->rings++;
 
@@ -1249,6 +1851,16 @@ static int at_response_cmgr (struct pvt* pvt, const char * str, size_t len)
 				{ "SMS", msg } ,
 				{ "SMS_BASE64", text_base64 },
 				{ "CMGR", (char *)str },
+
+
+			{ "DONGLENAME", PVT_ID(pvt) },
+			{ "DONGLEPROVIDER", pvt->provider_name },
+			{ "DONGLEIMEI", pvt->imei },
+			{ "DONGLEIMSI", pvt->imsi },
+			{ "DONGLES",    pvt->serial },
+			{ "DONGLENUMBER", pvt->subscriber_number },
+
+
 				{ NULL, NULL },
 			};
 			start_local_channel (pvt, "sms", number, vars);
@@ -1267,6 +1879,149 @@ static int at_response_cmgr (struct pvt* pvt, const char * str, size_t len)
 
 	return 0;
 }
+
+
+/*!
+ * \brief Handle +CMGR response
+ * \param pvt -- pvt structure
+ * \param str -- string containing response (null terminated)
+ * \param len -- string lenght
+ * \retval  0 success
+ * \retval -1 error
+ */
+
+static int at_response_cds (struct pvt* pvt, const char * str, size_t len)
+{
+/*    char *cds;
+    *cds=memchr(str,"\r",len);
+    if(cds)
+    {
+	cds=cds+1;
+	ast_verb(3,"[%s] CDS: %s\n",PVT_ID(pvt),cds);
+	
+    }*/
+
+	char		oa[512] = "";
+	char*		msg = NULL;
+	str_encoding_t	oa_enc;
+	str_encoding_t	msg_enc;
+	const char*	err;
+	char*		err_pos;
+	char*		cmgr;
+	ssize_t		res;
+	char		sms_utf8_str[4096];
+	char*		number;
+	char		from_number_utf8_str[1024];
+	char		text_base64[16384];
+	size_t		msg_len;
+
+	//const struct at_queue_cmd * ecmd = at_queue_head_cmd (pvt);
+	//manager_event_message("DongleNewCMGR", PVT_ID(pvt), str);
+	//if (ecmd)
+	//{
+	//    if (ecmd->res == RES_CMGR || ecmd->cmd == CMD_USER)
+	//    {
+	//	at_queue_handle_result (pvt, RES_CMGR);
+	//	pvt->incoming_sms = 0;
+	//	pvt_try_restate(pvt);
+
+		cmgr = err_pos = ast_strdupa (str);
+		err = at_parse_cds (&err_pos, len, oa, sizeof(oa), &oa_enc, &msg, &msg_enc);
+		if (err)
+		{
+			ast_log (LOG_WARNING, "[%s] Error parsing incoming CDS message '%s' at possition %d: %s\n", PVT_ID(pvt), str, (int)(err_pos - cmgr), err);
+			return 0;
+		}
+
+		ast_debug (1, "[%s] Successfully read CDS message\n", PVT_ID(pvt));
+
+		/* last chance to define encodings */
+		if (oa_enc == STR_ENCODING_UNKNOWN)
+			oa_enc = pvt->use_ucs2_encoding ? STR_ENCODING_UCS2_HEX : STR_ENCODING_7BIT;
+
+		if (msg_enc == STR_ENCODING_UNKNOWN)
+			msg_enc = pvt->use_ucs2_encoding ? STR_ENCODING_UCS2_HEX : STR_ENCODING_7BIT;
+
+		/* decode number and message */
+		res = str_recode (RECODE_DECODE, oa_enc, oa, strlen(oa), from_number_utf8_str, sizeof (from_number_utf8_str));
+		if (res < 0)
+		{
+			ast_log (LOG_ERROR, "[%s] Error decode CDS originator address: '%s', message is '%s'\n", PVT_ID(pvt), oa, str);
+			number = oa;
+			return 0;
+		}
+		else
+			number = from_number_utf8_str;
+
+		msg_len = strlen(msg);
+		res = str_recode (RECODE_DECODE, msg_enc, msg, msg_len, sms_utf8_str, sizeof (sms_utf8_str));
+		if (res < 0)
+		{
+			ast_log (LOG_ERROR, "[%s] Error decode CDS text '%s' from encoding %d, message is '%s'\n", PVT_ID(pvt), msg, msg_enc, str);
+			return 0;
+		}
+		else
+		{
+			msg = sms_utf8_str;
+			msg_len = res;
+		}
+
+		ast_verb (1, "[%s] Got CDS from %s: '%s'\n", PVT_ID(pvt), number, msg);
+
+
+		{
+			channel_var_t vars[] = 
+			{
+				{ "CDS", msg } ,
+				{ "SMS_BASE64", text_base64 },
+				{ "CMGR", (char *)str },
+
+
+			{ "DONGLENAME", PVT_ID(pvt) },
+			{ "DONGLEPROVIDER", pvt->provider_name },
+			{ "DONGLEIMEI", pvt->imei },
+			{ "DONGLEIMSI", pvt->imsi },
+			{ "DONGLES",    pvt->serial },
+			{ "DONGLENUMBER", pvt->subscriber_number },
+
+				{ NULL, NULL },
+			};
+			start_local_channel (pvt, "cds", number, vars);
+		}
+
+
+/*		ast_base64encode (text_base64, (unsigned char*)msg, msg_len, sizeof(text_base64));
+
+		manager_event_new_sms(PVT_ID(pvt), number, msg);
+		manager_event_new_sms_base64(PVT_ID(pvt), number, text_base64);
+		{
+			channel_var_t vars[] = 
+			{
+				{ "SMS", msg } ,
+				{ "SMS_BASE64", text_base64 },
+				{ "CMGR", (char *)str },
+				{ NULL, NULL },
+			};
+			start_local_channel (pvt, "sms", number, vars);
+		}
+*/
+//	    }
+
+/*
+	    else
+	    {
+		ast_log (LOG_ERROR, "[%s] Received '+CMGR' when expecting '%s' response to '%s', ignoring\n", PVT_ID(pvt),
+				at_res2str (ecmd->res), at_cmd2str (ecmd->cmd));
+	    }
+	}
+	else
+	{
+		ast_log (LOG_WARNING, "[%s] Received unexpected '+CMGR'\n", PVT_ID(pvt));
+	}*/
+
+	return 0;
+}
+
 
 /*!
  * \brief Send an SMS message from the queue.
@@ -1344,7 +2099,8 @@ static int at_response_cusd (struct pvt * pvt, char * str, size_t len)
 	typebuf[1] = 0;
 
 	// FIXME: strictly check USSD encoding and detect encoding
-	if ((dcs == 0 || dcs == 15) && !pvt->cusd_use_ucs2_decoding)
+// || dcs == 1
+	if ((dcs == 0 || dcs == 15 || dcs == 1) && !pvt->cusd_use_ucs2_decoding)
 		ussd_encoding = STR_ENCODING_7BIT_HEX;
 	else
 		ussd_encoding = STR_ENCODING_UCS2_HEX;
@@ -1353,11 +2109,11 @@ static int at_response_cusd (struct pvt * pvt, char * str, size_t len)
 	{
 		cusd = cusd_utf8_str;
 	}
-	else
+/*	else
 	{
 		ast_log (LOG_ERROR, "[%s] Error decode CUSD: %s\n", PVT_ID(pvt), cusd);
 		return -1;
-	}
+	}*/
 
 	ast_verb (1, "[%s] Got USSD type %d '%s': '%s'\n", PVT_ID(pvt), type, typestr, cusd);
 	ast_base64encode (text_base64, (unsigned char*)cusd, strlen(cusd), sizeof(text_base64));
@@ -1373,6 +2129,14 @@ static int at_response_cusd (struct pvt * pvt, char * str, size_t len)
 			{ "USSD_TYPE_STR", ast_strdupa(typestr) },
 			{ "USSD", cusd },
 			{ "USSD_BASE64", text_base64 },
+
+			{ "DONGLENAME", PVT_ID(pvt) },
+			{ "DONGLEPROVIDER", pvt->provider_name },
+			{ "DONGLEIMEI", pvt->imei },
+			{ "DONGLEIMSI", pvt->imsi },
+			{ "DONGLES",    pvt->serial },
+			{ "DONGLENUMBER", pvt->subscriber_number },
+
 			{ NULL, NULL },
 		};
 		start_local_channel(pvt, "ussd", "ussd", vars);
@@ -1388,21 +2152,50 @@ static int at_response_cusd (struct pvt * pvt, char * str, size_t len)
  * \param len -- string lenght
  * \retval  0 success
  * \retval -1 error
+   \ 50 wait
  */
 
 static int at_response_cpin (struct pvt* pvt, char* str, size_t len)
 {
 	int rv = at_parse_cpin (str, len);
+
 	switch(rv)
 	{
+		case 0:
+			pvt->pinrequired=0;
+			if(pvt->cfun==1)
+			{
+			    if(pvt->sim_start==0)
+			    {
+				pvt->sim_start=1;
+				at_enque_initialization_sim (&pvt->sys_chan);
+			    }
+			}
+			if(pvt->cfun==5)
+			{
+				at_enque_sn (&pvt->sys_chan);
+				at_enque_iccid (&pvt->sys_chan);
+			}
+			putfilei("dongles/state",PVT_ID(pvt),"pinrequired",pvt->pinrequired);
+			break;
 		case -1:
 			ast_log (LOG_ERROR, "[%s] Error parsing +CPIN message: %s\n", PVT_ID(pvt), str);
 			break;
 		case 1:
 			ast_log (LOG_ERROR, "Dongle %s needs PIN code!\n", PVT_ID(pvt));
+			pvt->pinrequired=1;
+			putfilei("dongles/state",PVT_ID(pvt),"pinrequired",pvt->pinrequired);
+			at_enque_iccid (&pvt->sys_chan);
+
+			return 50;
 			break;
 		case 2:
 			ast_log (LOG_ERROR, "Dongle %s needs PUK code!\n", PVT_ID(pvt));
+			pvt->pinrequired=2;
+			putfilei("dongles/state",PVT_ID(pvt),"pinrequired",pvt->pinrequired);
+			at_enque_iccid (&pvt->sys_chan);
+
+			return 51;
 			break;
 	}
 	return rv;
@@ -1437,7 +2230,11 @@ static int at_response_csq (struct pvt* pvt, const char* str)
 	if(rv)
 		ast_debug (2, "[%s] Error parsing +CSQ result '%s'\n", PVT_ID(pvt), str);
 	else
+	{
 		pvt->rssi = rssi;
+		putfilei("dongles/state",PVT_ID(pvt),"rssi",rssi);
+	}
+
 	return rv;
 }
 
@@ -1484,13 +2281,37 @@ static int at_response_cops (struct pvt* pvt, char* str)
 	if (provider_name)
 	{
 		ast_copy_string (pvt->provider_name, provider_name, sizeof (pvt->provider_name));
+		putfiles("sim/state",pvt->imsi,"provider_name",pvt->provider_name);
+		putfiles("dongles/state",PVT_ID(pvt),"operator",pvt->provider_name);
 		return 0;
 	}
 
 	ast_copy_string (pvt->provider_name, "NONE", sizeof (pvt->provider_name));
+	putfiles("sim/state",pvt->imsi,"provider_name",pvt->provider_name);
+	putfiles("dongles/state",PVT_ID(pvt),"operator",pvt->provider_name);
 
 	return -1;
 }
+
+static int at_response_spn (struct pvt* pvt, char* str)
+{
+	char* provider_name2 = at_parse_spn (str);
+
+	if (provider_name2)
+	{
+		ast_copy_string (pvt->provider_name2, provider_name2, sizeof (pvt->provider_name2));
+		putfiles("sim/state",pvt->imsi,"provider_name2",pvt->provider_name2);
+		putfiles("dongles/state",PVT_ID(pvt),"operator2",pvt->provider_name2);
+		return 0;
+	}
+
+	ast_copy_string (pvt->provider_name2, "", sizeof (pvt->provider_name2));
+	putfiles("sim/state",pvt->imsi,"provider_name2",pvt->provider_name2);
+	putfiles("dongles/state",PVT_ID(pvt),"operator2",pvt->provider_name2);
+
+	return -1;
+}
+
 
 /*!
  * \brief Handle +CREG response Here we get the GSM registration status
@@ -1507,16 +2328,28 @@ static int at_response_creg (struct pvt* pvt, char* str, size_t len)
 	char*	lac;
 	char*	ci;
 
+        char dn[256];
+	timenow(dn);
+
 	if (at_enque_cops (&pvt->sys_chan))
 	{
 		ast_log (LOG_ERROR, "[%s] Error sending query for provider name\n", PVT_ID(pvt));
 	}
+
+	if (at_enque_spn (&pvt->sys_chan))
+	{
+		ast_log (LOG_ERROR, "[%s] Error sending query for provider name2\n", PVT_ID(pvt));
+	}
+
+	putfileslog("dongles/state",PVT_ID(pvt),"laccell",str);
 
 	if (at_parse_creg (str, len, &d, &pvt->gsm_reg_status, &lac, &ci))
 	{
 		ast_verb (1, "[%s] Error parsing CREG: '%.*s'\n", PVT_ID(pvt), (int) len, str);
 		return 0;
 	}
+
+
 
 	if (d)
 	{
@@ -1527,21 +2360,31 @@ static int at_response_creg (struct pvt* pvt, char* str, size_t len)
 //#endif
 		pvt->gsm_registered = 1;
 		manager_event_device_status(PVT_ID(pvt), "Register");
+		putfilei("sim/state",pvt->imsi,"gsm_registered",1);
 	}
 	else
 	{
 		pvt->gsm_registered = 0;
 		manager_event_device_status(PVT_ID(pvt), "Unregister");
+		putfilei("sim/state",pvt->imsi,"gsm_registered",0);
 	}
 
 	if (lac)
 	{
 		ast_copy_string (pvt->location_area_code, lac, sizeof (pvt->location_area_code));
+		putfiles("sim/state",pvt->imsi,"lac",pvt->location_area_code);
+		putfiles("dongles/state",PVT_ID(pvt),"lac",pvt->location_area_code);
+
+//		ast_verb(3,"%s %s %s",dn,pvt->location_area_code,pvt->cell_id);
+//		putfileslog2("dongles/state",PVT_ID(pvt),"laccell","%s %s %s",dn,pvt->location_area_code,pvt->cell_id);
 	}
 
 	if (ci)
 	{
 		ast_copy_string (pvt->cell_id, ci, sizeof (pvt->cell_id));
+		putfiles("sim/state",pvt->imsi,"cell",pvt->cell_id);
+		putfiles("dongles/state",PVT_ID(pvt),"cell",pvt->cell_id);
+//		putfileslog2("dongles/state",PVT_ID(pvt),"laccell","%s %s %s",dn,pvt->location_area_code,pvt->cell_id);
 	}
 
 	return 0;
@@ -1559,7 +2402,7 @@ static int at_response_creg (struct pvt* pvt, char* str, size_t len)
 static int at_response_cgmi (struct pvt* pvt, const char* str)
 {
 	ast_copy_string (pvt->manufacturer, str, sizeof (pvt->manufacturer));
-
+	putfiles("dongles/state",PVT_ID(pvt),"manufacturer",pvt->manufacturer);
 	return 0;
 }
 
@@ -1586,11 +2429,21 @@ static int at_response_cgmm (struct pvt* pvt, const char* str)
 		"E1552",
 		"E171",
 		"E153",
-		"E156B",
-		"E1752",
 	};
 
 	ast_copy_string (pvt->model, str, sizeof (pvt->model));
+
+	writepvtstate(pvt);
+
+/* 	putfiles("dongles/state",PVT_ID(pvt),"model",pvt->model);
+	putfiles("dongles/state",PVT_ID(pvt),"data",PVT_STATE(pvt,data_tty));
+	putfiles("dongles/state",PVT_ID(pvt),"audio",PVT_STATE(pvt,audio_tty));
+	putfiles("dongles/state",PVT_ID(pvt),"dev",PVT_STATE(pvt,dev)); */
+
+putfilei("dongles/state",PVT_ID(pvt),"rssi",-1);
+putfilei("dongles/state",PVT_ID(pvt),"mode",-1);
+putfilei("dongles/state",PVT_ID(pvt),"submode",-1);
+	
 
 	pvt->cusd_use_7bit_encoding = 0;
 	pvt->cusd_use_ucs2_decoding = 1;
@@ -1606,6 +2459,82 @@ static int at_response_cgmm (struct pvt* pvt, const char* str)
 	return 0;
 }
 
+
+static int at_response_cvoice (struct pvt* pvt, const char* str)
+{
+	//ast_copy_string (pvt->firmware, str, sizeof (pvt->firmware));
+	//putfiles("dongles",PVT_ID(pvt),"firmware",pvt->firmware);
+
+	pvt->novoice = 0;
+	pvt->has_voice = 1;
+
+
+
+	if(strcmp(str,"^CVOICE:0,8000,16,20")!=0)
+	{
+		pvt->novoice = 1;
+		pvt->has_voice = 0;
+		
+		ast_verb(3,"NO VOICE CVOICERESPONSE=%s novoice=%d has_voice=%d\n",str,pvt->novoice,pvt->has_voice);
+		
+		return 50;
+	}
+
+	ast_verb(3,"CVOICERESPONSE=%s novoice=%d has_voice=%d\n",str,pvt->novoice,pvt->has_voice);
+
+	return 0;
+}
+
+static int at_response_cardlock (struct pvt* pvt, const char* str)
+{
+	char buf[256];
+	strcpy(buf,str);
+	char cl;
+	cl=buf[11];
+	buf[11]=0;
+
+	pvt->cardlock = 0;
+
+	
+	if((strcmp(buf,"^CARDLOCK: ")==0)&&(cl=='1'))
+	{
+		pvt->cardlock = 1;
+		
+		ast_verb(3,"LOCK CARDLOCKRESPONSE=%s cardlock=%d \n",str,pvt->cardlock);
+		
+		return 50;
+	}
+
+	ast_verb(3,"CARDLOCKRESPONSE=%s cl=%c cardlock=%d\n",str,cl,pvt->cardlock);
+
+	return 0;
+}
+
+
+static int at_response_freqlock (struct pvt* pvt, const char* str)
+{
+	char buf[256];
+	strcpy(buf,str);
+	char cl;
+	cl=buf[11];
+	buf[11]=0;
+
+	pvt->freqlock = -1;
+	if((strcmp(buf,"^FREQLOCK: ")==0)&&(cl=='1'))
+	{
+		pvt->freqlock = atoi(buf+12);
+	} else if((strcmp(buf,"^FREQLOCK: ")==0)&&(cl=='0'))
+	{
+		pvt->freqlock = 0;
+	}
+
+	ast_verb(3,"FREQLOCK RESPONSE=%s freq=%d \n",str,pvt->freqlock);
+	putfilei("dongles/state",PVT_ID(pvt),"freqlock",pvt->freqlock);
+
+	return 0;
+}
+
+
 /*!
  * \brief Handle AT+CGMR response
  * \param pvt -- pvt structure
@@ -1618,7 +2547,7 @@ static int at_response_cgmm (struct pvt* pvt, const char* str)
 static int at_response_cgmr (struct pvt* pvt, const char* str)
 {
 	ast_copy_string (pvt->firmware, str, sizeof (pvt->firmware));
-
+	putfiles("dongles/state",PVT_ID(pvt),"firmware",pvt->firmware);
 	return 0;
 }
 
@@ -1634,9 +2563,122 @@ static int at_response_cgmr (struct pvt* pvt, const char* str)
 static int at_response_cgsn (struct pvt* pvt, const char* str)
 {
 	ast_copy_string (pvt->imei, str, sizeof (pvt->imei));
+	putfiles("dongles/state",PVT_ID(pvt),"imei",pvt->imei);
+	return 0;
+}
+
+static int at_response_sn (struct pvt* pvt, const char* str)
+{
+if ((str[0]=='^')&&(str[1]=='S')&&(str[2]=='N')&&(str[3]==':')&&(str[4]==' '))
+{
+	ast_copy_string (pvt->serial, str+5, sizeof (pvt->serial));
+
+	dserial_changename(pvt);
+
+/*
+	putfiles("dongles/state",PVT_ID(pvt),"imsi",pvt->imsi);
+	putfiles("dongles/state",PVT_ID(pvt),"imei",pvt->imei);
+	putfiles("dongles/state",PVT_ID(pvt),"serial",pvt->serial);
+	putfiles("dongles/state",PVT_ID(pvt),"iccid",pvt->iccid);
+
+	putfiles("dongles/state",PVT_ID(pvt),"model",pvt->model);
+	putfiles("dongles/state",PVT_ID(pvt),"firmware",pvt->firmware);
+	putfiles("dongles/state",PVT_ID(pvt),"audio",PVT_STATE(pvt,audio_tty));
+	putfiles("dongles/state",PVT_ID(pvt),"data",PVT_STATE(pvt,data_tty));
+	putfiles("dongles/state",PVT_ID(pvt),"dev",PVT_STATE(pvt,dev));
+*/
+
+	writepvtstate(pvt);
+}
+	return 0;
+}
+
+static int at_response_iccid (struct pvt* pvt, const char* str)
+{
+	pvt->nosim=0;
+	pvt->eerror=0;
+
+    ast_verb(3,"ICCID:%s\n",str);
+
+if ((str[0]=='^')&&(str[1]=='I')&&(str[2]=='C')&&(str[3]=='C')&&(str[4]=='I')&&(str[5]=='D')&&(str[6]==':')&&(str[7]==' '))
+{
+	ast_copy_string (pvt->iccid, str+8, sizeof (pvt->iccid));
+
+	putfiles("dongles/state",PVT_ID(pvt),"iccid",pvt->iccid);
+} else if(strstr(str,"SIM not inserted"))
+{
+	pvt->nosim=1;
+	return -1;
+}
 
 	return 0;
 }
+
+
+
+static int at_response_cfun_v (struct pvt* pvt, const char* str)
+{
+    ast_verb(3,"[%s]CFUN str:%s\n",PVT_ID(pvt),str);
+
+
+
+    if ((str[0]=='+')&&(str[1]=='C')&&(str[2]=='F')&&(str[3]=='U')&&(str[4]=='N')&&(str[5]==':')&&(str[6]==' '))
+    {
+     if((str[7]>='0')&&(str[7]<='9'))
+     {
+	putfiles("dongles/state",PVT_ID(pvt),"cfun",str+7);
+	pvt->cfun=str[7]-'0';
+	ast_verb(3,"parsed CFUN=%d\n",pvt->cfun);
+	if (pvt->cfun==5)
+	{
+		if((pvt->simst==4)||(pvt->simst==3)||(pvt->simst==1)) //||(pvt->simst==0)
+		{
+		    
+		    if(pvt->sim_ready==0)
+		    {
+			pvt->sim_ready=1;
+			//at_enque_cpin_v (&pvt->sys_chan);
+		    }
+		}
+
+	    return 0;
+	} else if (pvt->cfun==1)
+	{
+		if(pvt->simst==255)
+		{ 
+			ast_verb (3, "[%s] No SIM, but not offline sending cfun5 if nosim2offline(=%d)==1 \n", PVT_ID(pvt),nosim2offline);
+			if (nosim2offline==1)	at_enque_cfun5 (&pvt->sys_chan);
+			pvt->nosim=1;
+		} else if((pvt->simst==4)||(pvt->simst==3)||(pvt->simst==1))
+		{
+		    
+		    if(pvt->sim_ready==0)
+		    {
+			pvt->sim_ready=1;
+			at_enque_cpin_v (&pvt->sys_chan);
+		    }
+		}
+
+	    return 0;
+	} else if (pvt->cfun==4)
+	{
+	    ast_verb(3,"[%s] CFUN=4!!!!!!\n",PVT_ID(pvt));
+	    at_enque_cfun6 (&pvt->sys_chan);
+	    return 0;
+
+	} else {
+	    ast_verb(3,"UNKNOWN CFUN str:%s\n",str);
+	}
+     } else {
+	    ast_verb(3,"CFUN NOT digit %d",str[7]);
+	    }
+    } else {
+	    ast_verb(3,"NOT CFUN str:%s",str);
+    }
+	return 0;
+}
+
+
 
 /*!
  * \brief Handle AT+CIMI response
@@ -1649,7 +2691,13 @@ static int at_response_cgsn (struct pvt* pvt, const char* str)
 
 static int at_response_cimi (struct pvt* pvt, const char* str)
 {
+
 	ast_copy_string (pvt->imsi, str, sizeof (pvt->imsi));
+	readpvtinfo(pvt);
+	writepvtinfo(pvt);
+
+	readpvtlimits(pvt);
+	writepvtlimits(pvt);
 
 	return 0;
 }
@@ -1669,6 +2717,57 @@ static void at_response_busy(struct pvt* pvt, enum ast_control_frame_type contro
 	}
 }
 
+
+
+
+static int at_response_simst (struct pvt* pvt, const char* str)
+{
+    // ^SIMST:255
+    int tmp=0;
+
+    if ((str[0]=='^')&&(str[1]=='S')&&(str[2]=='I')&&(str[3]=='M')&&(str[4]=='S')&&(str[5]=='T')&&(str[6]==':'))
+    {
+
+	ast_verb(3,"Found SIMST %s\n",str+7);
+	tmp=0;
+	if(str[7]=='1') tmp=1;
+	if((str[7]=='2')&&(str[8]=='5')&&(str[9]=='5')) tmp=255;
+//	tmp=atoi(str+7);
+	ast_verb(3,"atoi=%d\n",tmp);
+	at_enque_sysinfo (&pvt->sys_chan);
+//	at_enque_cfun_v (&pvt->sys_chan);
+
+	return 1;
+    }
+
+    return 0;
+}
+
+static int at_response_srvst (struct pvt* pvt, const char* str)
+{
+    // ^SRVST:1
+    int tmp=0;
+
+    if ((str[0]=='^')&&(str[1]=='S')&&(str[2]=='R')&&(str[3]=='V')&&(str[4]=='S')&&(str[5]=='T')&&(str[6]==':'))
+    {
+
+	ast_verb(3,"Found SRVST %s\n",str+7);
+	at_enque_sysinfo (&pvt->sys_chan);
+//	at_enque_cfun_v (&pvt->sys_chan);
+	return 1;
+    }
+
+    return 0;
+}
+
+
+
+static int at_response_unknown (struct pvt* pvt, const char* str)
+{
+    return 0;
+}
+
+
 /*!
  * \brief Do response
  * \param pvt -- pvt structure
@@ -1676,6 +2775,7 @@ static void at_response_busy(struct pvt* pvt, enum ast_control_frame_type contro
  * \param at_res -- result type
  * \retval  0 success
  * \retval -1 error
+   \ 50 - wait
  */
 
 int at_response (struct pvt* pvt, const struct iovec iov[2], int iovcnt, at_res_t at_res)
@@ -1683,12 +2783,18 @@ int at_response (struct pvt* pvt, const struct iovec iov[2], int iovcnt, at_res_
 	char*		str;
 	size_t		len;
 	const struct at_queue_cmd*	ecmd = at_queue_head_cmd(pvt);
+	char dn[256];
 
 
 	if(iov[0].iov_len + iov[1].iov_len > 0)
 	{
 		len = iov[0].iov_len + iov[1].iov_len - 1;
 
+	    
+		timenow(dn);
+
+		at_log(pvt,dn,strlen(dn));
+		at_log(pvt," << ",4);
 		if (iovcnt == 2)
 		{
 			ast_debug (5, "[%s] iovcnt == 2\n", PVT_ID(pvt));
@@ -1705,7 +2811,12 @@ int at_response (struct pvt* pvt, const struct iovec iov[2], int iovcnt, at_res_
 		else
 		{
 			str = iov[0].iov_base;
-		}
+    	        }
+
+		at_log(pvt,str,len);
+		at_log(pvt,"\n",1);
+
+
 		str[len] = '\0';
 
 /*		ast_debug (5, "[%s] [%.*s]\n", PVT_ID(pvt), (int) len, str);
@@ -1715,16 +2826,56 @@ int at_response (struct pvt* pvt, const struct iovec iov[2], int iovcnt, at_res_
 			ast_verb(1, "[%s] Got Response for user's command:'%s'\n", PVT_ID(pvt), str);
 			ast_log(LOG_NOTICE, "[%s] Got Response for user's command:'%s'\n", PVT_ID(pvt), str);
 		}
+
 		switch (at_res)
 		{
 			case RES_BOOT:
 			case RES_CSSI:
 			case RES_CSSU:
+
+				return 0;
+
+			case RES_SYSINFO:
+				ast_verb(1, "[%s] GOT SYSINFO !!!! '%s'\n", PVT_ID(pvt), str);
+				at_response_sysinfo (pvt, str, len);
+				return 0;
+
 			case RES_SRVST:
-			case RES_CVOICE:
+				ast_verb(1, "[%s] GOT SRVST !!!! '%s'\n", PVT_ID(pvt), str);
+				at_response_srvst (pvt, str);
+				return 0;
+			case RES_SIMST:
+				ast_verb(1, "[%s] GOT SIMST !!!! '%s'\n", PVT_ID(pvt), str);
+				at_response_simst (pvt, str);
+				return 0;
+			case RES_CFUN_V:
+				ast_verb(1, "[%s] GOT CFUN_V !!!! '%s'\n", PVT_ID(pvt), str);
+				at_response_cfun_v(pvt, str);
+				return 0;
+
+			case RES_ICCID:
+				ast_verb(1, "[%s] GOT ICCID '%s'\n", PVT_ID(pvt), str);
+				at_response_iccid(pvt, str);
+				return 0;
+
+			case RES_SN:
+				ast_verb(1, "[%s] GOT SN '%s'\n", PVT_ID(pvt), str);
+				at_response_sn(pvt, str);
+				return 0;
+
+			case RES_CDS:
+				ast_verb(1, "[%s] GOT CDS '%s'\n", PVT_ID(pvt), str);
+				at_response_cds(pvt, str, len);
+				return 0;
+
+
+//			case RES_CVOICE:
 			case RES_CMGS:
 			case RES_CPMS:
+				return 0;
 			case RES_CONF:
+				v_stat_call_response(pvt);
+// ??? Why not			return at_response_conf (pvt, str);
 				return 0;
 
 			case RES_OK:
@@ -1739,6 +2890,11 @@ int at_response (struct pvt* pvt, const struct iovec iov[2], int iovcnt, at_res_
 				/* An error here is not fatal. Just keep going. */
 				at_response_mode (pvt, str, len);
 				return 0;
+
+
+
+
+
 
 			case RES_ORIG:
 				return at_response_orig (pvt, str);
@@ -1757,6 +2913,11 @@ int at_response (struct pvt* pvt, const struct iovec iov[2], int iovcnt, at_res_
 			case RES_COPS:
 				/* An error here is not fatal. Just keep going. */
 				at_response_cops (pvt, str);
+				return 0;
+
+			case RES_SPN:
+				/* An error here is not fatal. Just keep going. */
+				at_response_spn (pvt, str);
 				return 0;
 
 			case RES_CSQ:
@@ -1811,8 +2972,10 @@ int at_response (struct pvt* pvt, const struct iovec iov[2], int iovcnt, at_res_
 				break;
 			case RES_CPIN:
 				/* fatal */
-				return at_response_cpin (pvt, str, len);
-
+				//return at_response_cpin (pvt, str, len);
+				at_response_cpin (pvt, str, len);
+				return 0;
+//				break;
 			case RES_CNUM:
 				/* An error here is not fatal. Just keep going. */
 				at_response_cnum (pvt, str);
@@ -1832,6 +2995,15 @@ int at_response (struct pvt* pvt, const struct iovec iov[2], int iovcnt, at_res_
 				{
 					switch (ecmd->cmd)
 					{
+
+						case CMD_AT_CVOICE:
+							ast_debug (1, "[%s] Got AT^CVOICE data\n", PVT_ID(pvt));
+							return at_response_cvoice(pvt, str);
+
+						case CMD_AT_CARDLOCK:
+							ast_debug (1, "[%s] Got AT^CARDLOCK data\n", PVT_ID(pvt));
+							return at_response_cardlock(pvt, str);
+
 						case CMD_AT_CGMI:
 							ast_debug (1, "[%s] Got AT_CGMI data (manufacturer info)\n", PVT_ID(pvt));
 							return at_response_cgmi (pvt, str);
@@ -1848,6 +3020,24 @@ int at_response (struct pvt* pvt, const struct iovec iov[2], int iovcnt, at_res_
 							ast_debug (1, "[%s] Got AT+CGSN data (IMEI number)\n", PVT_ID(pvt));
 							return at_response_cgsn (pvt, str);
 
+						case CMD_AT_SN:
+							ast_debug (1, "[%s] Got AT^SN data\n", PVT_ID(pvt));
+							return at_response_sn (pvt, str);
+
+						case CMD_AT_ICCID:
+							ast_debug (1, "[%s] Got AT^ICCID data\n", PVT_ID(pvt));
+							return at_response_iccid (pvt, str);
+
+						case CMD_AT_CFUN_V:
+							ast_debug (1, "[%s] Got AT+CFUN? data\n", PVT_ID(pvt));
+							return at_response_cfun_v (pvt, str);
+
+
+						case CMD_AT_FREQLOCK:
+							ast_debug (1, "[%s] Got AT^FREQLOCK data\n", PVT_ID(pvt));
+							return at_response_freqlock (pvt, str);
+
+
 						case CMD_AT_CIMI:
 							ast_debug (1, "[%s] Got AT+CIMI data (IMSI number)\n", PVT_ID(pvt));
 							return at_response_cimi (pvt, str);
@@ -1855,8 +3045,13 @@ int at_response (struct pvt* pvt, const struct iovec iov[2], int iovcnt, at_res_
 							break;
 					}
 				}
+				/*
+				if(at_response_unknown_simst (pvt, str))
+				{
+					ast_debug (1, "[%s] Parsed unknown result: '%.*s'\n", PVT_ID(pvt), (int) len, str);
+					break;
+				}*/
 				ast_debug (1, "[%s] Ignoring unknown result: '%.*s'\n", PVT_ID(pvt), (int) len, str);
-
 				break;
 		}
 	}

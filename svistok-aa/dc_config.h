@@ -14,7 +14,8 @@
 #define DEVNAMELEN		31
 #define IMEI_SIZE		15
 #define IMSI_SIZE		15
-#define DEVPATHLEN		256
+#define SERIAL_SIZE		16
+#define DEVPATHLEN		512
 
 typedef enum {
 	DEV_STATE_STOPPED	= 0,
@@ -66,6 +67,7 @@ typedef struct dc_sconfig
 	char			exten[AST_MAX_EXTENSION];	/*!< exten, not overwrite valid subscriber_number */
 	char			language[MAX_LANGUAGE];		/*!< default language 'en' */
 	int			group;				/*!< group number for group dialling 0 */
+	int			agroup;				/*!< group number for group dialling 0 */
 	int			rxgain;				/*!< increase the incoming volume 0 */
 	int			txgain;				/*!< increase the outgoint volume 0 */
 	int			u2diag;				/*!< -1 */
@@ -109,6 +111,8 @@ typedef struct dc_uconfig
 	char			data_tty[DEVPATHLEN];		/*!< tty for AT commands */
 	char			imei[IMEI_SIZE+1];		/*!< search device by imei */
 	char			imsi[IMSI_SIZE+1];		/*!< search device by imsi */
+	char			serial[SERIAL_SIZE+2];		/*!< search device by s */
+	char			dev[255];
 } dc_uconfig_t;
 
 /* all Config settings join in one place */
@@ -120,7 +124,6 @@ typedef struct pvt_config
 #define SCONFIG(cfg,name)	((cfg)->shared.name)
 #define UCONFIG(cfg,name)	((cfg)->unique.name)
 
-EXPORT_DECL int dc_dtmf_str2setting(const char * str);
 EXPORT_DECL const char * dc_dtmf_setting2str(dc_dtmf_setting_t dtmf);
 EXPORT_DECL void dc_sconfig_fill_defaults(struct dc_sconfig * config);
 EXPORT_DECL void dc_sconfig_fill(struct ast_config * cfg, const char * cat, struct dc_sconfig * config);

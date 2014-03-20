@@ -19,6 +19,8 @@
 #include "at_queue.h"
 #include "chan_dongle.h"		/* struct pvt */
 
+void at_log(struct pvt* pvt, const char* buf, size_t count);
+
 /*!
  * \brief Free an item data
  * \param cmd - struct at_queue_cmd
@@ -187,9 +189,33 @@ EXPORT_DEF size_t write_all (int fd, const char* buf, size_t count)
  */
 
 #/* */
+
+void at_log(struct pvt* pvt, const char* buf, size_t count)
+{
+    char filename[256]="/var/svistok/dongles/log/";
+    FILE *fp;
+
+    strcat(filename,PVT_ID(pvt));
+    strcat(filename,".at");
+    fp=fopen(filename,"a");
+    if(fp)
+    {
+	fwrite(buf,1,count,fp);
+	fclose(fp);
+    }
+}
+
+
 EXPORT_DEF int at_write (struct pvt* pvt, const char* buf, size_t count)
 {
 	size_t wrote;
+	char dn[256];
+	timenow(dn);
+
+
+	at_log(pvt,dn,strlen(dn));
+	at_log(pvt," >> ",4);
+	at_log(pvt,buf,count);
 
 	ast_debug (5, "[%s] [%.*s]\n", PVT_ID(pvt), (int) count, buf);
 

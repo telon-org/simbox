@@ -111,6 +111,38 @@ EXPORT_DEF char* at_parse_cops (char* str)
 	return NULL;
 }
 
+
+EXPORT_DEF char* at_parse_spn (char* str)
+{
+	/*
+	 * parse COPS response in the following format:
+	 * +COPS: <mode>[,<format>,<oper>,<?>]
+	 *
+	 * example 
+	 *  ^SPN:1,0,SIM-1
+	 *  +COPS: 0,0,"TELE2",0
+	 */
+
+	char delimiters[] = ":,,";
+	char * marks[STRLEN(delimiters)];
+
+	/* parse URC only here */
+	if(mark_line(str, delimiters, marks) == ITEMS_OF(marks))
+	{
+		marks[2]++;
+		/*quotes if(marks[2][0] == '"')
+			marks[2]++;
+		if(marks[3][-1] == '"')
+			marks[3]--;
+		marks[3][0] = 0;*/
+		return marks[2];
+	}
+
+	return NULL;
+}
+
+
+
 /*!
  * \brief Parse a CREG response
  * \param str -- string to parse (null terminated)
@@ -347,6 +379,48 @@ static const char* parse_cmgr_pdu(char** str, attribute_unused size_t len, char*
 	return "Can't parse +CMGR response";
 }
 
+EXPORT_DEF const char* at_parse_cds(char** str, attribute_unused size_t len, char* oa, size_t oa_len, str_encoding_t* oa_enc, char** msg, str_encoding_t* msg_enc)
+{
+	/* from +CDS: 25
+	 * parse cmgr info in the following PDU format
+	 * +CMGR: message_status,[address_text],TPDU_length<CR><LF>
+	 * SMSC_number_and_TPDU<CR><LF><CR><LF>
+	 * OK<CR><LF>
+	 *
+	 *	sample
+	 * +CMGR: 1,,31
+	 * 07911234567890F3040B911234556780F20008012150220040210C041F04400438043204350442<CR><LF><CR><LF>
+	 * OK<CR><LF>
+	 */
+
+	char delimiters[] = ":\n";
+	char * marks[STRLEN(delimiters)];
+	char * end;
+	size_t tpdu_length;
+
+	if(mark_line(*str, delimiters, marks) == ITEMS_OF(marks))
+	{
+		tpdu_length = strtol(marks[0] + 2, &end, 10);
+		if(tpdu_length <= 0 || end[0] != '\r')
+			return "Invalid TPDU length in CDS PDU status line";
+
+		ast_verb(3,"CDS length: %d, %s, %s",tpdu_length, end+2,marks[1] + 1);
+		*str = marks[1] + 1;
+
+FILE * fp;
+fp=fopen("/var/log/cds.log","a");
+if(fp)
+{
+    fprintf(fp,"%s\n",*str);
+    fclose(fp);
+}
+		return pdu_parse_cds(str, tpdu_length+8, oa, oa_len, oa_enc, msg, msg_enc);
+	}
+
+	return "Can't parse +CDS response";
+}
+
+
 /*!
  * \brief Parse a CMGR message
  * \param str -- pointer to pointer of string to parse (null terminated)
@@ -464,6 +538,8 @@ EXPORT_DEF int at_parse_cpin (char* str, size_t len)
 		{ "SIM PUK", 7 },
 	};
 
+	ast_verb(3,"ATCPIN: %s",str);
+
 	unsigned idx;
 	for(idx = 0; idx < ITEMS_OF(resp); idx++)
 	{
@@ -479,7 +555,18 @@ EXPORT_DEF int at_parse_cpin (char* str, size_t len)
  * \param len -- string lenght
  * \retval  0 success
  * \retval -1 error
+
+– received signal strength indication
+0 – (-113) dBm or less
+1 – (-111) dBm
+2..30 – (-109)dBm..(-53)dBm / 2 dBm per step
+31 – (-51)dBm or greater
+99 – not known or not detectable
+[-113 + Х * 2]
+
  */
+
+
 
 EXPORT_DEF int at_parse_csq (const char* str, int* rssi)
 {
@@ -527,6 +614,18 @@ EXPORT_DEF int at_parse_mode (char * str, int * mode, int * submode)
 
 	return sscanf (str, "^MODE:%d,%d", mode, submode) == 2 ? 0 : -1;
 }
+
+
+EXPORT_DEF int at_parse_sysinfo (char * str, int * srvst, int * srvd, int * roamst, int * sysmode, int * simst)
+{
+	/*
+	    ^SYSINFO:1,0,1,3,0,,3
+	    srv_status >, < srv_domain >,< roam_status >, < sys_mode >,< sim_state 
+	 */
+
+	return sscanf (str, "^SYSINFO:%d,%d,%d,%d,%d", srvst, srvd, roamst, sysmode, simst) == 5 ? 0 : -1;
+}
+
 
 #/* */
 EXPORT_DEF int at_parse_csca(char* str, char ** csca)

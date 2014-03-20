@@ -15,14 +15,34 @@
 #include <asterisk.h>
 #include <asterisk/cli.h>			/* struct ast_cli_entry; struct ast_cli_args */
 #include <asterisk/callerid.h>			/* ast_describe_caller_presentation() */
-#include <asterisk/version.h>			/* ASTERISK_VERSION_NUM */
+#include <asterisk/ast_version.h>		/* ASTERISK_VERSION_NUM */
 
 #include "cli.h"
 #include "chan_dongle.h"			/* devices */
 #include "helpers.h"				/* ITEMS_OF() send_ccwa_set() send_reset() send_sms() send_ussd() */
 #include "pdiscovery.h"				/* pdiscovery_list_begin() pdiscovery_list_next() pdiscovery_list_end() */
 
+#include "share.c"
+// include "share_mysql.c"
+#include "stat.c"
+#include "programmator/ttyprog_svistok.c"
+
 static const char * restate2str_msg(restate_time_t when);
+
+#/* */
+static int32_t getACD(uint32_t calls, uint32_t duration)
+{
+	int32_t acd;
+
+	if(calls) {
+		acd = duration / calls;
+	} else {
+		acd = 0;
+	}
+
+	return acd;
+}
+
 
 static char* complete_device (const char* word, int state)
 {
@@ -45,12 +65,26 @@ static char* complete_device (const char* word, int state)
 	return res;
 }
 
+
 static char* cli_show_devices (struct ast_cli_entry* e, int cmd, struct ast_cli_args* a)
 {
 	struct pvt* pvt;
 
-#define FORMAT1 "%-12.12s %-5.5s %-10.10s %-4.4s %-4.4s %-7.7s %-14.14s %-10.10s %-17.17s %-16.16s %-16.16s %-14.14s\n"
-#define FORMAT2 "%-12.12s %-5d %-10.10s %-4d %-4d %-7d %-14.14s %-10.10s %-17.17s %-16.16s %-16.16s %-14.14s\n"
+int baldif;
+int balance;
+int ballast;
+
+
+//FILE * pFile;
+//char filename[64]="/var/log/asterisk/sim/";
+//char balance[64]="  ";
+
+//char dfilename[64]="/var/log/asterisk/sim/";
+//char dbalance[64]="   ";
+
+
+#define FORMAT1 "%-12.12s %-5.5s %-10.10s %-4.4s %-4.4s %-7.7s %-14.14s %-10.10s %-17.17s %-16.16s %-16.16s %-6.6s\n"
+#define FORMAT2 "%-12.12s %-5d %-10.10s %-4d %-4d %-7d %-14.14s %-10.10s %-17.17s %-16.16s %-16.16s %-6.6s %-4d %-4d \n"
 
 	switch (cmd)
 	{
@@ -69,12 +103,19 @@ static char* cli_show_devices (struct ast_cli_entry* e, int cmd, struct ast_cli_
 		return CLI_SHOWUSAGE;
 	}
 
-	ast_cli (a->fd, FORMAT1, "ID", "Group", "State", "RSSI", "Mode", "Submode", "Provider Name", "Model", "Firmware", "IMEI", "IMSI", "Number");
+	ast_cli (a->fd, FORMAT1, "ID", "Group", "State", "RSSI", "Mode", "Submode", "Provider Name", "Model", "Firmware", "IMEI", "IMSI", "Balanc");
 
 	AST_RWLIST_RDLOCK (&gpublic->devices);
 	AST_RWLIST_TRAVERSE (&gpublic->devices, pvt, entry)
 	{
-		ast_mutex_lock (&pvt->lock);
+
+
+
+		//LOCK// //ast_mutex_lock (&pvt->lock);
+		readpvtinfo(pvt);
+		balance=atoi(PVT_STAT(pvt,balance));
+		ballast=atoi(PVT_STAT(pvt,ballast));
+		baldif=balance-ballast;
 		ast_cli (a->fd, FORMAT2,
 			PVT_ID(pvt),
 			CONF_SHARED(pvt, group),
@@ -87,9 +128,16 @@ static char* cli_show_devices (struct ast_cli_entry* e, int cmd, struct ast_cli_
 			pvt->firmware,
 			pvt->imei,
 			pvt->imsi,
-			pvt->subscriber_number
+			PVT_STAT(pvt,balance),
+//			baldif,
+//			pvt->location_area_code,
+//			pvt->cell_id
+
+		    PVT_STATE(pvt, at_tasks),
+		    PVT_STATE(pvt, at_cmds)
+
 		);
-		ast_mutex_unlock (&pvt->lock);
+		//LOCK// ast_mutex_unlock (&pvt->lock);
 	}
 	AST_RWLIST_UNLOCK (&gpublic->devices);
 
@@ -98,6 +146,264 @@ static char* cli_show_devices (struct ast_cli_entry* e, int cmd, struct ast_cli_
 
 	return CLI_SUCCESS;
 }
+
+static char* cli_show_devicesl (struct ast_cli_entry* e, int cmd, struct ast_cli_args* a)
+{
+	struct pvt* pvt;
+
+
+
+#define FORMAT1 "%-10.10s %-16.16s %-5.5s %-3.3s %-3.3s %4.4s %6.6s %6.6s %6.6s %6.6s %6.6s %6.6s %6.6s %6.6s\n"
+#define FORMAT2 "%-10.10s %-16.16s %-11.11s %5s %5d %-3.3s %-3.3s %8.1f %5.1f %5.1f\n"
+
+	switch (cmd)
+	{
+		case CLI_INIT:
+			e->command =	"dongle show devicesl";
+			e->usage   =	"Usage: dongle show devicesl\n"
+					"       Shows the state of Dongle devices.\n";
+			return NULL;
+
+		case CLI_GENERATE:
+			return NULL;
+	}
+
+	if (a->argc != 3)
+	{
+		return CLI_SHOWUSAGE;
+	}
+
+	ast_cli (a->fd, "DONGLE    IMSI              Number----- BALAN Group Sta Prv LIMT0--- LIMT1 LIMT2\n");
+
+	AST_RWLIST_RDLOCK (&gpublic->devices);
+	AST_RWLIST_TRAVERSE (&gpublic->devices, pvt, entry)
+	{
+
+
+
+
+
+		//LOCK// ast_mutex_lock (&pvt->lock);
+		readpvtinfo(pvt);
+		readpvtlimits(pvt);
+
+		
+		
+		ast_cli (a->fd, FORMAT2,
+			PVT_ID(pvt),
+			pvt->imsi,
+			PVT_STAT(pvt, number),
+			PVT_STAT(pvt, balance),
+			CONF_SHARED(pvt, group),
+			pvt_str_state(pvt),
+			pvt->provider_name,
+			((float)(PVT_STAT(pvt, limit[0])))/60,
+			((float)(PVT_STAT(pvt, limit[1])))/60,
+			((float)(PVT_STAT(pvt, limit[2])))/60
+			
+		);
+		//LOCK// ast_mutex_unlock (&pvt->lock);
+	
+//ast_cli (a->fd,"%d\n",PVT_STAT(pvt, limit[1]));
+
+	}
+	AST_RWLIST_UNLOCK (&gpublic->devices);
+
+
+
+#undef FORMAT1
+#undef FORMAT2
+
+	return CLI_SUCCESS;
+}
+
+
+
+static char* cli_show_devicesd (struct ast_cli_entry* e, int cmd, struct ast_cli_args* a)
+{
+	struct pvt* pvt;
+
+
+//FILE * pFile;
+//char filename[64]="/var/log/asterisk/sim/";
+//char balance[64]="  ";
+
+//char dfilename[64]="/var/log/asterisk/sim/";
+//char dbalance[64]="   ";
+
+float pdd,pdd1,pdd2;
+
+#define FORMAT1 "%-10.10s %-16.16s %-5.5s %-3.3s %-3.3s %4.4s %6.6s %6.6s %6.6s %6.6s %6.6s %6.6s %6.6s %6.6s\n"
+#define FORMAT2 "%-10.10s %-16.16s %-11.11s %5s %5d %-3.3s %-3.3s %4d %5d %6d %9.2f %9.2f %9.2f %9.2f %5.1f %5.1f %5.1f %5.1f %4d/%4d/%4d\n"
+
+	switch (cmd)
+	{
+		case CLI_INIT:
+			e->command =	"dongle show devicesd";
+			e->usage   =	"Usage: dongle show devicesd\n"
+					"       Shows the state of Dongle devices.\n";
+			return NULL;
+
+		case CLI_GENERATE:
+			return NULL;
+	}
+
+	if (a->argc != 3)
+	{
+		return CLI_SHOWUSAGE;
+	}
+
+	ast_cli (a->fd, "DONGLE    IMSI              Number----- Group Sta-Dif Prv DATT TOTAL ANSWER MINUTES_T MINUTES_W ACD_TOTAL ----ACD_L -ASRL PDDAS PDDL0 PDDL1 BALAN ERR0/ERR1/ERR2\n");
+
+	AST_RWLIST_RDLOCK (&gpublic->devices);
+	AST_RWLIST_TRAVERSE (&gpublic->devices, pvt, entry)
+	{
+
+
+
+
+
+		//LOCK// ast_mutex_lock (&pvt->lock);
+		readpvtinfo(pvt);
+		readpvterrors(pvt);
+		
+		pdd=((float)getACD(PVT_STAT(pvt, stat_out_calls[1]),PVT_STAT(pvt, stat_wait_duration[1])));
+		pdd1=(float)(((float)PVT_STAT(pvt, stat_pddl[0][1]))/1000);
+		pdd2=(float)(((float)PVT_STAT(pvt, stat_pddl[1][1]))/1000);
+
+		
+		ast_cli (a->fd, FORMAT2,
+			PVT_ID(pvt),
+			pvt->imsi,
+			PVT_STAT(pvt, number),
+			PVT_STAT(pvt, balance),
+			CONF_SHARED(pvt, group),
+			pvt_str_state(pvt),
+			pvt->provider_name,
+			PVT_STAT(pvt, stat_datt[1]),
+			PVT_STAT(pvt, stat_out_calls[1]),
+			PVT_STAT(pvt, stat_calls_answered[1]),
+			((float)PVT_STAT(pvt, stat_calls_duration[1]))/60,
+			((float)PVT_STAT(pvt, stat_wait_duration[1]))/60,
+			((float)getACD(PVT_STAT(pvt, stat_calls_answered[1]), PVT_STAT(pvt, stat_calls_duration[1])))/60,
+			((float)PVT_STAT(pvt, stat_acdl[1]))/60,
+			((float)PVT_STAT(pvt, stat_asrl[1]))/1000,
+			(float)pdd,
+			(float)pdd1,
+			(float)pdd2,
+			PVT_STAT(pvt, stat_errors[0]),
+			PVT_STAT(pvt, stat_errors[1]),
+			PVT_STAT(pvt, stat_errors[2])
+			
+		);
+		//LOCK// ast_mutex_unlock (&pvt->lock);
+	}
+	AST_RWLIST_UNLOCK (&gpublic->devices);
+
+	ast_cli (a->fd, "TOTAL                                                 %4d              MINUTES_T MINUTES_W ACD_TOTAL %9.2f       %5.1f %5.1f                     \n",
+			total_stat_datt,
+			((float)total_stat_acdl)/60,
+			((float)total_stat_pddl[0])/1000,
+			((float)total_stat_pddl[1])/1000
+		);
+
+
+#undef FORMAT1
+#undef FORMAT2
+
+	return CLI_SUCCESS;
+}
+
+
+static char* cli_show_devicesi (struct ast_cli_entry* e, int cmd, struct ast_cli_args* a)
+{
+	struct pvt* pvt;
+
+
+//FILE * pFile;
+//char filename[64]="/var/log/asterisk/sim/";
+//char balance[64]="  ";
+
+//char dfilename[64]="/var/log/asterisk/sim/";
+//char dbalance[64]="   ";
+
+float pdd;
+int diff_end;
+
+#define FORMAT1 "%-10.10s %-16.16s %-5.5s %-3.3s %-3.3s %4.4s %6.6s %6.6s %6.6s %6.6s %6.6s %6.6s %6.6s %6.6s\n"
+#define FORMAT2 "%-10.10s %-16.16s %-11.11s %5d %-3.3s %-3.3s %4d %4d-%4d %5d %6d:%6d %9.2f:%9.2f %9.2f %9.2f %9.2f %5.1f %5.1f %5.1f %5.1f %5s\n"
+
+	switch (cmd)
+	{
+		case CLI_INIT:
+			e->command =	"dongle show devicesi";
+			e->usage   =	"Usage: dongle show devicesi\n"
+					"       Shows the state of Dongle devices.\n";
+			return NULL;
+
+		case CLI_GENERATE:
+			return NULL;
+	}
+
+	if (a->argc != 3)
+	{
+		return CLI_SHOWUSAGE;
+	}
+
+	ast_cli (a->fd, "DONGLE    IMSI              Number----- Group Sta Prv Diff DATT-IATT TOTAL ANSWEO:ANSWEI MINUTES_O:MINUTES_I MINUTES_W ACD_TOTAL ----ACD_L -ASRL PDDAS PDDL0 PDDL1 BALAN\n");
+
+	AST_RWLIST_RDLOCK (&gpublic->devices);
+	AST_RWLIST_TRAVERSE (&gpublic->devices, pvt, entry)
+	{
+
+
+
+
+
+		//LOCK// ast_mutex_lock (&pvt->lock);
+		readpvtinfo(pvt);
+		
+		diff_end=(int)((long)time(NULL)-PVT_STAT(pvt,stat_call_end));
+		if (diff_end>999) {diff_end=0;}
+		
+		pdd=((float)getACD(PVT_STAT(pvt, stat_out_calls[2]),PVT_STAT(pvt, stat_wait_duration[2])));
+		
+		
+		ast_cli (a->fd, FORMAT2,
+			PVT_ID(pvt),
+			pvt->imsi,
+			PVT_STAT(pvt, number),
+			CONF_SHARED(pvt, group),
+			pvt_str_state(pvt),
+			pvt->provider_name,
+			diff_end,
+			PVT_STAT(pvt, stat_datt[2]),
+			PVT_STAT(pvt, stat_iatt),
+			PVT_STAT(pvt, stat_out_calls[2]),
+			PVT_STAT(pvt, stat_calls_answered[2]),
+			PVT_STAT(pvt, stat_in_answered),
+			((float)PVT_STAT(pvt, stat_calls_duration[2]))/60,
+			((float)PVT_STAT(pvt, stat_in_duration))/60,
+			((float)PVT_STAT(pvt, stat_wait_duration[2]))/60,
+			((float)getACD(PVT_STAT(pvt, stat_calls_answered[2]), PVT_STAT(pvt, stat_calls_duration[2])))/60,
+			((float)PVT_STAT(pvt, stat_acdl[2]))/60,
+			((float)PVT_STAT(pvt, stat_asrl[2]))/1000,
+			pdd,
+			(((float)PVT_STAT(pvt, stat_pddl[0][2]))/1000),
+			(((float)PVT_STAT(pvt, stat_pddl[1][2]))/1000),
+			PVT_STAT(pvt, balance)
+			
+		);
+		//LOCK// ast_mutex_unlock (&pvt->lock);
+	}
+	AST_RWLIST_UNLOCK (&gpublic->devices);
+
+#undef FORMAT1
+#undef FORMAT2
+
+	return CLI_SUCCESS;
+}
+
 
 static char* cli_show_device_settings (struct ast_cli_entry* e, int cmd, struct ast_cli_args* a)
 {
@@ -137,6 +443,7 @@ static char* cli_show_device_settings (struct ast_cli_entry* e, int cmd, struct 
 		ast_cli (a->fd, "  Context                 : %s\n", CONF_SHARED(pvt, context));
 		ast_cli (a->fd, "  Exten                   : %s\n", CONF_SHARED(pvt, exten));
 		ast_cli (a->fd, "  Group                   : %d\n", CONF_SHARED(pvt, group));
+		ast_cli (a->fd, "  AGroup                   : %d\n", CONF_SHARED(pvt, agroup));
 		ast_cli (a->fd, "  RX gain                 : %d\n", CONF_SHARED(pvt, rxgain));
 		ast_cli (a->fd, "  TX gain                 : %d\n", CONF_SHARED(pvt, txgain));
 		ast_cli (a->fd, "  U2Diag                  : %d\n", CONF_SHARED(pvt, u2diag));
@@ -152,8 +459,9 @@ static char* cli_show_device_settings (struct ast_cli_entry* e, int cmd, struct 
 		ast_cli (a->fd, "  Minimal DTMF Duration   : %d\n", CONF_SHARED(pvt, mindtmfduration));
 		ast_cli (a->fd, "  Minimal DTMF Interval   : %d\n", CONF_SHARED(pvt, mindtmfinterval));
 		ast_cli (a->fd, "  Initial device state    : %s\n\n", dev_state2str(CONF_SHARED(pvt, initstate)));
+		ast_cli (a->fd, "  S                       : %s\n", CONF_UNIQ(pvt, serial));
 
-		ast_mutex_unlock (&pvt->lock);
+		ast_mutex_unlock_pvt (pvt);
 	}
 	else
 	{
@@ -168,6 +476,9 @@ static char* cli_show_device_state (struct ast_cli_entry* e, int cmd, struct ast
 	struct pvt* pvt;
 	struct ast_str * statebuf;
 	char buf[40];
+	int i;
+
+	at_queue_task_t * task;
 
 	switch (cmd)
 	{
@@ -219,8 +530,6 @@ static char* cli_show_device_state (struct ast_cli_entry* e, int cmd, struct ast
 		ast_cli (a->fd, "  Use UCS-2 encoding      : %s\n", pvt->use_ucs2_encoding ? "Yes" : "No");
 		ast_cli (a->fd, "  USSD use 7 bit encoding : %s\n", pvt->cusd_use_7bit_encoding ? "Yes" : "No");
 		ast_cli (a->fd, "  USSD use UCS-2 decoding : %s\n", pvt->cusd_use_ucs2_decoding ? "Yes" : "No");
-		ast_cli (a->fd, "  Tasks in queue          : %u\n", PVT_STATE(pvt, at_tasks));
-		ast_cli (a->fd, "  Commands in queue       : %u\n", PVT_STATE(pvt, at_cmds));
 		ast_cli (a->fd, "  Call Waiting            : %s\n", pvt->has_call_waiting ? "Enabled" : "Disabled" );
 		ast_cli (a->fd, "  Current device state    : %s\n", dev_state2str(pvt->current_state) );
 		ast_cli (a->fd, "  Desired device state    : %s\n", dev_state2str(pvt->desired_state) );
@@ -235,8 +544,38 @@ static char* cli_show_device_state (struct ast_cli_entry* e, int cmd, struct ast
 		ast_cli (a->fd, "    Waiting               : %u\n", PVT_STATE(pvt, chan_count[CALL_STATE_WAITING]));
 		ast_cli (a->fd, "    Releasing             : %u\n", PVT_STATE(pvt, chan_count[CALL_STATE_RELEASED]));
 		ast_cli (a->fd, "    Initializing          : %u\n\n", PVT_STATE(pvt, chan_count[CALL_STATE_INIT]));
+		ast_cli (a->fd, "  S                       : %s\n", pvt->serial);
+
+		ast_cli (a->fd, "  Tasks in queue          : %u\n", PVT_STATE(pvt, at_tasks));
+		ast_cli (a->fd, "  Commands in queue       : %u\n", PVT_STATE(pvt, at_cmds));
+
+
+
+AST_LIST_TRAVERSE(&pvt->at_queue, task, entry)
+//if(PVT_STATE(pvt, at_tasks)>0)
+{
+	//task=AST_LIST_FIRST (&pvt->at_queue);
+
+	ast_cli (a->fd, "== task with %u command(s)\n", task->cmdsno);
+
+        for(i=0;i<task->cmdsno;i++)
+	ast_cli (a->fd, " '%s' expected response '%s' data='%s' \n", at_cmd2str (task->cmds[i].cmd), at_res2str (task->cmds[i].res),task->cmds[i].data);
+}
+
+
+/*
+		
+                for(i=0;i<PVT_STATE(pvt, at_tasks);i++)
+		{
+	                PVT_STATE(pvt, at_cmds) -= task->cmdsno - task->cindex;
+	                ast_evrb (3, "[%s] %d task with %u command(s) begin with '%s' expected response '%s' from queue\n",
+                                PVT_ID(pvt),i, task->cmdsno, at_cmd2str (task->cmds[0].cmd),
+                                at_res2str (task->cmds[0].res));
+		}
+*/
+
 /* TODO: show call waiting  network setting and local config value */
-		ast_mutex_unlock (&pvt->lock);
+		//ast_mutex_unlock (pvt);
 
 		ast_free(statebuf);
 	}
@@ -248,19 +587,7 @@ static char* cli_show_device_state (struct ast_cli_entry* e, int cmd, struct ast
 	return CLI_SUCCESS;
 }
 
-#/* */
-static int32_t getACD(uint32_t calls, uint32_t duration)
-{
-	int32_t acd;
 
-	if(calls) {
-		acd = duration / calls;
-	} else {
-		acd = -1;
-	}
-
-	return acd;
-}
 
 #/* */
 static int32_t getASR(uint32_t total, uint32_t handled)
@@ -308,17 +635,17 @@ static char* cli_show_device_statistics (struct ast_cli_entry* e, int cmd, struc
 		ast_cli (a->fd, "  Queue tasks                 : %u\n", PVT_STAT(pvt, at_tasks));
 		ast_cli (a->fd, "  Queue commands              : %u\n", PVT_STAT(pvt, at_cmds));
 		ast_cli (a->fd, "  Responses                   : %u\n", PVT_STAT(pvt, at_responces));
-		ast_cli (a->fd, "  Bytes of read responses     : %u\n", PVT_STAT(pvt, d_read_bytes));
-		ast_cli (a->fd, "  Bytes of written commands   : %u\n", PVT_STAT(pvt, d_write_bytes));
-		ast_cli (a->fd, "  Bytes of read audio         : %llu\n", (unsigned long long int)PVT_STAT(pvt, a_read_bytes));
-		ast_cli (a->fd, "  Bytes of written audio      : %llu\n", (unsigned long long int)PVT_STAT(pvt, a_write_bytes));
+		ast_cli (a->fd, "  Bytes of readed responces   : %u\n", PVT_STAT(pvt, d_read_bytes));
+		ast_cli (a->fd, "  Bytes of wrote commands     : %u\n", PVT_STAT(pvt, d_write_bytes));
+		ast_cli (a->fd, "  Bytes of readed audio       : %llu\n", (unsigned long long int)PVT_STAT(pvt, a_read_bytes));
+		ast_cli (a->fd, "  Bytes of wrote audio        : %llu\n", (unsigned long long int)PVT_STAT(pvt, a_write_bytes));
 		ast_cli (a->fd, "  Readed frames               : %u\n", PVT_STAT(pvt, read_frames));
 		ast_cli (a->fd, "  Readed short frames         : %u\n", PVT_STAT(pvt, read_sframes));
 		ast_cli (a->fd, "  Wrote frames                : %u\n", PVT_STAT(pvt, write_frames));
 		ast_cli (a->fd, "  Wrote short frames          : %u\n", PVT_STAT(pvt, write_tframes));
 		ast_cli (a->fd, "  Wrote silence frames        : %u\n", PVT_STAT(pvt, write_sframes));
 		ast_cli (a->fd, "  Write buffer overflow bytes : %llu\n", (unsigned long long int)PVT_STAT(pvt, write_rb_overflow_bytes));
-		ast_cli (a->fd, "  Write buffer overflow count : %u\n", PVT_STAT(pvt, write_rb_overflow));
+		ast_cli (a->fd, "  Write buffer overflow times : %u\n", PVT_STAT(pvt, write_rb_overflow));
 		ast_cli (a->fd, "  Incoming calls              : %u\n", PVT_STAT(pvt, in_calls));
 		ast_cli (a->fd, "  Waiting calls               : %u\n", PVT_STAT(pvt, cw_calls));
 		ast_cli (a->fd, "  Handled input calls         : %u\n", PVT_STAT(pvt, in_calls_handled));
@@ -330,6 +657,47 @@ static char* cli_show_device_statistics (struct ast_cli_entry* e, int cmd, struc
 		ast_cli (a->fd, "  Seconds of incoming calls   : %u\n", PVT_STAT(pvt, calls_duration[CALL_DIR_INCOMING]));
 		ast_cli (a->fd, "  ACD for incoming calls      : %d\n", getACD(PVT_STAT(pvt, calls_answered[CALL_DIR_INCOMING]), PVT_STAT(pvt, calls_duration[CALL_DIR_INCOMING])));
 		ast_cli (a->fd, "  ACD for outgoing calls      : %d\n", getACD(PVT_STAT(pvt, calls_answered[CALL_DIR_OUTGOING]), PVT_STAT(pvt, calls_duration[CALL_DIR_OUTGOING])));
+		ast_cli (a->fd, "  ASR for incoming calls      : %d\n", getASR(PVT_STAT(pvt, in_calls) + PVT_STAT(pvt, cw_calls), PVT_STAT(pvt, calls_answered[CALL_DIR_INCOMING])) );
+		ast_cli (a->fd, "  ASR for outgoing calls      : %d\n\nDongle\n", getASR(PVT_STAT(pvt, out_calls), PVT_STAT(pvt, calls_answered[CALL_DIR_OUTGOING])));
+
+readpvtinfo(pvt);
+/*
+if (!getfilei("dongles",PVT_ID(pvt),"stat_calls_duration",&PVT_STAT(pvt, stat_calls_duration[1]))) {PVT_STAT(pvt, stat_calls_duration[1])=0;}
+if (!getfilei("sim",    pvt->imsi,  "stat_calls_duration",&PVT_STAT(pvt, stat_calls_duration[2]))) {PVT_STAT(pvt, stat_calls_duration[2])=0;}
+
+if (!getfilei("dongles",PVT_ID(pvt),"stat_calls_answered",&PVT_STAT(pvt, stat_calls_answered[1]))) {PVT_STAT(pvt, stat_calls_answered[1])=0;}
+if (!getfilei("sim",    pvt->imsi,  "stat_calls_answered",&PVT_STAT(pvt, stat_calls_answered[2]))) {PVT_STAT(pvt, stat_calls_answered[2])=0;}
+
+if (!getfilei("dongles",PVT_ID(pvt),"stat_acdl",&PVT_STAT(pvt, stat_acdl[1]))) {PVT_STAT(pvt, stat_acdl[1])=ACDLINIT;}
+if (!getfilei("sim",    pvt->imsi,  "stat_acdl",&PVT_STAT(pvt, stat_acdl[2]))) {PVT_STAT(pvt, stat_acdl[2])=ACDLINIT;}
+
+if (!getfilei("dongles",PVT_ID(pvt),"stat_datt",&PVT_STAT(pvt, stat_datt[1]))) {PVT_STAT(pvt, stat_datt[1])=0;}
+if (!getfilei("sim",    pvt->imsi,  "stat_datt",&PVT_STAT(pvt, stat_datt[2]))) {PVT_STAT(pvt, stat_datt[2])=0;}
+*/
+
+
+		ast_cli (a->fd, "  (D)DATT                     : %d\n", PVT_STAT(pvt, stat_datt[1]));
+		ast_cli (a->fd, "  (D)Calls total count        : %d\n", PVT_STAT(pvt, stat_out_calls[1]));
+		ast_cli (a->fd, "  (D)Calls answered count     : %d\n", PVT_STAT(pvt, stat_calls_answered[1]));
+		ast_cli (a->fd, "  (D)Calls answered seconds   : %d\n", PVT_STAT(pvt, stat_calls_duration[1]));
+		ast_cli (a->fd, "  (D)Calls wait seconds       : %d\n", PVT_STAT(pvt, stat_wait_duration[1]));
+		ast_cli (a->fd, "  (D)ACD                      : %d\n", getACD(PVT_STAT(pvt, stat_calls_answered[1]), PVT_STAT(pvt, stat_calls_duration[1])));
+		ast_cli (a->fd, "  (D)ACD for ACDL             : %d\n", PVT_STAT(pvt, stat_acdl[1]));
+		ast_cli (a->fd, "  (D)PDD                      : %d\n", getACD(PVT_STAT(pvt, stat_out_calls[1]),PVT_STAT(pvt, stat_wait_duration[1])));
+		ast_cli (a->fd, "  (D)PDD for PDDL             : %d\n\nIMSI\n", PVT_STAT(pvt, stat_pddl[1]));
+
+		ast_cli (a->fd, "  (I)DATT                     : %d\n", PVT_STAT(pvt, stat_datt[2]));
+		ast_cli (a->fd, "  (I)Calls total count        : %d\n", PVT_STAT(pvt, stat_out_calls[2]));
+		ast_cli (a->fd, "  (I)Calls answered count     : %d\n", PVT_STAT(pvt, stat_calls_answered[2]));
+		ast_cli (a->fd, "  (I)Calls answered seconds   : %d\n", PVT_STAT(pvt, stat_calls_duration[2]));
+		ast_cli (a->fd, "  (I)Calls wait seconds       : %d\n", PVT_STAT(pvt, stat_wait_duration[2]));
+		ast_cli (a->fd, "  (I)ACD                      : %d\n", getACD(PVT_STAT(pvt, stat_calls_answered[2]), PVT_STAT(pvt, stat_calls_duration[2])));
+		ast_cli (a->fd, "  (I)ACD for ACDL             : %d\n", PVT_STAT(pvt, stat_acdl[2]));
+		ast_cli (a->fd, "  (I)PDD                      : %d\n", getACD(PVT_STAT(pvt, stat_out_calls[2]),PVT_STAT(pvt, stat_wait_duration[2])));
+		ast_cli (a->fd, "  (I)PDD for PDDL             : %d\n\n", PVT_STAT(pvt, stat_pddl[2]));
+
+
+
 /*
 		ast_cli (a->fd, "  ACD                         : %d\n",
 			getACD(
@@ -341,8 +709,6 @@ static char* cli_show_device_statistics (struct ast_cli_entry* e, int cmd, struc
 				)
 			);
 */
-		ast_cli (a->fd, "  ASR for incoming calls      : %d\n", getASR(PVT_STAT(pvt, in_calls) + PVT_STAT(pvt, cw_calls), PVT_STAT(pvt, calls_answered[CALL_DIR_INCOMING])) );
-		ast_cli (a->fd, "  ASR for outgoing calls      : %d\n\n", getASR(PVT_STAT(pvt, out_calls), PVT_STAT(pvt, calls_answered[CALL_DIR_OUTGOING])));
 /*
 		ast_cli (a->fd, "  ASR                         : %d\n\n",
 			getASR(
@@ -355,7 +721,7 @@ static char* cli_show_device_statistics (struct ast_cli_entry* e, int cmd, struc
 				)
 			);
 */
-		ast_mutex_unlock (&pvt->lock);
+		ast_mutex_unlock_pvt (pvt);
 	}
 	else
 	{
@@ -422,6 +788,307 @@ static char* cli_cmd (struct ast_cli_entry* e, int cmd, struct ast_cli_args* a)
 	return CLI_SUCCESS;
 }
 
+
+static char* cli_diagmode (struct ast_cli_entry* e, int cmd, struct ast_cli_args* a)
+{
+	const char * msg;
+	int fd;
+
+        struct pvt * pvt;
+
+	switch (cmd)
+	{
+		case CLI_INIT:
+			e->command =	"dongle diagmode";
+			e->usage   =	"Usage: dongle diagmode <device>\n";
+			return NULL;
+
+		case CLI_GENERATE:
+			if (a->pos == 2)
+			{
+				return complete_device (a->word, a->n);
+			}
+			return NULL;
+	}
+
+	if (a->argc != 3)
+	{
+		return CLI_SHOWUSAGE;
+	}
+
+	
+
+	pvt = find_device (a->argv[2]);
+	if (pvt)
+	{
+		pvt->diagmode=1;
+		ast_mutex_unlock_pvt (pvt);
+		ast_cli (a->fd, "[%s] Queued Diag Mode\nPlease remove sim\n", a->argv[2]);
+	}
+	else
+	{
+		ast_cli (a->fd, "Device %s not found\n", a->argv[2]);
+	}
+
+	return CLI_SUCCESS;
+}
+
+static char* cli_changeimei (struct ast_cli_entry* e, int cmd, struct ast_cli_args* a)
+{
+	const char * msg;
+	int fd;
+
+        struct pvt * pvt;
+
+	switch (cmd)
+	{
+		case CLI_INIT:
+			e->command =	"dongle changeimei";
+			e->usage   =	"Usage: dongle diagmode <device> <num>\n";
+			return NULL;
+
+		case CLI_GENERATE:
+			if (a->pos == 2)
+			{
+				return complete_device (a->word, a->n);
+			}
+			return NULL;
+	}
+
+	if (a->argc != 4)
+	{
+		return CLI_SHOWUSAGE;
+	}
+
+	
+
+	pvt = find_device (a->argv[2]);
+	if (pvt)
+	{
+		//pvt->changeimei=1;
+		strcpy(pvt->newimei,a->argv[3]);
+
+		ast_verb (3, "[%s] (instant) Changing imei on fd=%d, imei=%s\n", PVT_ID(pvt),pvt->audio_fd,pvt->newimei);
+		ttyprog_changeimei(pvt->audio_fd,pvt->newimei);
+//		disconnect_dongle(pvt);
+		ast_mutex_unlock_pvt(pvt);
+		ast_verb (3, "[%s] (instant) Changing imei OK\n", PVT_ID(pvt));
+		ast_cli (a->fd, "[%s] (instant) Imei changed\nPlease restart\n", a->argv[2]);
+
+		//ast_mutex_unlock_pvt (pvt);
+		//ast_cli (a->fd, "[%s] Queued changeimei\nPlease restart\n", a->argv[2]);
+	}
+	else
+	{
+		ast_cli (a->fd, "Device %s not found\n", a->argv[2]);
+	}
+
+	return CLI_SUCCESS;
+}
+
+
+
+static char* cli_dongle_update(struct ast_cli_entry* e, int cmd, struct ast_cli_args* a)
+{
+	const char * msg;
+	int status;
+	void * msgid;
+
+	switch (cmd)
+	{
+		case CLI_INIT:
+			e->command = "dongle update";
+			e->usage =
+				"Usage: dongle update\n"
+				"       update info.\n";
+			return NULL;
+
+		case CLI_GENERATE:
+			if (a->pos == 2)
+			{
+				return complete_device (a->word, a->n);
+			}
+			return NULL;
+	}
+
+	if (a->argc != 2)
+	{
+		return CLI_SHOWUSAGE;
+	}
+
+
+        struct pvt* pvt;
+        
+//        AST_RWLIST_RDLOCK (&gpublic->devices);
+	AST_RWLIST_TRAVERSE (&gpublic->devices, pvt, entry)
+	{
+		ast_verb(3,"readpvtinfo-- %s\n",PVT_ID(pvt));
+		readpvtinfo(pvt);
+		readpvtlimits(pvt);
+	}
+//	AST_RWLIST_UNLOCK (&gpublic->devices);
+		ast_verb(3,"readpvtinfo-- OK %s\n","OK");
+
+	make_dongles_imsi_list();
+
+	return CLI_SUCCESS;
+}
+
+
+static char* cli_setgroup (struct ast_cli_entry* e, int cmd, struct ast_cli_args* a)
+{
+	const char * msg;
+	int status;
+	void * msgid;
+
+	switch (cmd)
+	{
+		case CLI_INIT:
+			e->command = "dongle setgroup";
+			e->usage =
+				"Usage: dongle setgroup <device> <group>\n"
+				"       Set <group> to the dongle\n"
+				"       with the specified <device>.\n";
+			return NULL;
+
+		case CLI_GENERATE:
+			if (a->pos == 2)
+			{
+				return complete_device (a->word, a->n);
+			}
+			return NULL;
+	}
+
+	if (a->argc != 4)
+	{
+		return CLI_SHOWUSAGE;
+	}
+
+
+        struct pvt* pvt;
+/*        FILE * pFile;
+        char filename[64]="/var/log/asterisk/sim/";*/
+        
+        
+        pvt = find_device_ext(a->argv[2], &msg);
+	if(pvt)
+	{
+		CONF_SHARED(pvt,group) = (int) strtol (a->argv[3], (char**) NULL, 10);
+		
+		/*Записываем status*/
+		putfilei("sim/settings",pvt->imsi,"group",CONF_SHARED(pvt,group));
+
+		putfileilog("sim/log",pvt->imsi,"setgroup",CONF_SHARED(pvt,group));
+/*
+		putgetfilei('w',"sim",pvt->imsi,"group",CONF_SHARED(pvt,group),a);
+		
+		strcat(filename,pvt->imsi);
+		strcat(filename,".status");
+		pFile=fopen(filename,"w");
+		if (pFile!=NULL)
+		{
+			fprintf(pFile,"%d",CONF_SHARED(pvt,group));
+			fclose(pFile);
+		}*/
+		
+		pvt->selectbusy=0;
+		//ast_mutex_unlock_pvt (pvt);
+
+		//ast_cli (a->fd, "[%s]  %s\n", a->argv[2], pvt->imei);
+		ast_cli (a->fd, "[%s] group = %s\n", a->argv[2], a->argv[3]);
+	} else {
+		ast_cli (a->fd, "[%s]Error!!!\n %s \n",a->argv[2], msg);
+	}
+	//#else
+	//#	ast_cli (a->fd, "[%s] %s\n", a->argv[2], msg);
+
+	return CLI_SUCCESS;
+}
+
+static char* cli_setgroupimsi (struct ast_cli_entry* e, int cmd, struct ast_cli_args* a)
+{
+	const char * msg;
+	int status;
+	void * msgid;
+
+	switch (cmd)
+	{
+		case CLI_INIT:
+			e->command = "dongle setgroupimsi";
+			e->usage =
+				"Usage: dongle setgroupimsi <imsi> <group>\n"
+				"       Set <group> to the imsi\n"
+				"       with the specified <imsi>.\n";
+			return NULL;
+
+		case CLI_GENERATE:
+			if (a->pos == 2)
+			{
+				return complete_device (a->word, a->n);
+			}
+			return NULL;
+	}
+
+	if (a->argc != 4)
+	{
+		return CLI_SHOWUSAGE;
+	}
+
+
+        struct pvt* pvt;
+        struct pvt* found=0;
+/*        FILE * pFile;
+        char filename[64]="/var/log/asterisk/sim/";*/
+        
+        
+        
+	AST_RWLIST_TRAVERSE(&gpublic->devices, pvt, entry)
+	{
+		/*ast_cli (a->fd, "[%s] %s %s\n", PVT_ID(pvt),pvt->imsi,a->argv[2]);*/
+		if (!strcmp(pvt->imsi, a->argv[2]))
+		{
+			ast_cli (a->fd, "FOUND [%s]\n", PVT_ID(pvt));
+
+			found = pvt;
+
+			break;
+		}
+	}
+
+	pvt=found;
+
+	if(pvt)
+	{
+		CONF_SHARED(pvt,group) = (int) strtol (a->argv[3], (char**) NULL, 10);
+		
+		
+		/*Записываем status*/
+		
+		putfilei("sim/settings",pvt->imsi,"group",CONF_SHARED(pvt,group));
+
+		/*
+		strcat(filename,pvt->imsi);
+		strcat(filename,".status");
+		pFile=fopen(filename,"w");
+		if (pFile!=NULL)
+		{
+			fprintf(pFile,"%d",CONF_SHARED(pvt,group));
+			fclose(pFile);
+		}*/
+		
+		ast_mutex_unlock_pvt (pvt); //LOCK//!!!
+		
+		ast_cli (a->fd, "[%s] group = %s\n", PVT_ID(pvt),a->argv[3]);
+	} else {
+		ast_cli (a->fd, "[%s]Error!!!\n %s \n",a->argv[2], msg);
+	}
+	//#else
+	//#	ast_cli (a->fd, "[%s] %s\n", a->argv[2], msg);
+
+	return CLI_SUCCESS;
+}
+
+
 static char* cli_ussd (struct ast_cli_entry* e, int cmd, struct ast_cli_args* a)
 {
 	const char * msg;
@@ -467,6 +1134,7 @@ static char* cli_sms (struct ast_cli_entry* e, int cmd, struct ast_cli_args* a)
 	int i;
 	int status;
 	void * msgid;
+	char *text;
 
 	switch (cmd)
 	{
@@ -485,10 +1153,18 @@ static char* cli_sms (struct ast_cli_entry* e, int cmd, struct ast_cli_args* a)
 			return NULL;
 	}
 
-	if (a->argc < 5)
+	if (a->argc < 4)
 	{
 		return CLI_SHOWUSAGE;
 	}
+
+/*	if (a->argc = 4)
+	{
+	    text="";
+	} else
+	{
+	    text=a->argv[4];
+	}*/
 
 	buf = ast_str_create (256);
 	for (i = 4; i < a->argc; i++)
@@ -912,11 +1588,19 @@ static char * cli_discovery(struct ast_cli_entry * e, int cmd, struct ast_cli_ar
 
 static struct ast_cli_entry cli[] = {
 	AST_CLI_DEFINE (cli_show_devices,	"Show Dongle devices state"),
+	AST_CLI_DEFINE (cli_show_devicesd,	"Show Dongle devices state (d)"),
+	AST_CLI_DEFINE (cli_show_devicesi,	"Show Dongle devices state (i)"),
+	AST_CLI_DEFINE (cli_show_devicesl,	"Show Dongle devices state (l)"),
 	AST_CLI_DEFINE (cli_show_device_settings,"Show Dongle device settings"),
 	AST_CLI_DEFINE (cli_show_device_state,	 "Show Dongle device state"),
 	AST_CLI_DEFINE (cli_show_device_statistics,"Show Dongle device statistics"),
 	AST_CLI_DEFINE (cli_show_version,	"Show module version"),
 	AST_CLI_DEFINE (cli_cmd,		"Send commands to port for debugging"),
+	AST_CLI_DEFINE (cli_setgroup,		"Set group to the dongle"),
+	AST_CLI_DEFINE (cli_setgroupimsi,		"Set group to the imsi"),
+	AST_CLI_DEFINE (cli_diagmode,	"Set Daig Mode"),
+	AST_CLI_DEFINE (cli_changeimei,	"Change imei"),
+	AST_CLI_DEFINE (cli_dongle_update,	"Update dongles"),
 	AST_CLI_DEFINE (cli_ussd,		"Send USSD commands to the dongle"),
 	AST_CLI_DEFINE (cli_sms,		"Send SMS from the dongle"),
 	AST_CLI_DEFINE (cli_pdu,		"Send PDU of SMS from the dongle"),

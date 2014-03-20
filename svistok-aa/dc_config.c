@@ -20,11 +20,6 @@ static struct ast_jb_conf jbconf_default =
 
 static const char * const dtmf_values[] = { "off", "inband", "relax" };
 
-EXPORT_DEF int dc_dtmf_str2setting(const char * value)
-{
-    return str2enum(value, dtmf_values, ITEMS_OF(dtmf_values));
-}
-
 EXPORT_DEF const char * dc_dtmf_setting2str(dc_dtmf_setting_t dtmf)
 {
 	return enum2str(dtmf, dtmf_values, ITEMS_OF(dtmf_values));
@@ -37,11 +32,13 @@ static int dc_uconfig_fill(struct ast_config * cfg, const char * cat, struct dc_
 	const char * data_tty;
 	const char * imei;
 	const char * imsi;
+	const char * serial;
 
 	audio_tty = ast_variable_retrieve (cfg, cat, "audio");
 	data_tty  = ast_variable_retrieve (cfg, cat, "data");
 	imei = ast_variable_retrieve (cfg, cat, "imei");
 	imsi = ast_variable_retrieve (cfg, cat, "imsi");
+	serial = ast_variable_retrieve (cfg, cat, "serial");
 
 	if(imei && strlen(imei) != IMEI_SIZE) {
 		ast_log (LOG_WARNING, "[%s] Ignore invalid IMEI value '%s'\n", cat, imei);
@@ -51,14 +48,18 @@ static int dc_uconfig_fill(struct ast_config * cfg, const char * cat, struct dc_
 		ast_log (LOG_WARNING, "[%s] Ignore invalid IMSI value '%s'\n", cat, imsi);
 		imsi = NULL;
 		}
+	if(imsi && strlen(imsi) != SERIAL_SIZE) {
+		ast_log (LOG_WARNING, "[%s] Ignore invalid S value '%s'\n", cat, serial);
+		serial = NULL;
+		}
 
-	if(!audio_tty && !imei && !imsi)
+	if(!audio_tty && !imei && !imsi && !serial)
 	{
 		ast_log (LOG_ERROR, "Skipping device %s. Missing required audio_tty setting\n", cat);
 		return 1;
 	}
 
-	if(!data_tty && !imei && !imsi)
+	if(!data_tty && !imei && !imsi && !serial)
 	{
 		ast_log (LOG_ERROR, "Skipping device %s. Missing required data_tty setting\n", cat);
 		return 1;
@@ -75,6 +76,7 @@ static int dc_uconfig_fill(struct ast_config * cfg, const char * cat, struct dc_
 	ast_copy_string (config->audio_tty,	S_OR(audio_tty, ""), sizeof (config->audio_tty));
 	ast_copy_string (config->imei,		S_OR(imei, ""),	     sizeof (config->imei));
 	ast_copy_string (config->imsi,		S_OR(imsi, ""),	     sizeof (config->imsi));
+	ast_copy_string (config->serial,	S_OR(serial, ""),    sizeof (config->serial));
 
 	return 0;
 }
@@ -124,6 +126,7 @@ EXPORT_DEF void dc_sconfig_fill(struct ast_config * cfg, const char * cat, struc
 		else if (!strcasecmp (v->name, "group"))
 		{
 			config->group = (int) strtol (v->value, (char**) NULL, 10);		/* group is set to 0 if invalid */
+			config->agroup = (int) strtol (v->value, (char**) NULL, 10);		/* group is set to 0 if invalid */
 		}
 		else if (!strcasecmp (v->name, "rxgain"))
 		{
@@ -194,7 +197,7 @@ EXPORT_DEF void dc_sconfig_fill(struct ast_config * cfg, const char * cat, struc
 		}
 		else if (!strcasecmp (v->name, "dtmf"))
 		{
-			int val = dc_dtmf_str2setting(v->value);
+			int val = str2enum(v->value, dtmf_values, ITEMS_OF(dtmf_values));
 			if(val >= 0)
 				config->dtmf = val;
 			else

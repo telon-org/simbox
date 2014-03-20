@@ -53,6 +53,8 @@ EXPORT_DECL int rb_read_all_iov (const struct ringbuffer* rb, struct iovec iov[2
 EXPORT_DECL int rb_read_n_iov (const struct ringbuffer* rb, struct iovec* iov, size_t len);
 
 EXPORT_DECL int rb_read_until_char_iov (const struct ringbuffer*, struct iovec iov[2], char);
+EXPORT_DECL int rb_read_until_char_after_iov (const struct ringbuffer*, struct iovec iov[2], char, int after);
+
 EXPORT_DECL int rb_read_until_mem_iov (const struct ringbuffer*, struct iovec iov[2], const void*, size_t);
 
 /*!< advice read position to len bytes */

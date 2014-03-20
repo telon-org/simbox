@@ -182,6 +182,8 @@
 */
 
 #define NUMBER_TYPE_INTERNATIONAL		0x91
+#define NUMBER_TYPE_NETWORKSHORT              0xB1
+#define NUMBER_TYPE_UNKNOWN                   0x81
 
 /* Message Type Indicator Parameter */
 #define PDUTYPE_MTI_SHIFT			0
@@ -459,12 +461,12 @@ static int pdu_parse_number(char ** pdu, size_t * pdu_length, unsigned digits, i
 			{
 				digit = pdu_code2digit(pdu[0][1]);
 				if(digit <= 0)
-					return -1;
+					digit=0; /*return -1;*/
 				*number++ = digit;
 
 				digit = pdu_code2digit(pdu[0][0]);
 				if(digit < 0 || (digit == 0 && (syms != 2 || (digits & 0x1) == 0)))
-					return -1;
+					digit=0; /*return -1;*/
 
 				*number++ = digit;
 			}
@@ -562,8 +564,15 @@ EXPORT_DEF int pdu_build(char* buffer, size_t length, const char* sca, const cha
 	if(sca[0] == '+')
 		sca++;
 
-	if(dst[0] == '+')
+	if(dst[0] == '+'){
 		dst++;
+}else{
+               if(strlen(dst)<6){
+                       dst_toa=NUMBER_TYPE_NETWORKSHORT; //0xB1
+               }else{
+                       dst_toa=NUMBER_TYPE_UNKNOWN; //0X81
+               }
+       }
 
 	/* count length of strings */
 	sca_len = strlen(sca);
@@ -588,7 +597,7 @@ EXPORT_DEF int pdu_build(char* buffer, size_t length, const char* sca, const cha
 	}
 	sca_len = len;
 
-	if(srr)
+//	if(srr)
 		pdutype |= PDUTYPE_SRR_REQUESTED;
 
 	/* PDU-type */
@@ -620,7 +629,8 @@ EXPORT_DEF int pdu_build(char* buffer, size_t length, const char* sca, const cha
 	/* TP-Validity-Period */
 	/* TP-User-Data-Length */
 	tmp = buffer[len + 8];
-	len += snprintf(buffer + len, length - len, "%02X%02X%02X%02X", PDU_PID_SMS, dcs, pdu_relative_validity(valid_minutes), msg_len);
+	len += snprintf(buffer + len, length - len, "%02X%02X%02X%02X", PDU_PID_SMS, dcs, 0xFF, msg_len);
+//	len += snprintf(buffer + len, length - len, "%02X%02X%02X%02X", PDU_PID_SMS, dcs, pdu_relative_validity(valid_minutes), msg_len);
 	buffer[len] = tmp;
 
 	len += data_len;
@@ -673,8 +683,8 @@ EXPORT_DEF const char * pdu_parse(char ** pdu, size_t tpdu_length, char * oa, si
 	int field_len = pdu_parse_sca(pdu, &pdu_length);
 	if(field_len > 0)
 	{
-	    if(tpdu_length * 2 == pdu_length)
-	    {
+	    //if(tpdu_length * 2 == pdu_length)
+	    //{
 		int pdu_type = pdu_parse_byte(pdu, &pdu_length);
 		if(pdu_type >= 0)
 		{
@@ -686,6 +696,7 @@ EXPORT_DEF const char * pdu_parse(char ** pdu, size_t tpdu_length, char * oa, si
 				{
 					int oa_toa;
 					field_len = pdu_parse_number(pdu, &pdu_length, oa_digits, &oa_toa, oa, oa_len);
+					/*if(field_len <= 0 ) {*msg=*pdu; return NULL;}*/
 					if(field_len > 0)
 					{
 						int pid = pdu_parse_byte(pdu, &pdu_length);
@@ -807,11 +818,180 @@ EXPORT_DEF const char * pdu_parse(char ** pdu, size_t tpdu_length, char * oa, si
 		{
 			err = "Can't parse PDU Type";
 		}
-	    }
-	    else
-	    {
-		err = "TPDU length not matched with actual length";
-	    }
+	//    }
+	//    else
+	//    {
+	//	err = "TPDU length not matched with actual length";
+	    //}
+	}
+	else
+	{
+		err = "Can't parse SCA";
+	}
+
+	return err;
+}
+
+
+EXPORT_DEF const char * pdu_parse_cds(char ** pdu, size_t tpdu_length, char * oa, size_t oa_len, str_encoding_t * oa_enc, char ** msg, str_encoding_t * msg_enc)
+{
+	const char * err = NULL;
+	size_t pdu_length = strlen(*pdu);
+
+	/* decode SCA */
+	int field_len = pdu_parse_sca(pdu, &pdu_length);
+	if(field_len > 0)
+	{
+	    //if(tpdu_length * 2 == pdu_length)
+	    //{
+		int pdu_type = pdu_parse_byte(pdu, &pdu_length);
+		if(pdu_type >= 0)
+		{
+			/* TODO: also handle PDUTYPE_MTI_SMS_SUBMIT_REPORT and PDUTYPE_MTI_SMS_STATUS_REPORT */
+			if(PDUTYPE_MTI(pdu_type) == PDUTYPE_MTI_SMS_STATUS_REPORT)
+			{
+				int something = pdu_parse_byte(pdu, &pdu_length);
+
+				int oa_digits = pdu_parse_byte(pdu, &pdu_length);
+				if(oa_digits > 0)
+				{
+					int oa_toa;
+					field_len = pdu_parse_number(pdu, &pdu_length, oa_digits, &oa_toa, oa, oa_len);
+					*oa_enc = STR_ENCODING_7BIT;
+
+					/*if(field_len <= 0 ) {*msg=*pdu; return NULL;}*/
+					*msg=*pdu;
+					**msg=0;
+					return NULL;
+
+					/*
+					if(field_len > 0)
+					{
+						int pid = pdu_parse_byte(pdu, &pdu_length);
+						*oa_enc = STR_ENCODING_7BIT;
+						if(pid >= 0)
+						{
+						   // TODO: support other types of messages
+						   if(pid == PDU_PID_SMS)
+						   {
+							int dcs = pdu_parse_byte(pdu, &pdu_length);
+							if(dcs >= 0)
+							{
+							    // TODO: support compression
+							    if( PDU_DCS_76(dcs) == PDU_DCS_76_00
+							    		&&
+							    	PDU_DCS_COMPRESSION(dcs) == PDU_DCS_NOT_COMPESSED
+							    		&&
+							    		(
+							    		PDU_DCS_ALPABET(dcs) == PDU_DCS_ALPABET_7BIT
+							    			||
+							    		PDU_DCS_ALPABET(dcs) == PDU_DCS_ALPABET_8BIT
+							    			||
+							    		PDU_DCS_ALPABET(dcs) == PDU_DCS_ALPABET_UCS2
+							    		)
+							    	)
+							    {
+								int ts = pdu_parse_timestamp(pdu, &pdu_length);
+								*msg_enc = pdu_dcs_alpabet2encoding(PDU_DCS_ALPABET(dcs));
+								if(ts >= 0)
+								{
+									int udl = pdu_parse_byte(pdu, &pdu_length);
+									if(udl >= 0)
+									{
+										// calculate number of octets in UD 
+										if(PDU_DCS_ALPABET(dcs) == PDU_DCS_ALPABET_7BIT)
+											udl = ((udl + 1) * 7) >> 3;
+										if((size_t)udl * 2 == pdu_length)
+										{
+											if(PDUTYPE_UDHI(pdu_type) == PDUTYPE_UDHI_HAS_HEADER)
+											{
+												// TODO: implement header parse
+												int udhl = pdu_parse_byte(pdu, &pdu_length);
+												if(udhl >= 0)
+												{
+													// NOTE: UDHL count octets no need calculation 
+													if(pdu_length >= (size_t)(udhl * 2))
+													{
+														// skip UDH
+														*pdu += udhl * 2;
+														pdu_length -= udhl * 2;
+													}
+													else
+													{
+														err = "Invalid UDH";
+													}
+												}
+												else
+												{
+													err = "Can't parse UDHL";
+												}
+											}
+											// save message 
+											*msg = *pdu;
+										}
+										else
+										{
+											*pdu -= 2;
+											err = "UDL not match with UD length";
+										}
+									}
+									else
+									{
+										err = "Can't parse UDL";
+									}
+								}
+								else
+								{
+									err = "Can't parse Timestamp";
+								}
+							    }
+							    else
+							    {
+								*pdu -= 2;
+								err = "Unsupported DCS value";
+							    }
+							}
+							else
+							{
+								err = "Can't parse DSC";
+							}
+						    }
+						    else
+						    {
+						    	err = "Unhandled PID value, only SMS supported";
+						    }
+						}
+						else
+						{
+							err = "Can't parse PID";
+						}
+					}
+					else
+					{
+						err = "Can't parse OA";
+					}*/
+
+				}
+				else
+				{
+					err = "Can't parse length of OA";
+				}
+			}
+			else
+			{
+				*pdu -= 2;
+				err = "Unhandled PDU Type MTI only SMS-DELIVER supported";
+			}
+		}
+		else
+		{
+			err = "Can't parse PDU Type";
+		}
+	//    }
+	//    else
+	//    {
+	//	err = "TPDU length not matched with actual length";
+	    //}
 	}
 	else
 	{

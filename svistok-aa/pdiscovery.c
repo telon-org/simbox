@@ -26,7 +26,7 @@ static const char sys_bus_usb_devices[] = "/sys/bus/usb/devices";
 
 
 /* timeout for port readering milliseconds */
-#define PDISCOVERY_TIMEOUT		500
+#define PDISCOVERY_TIMEOUT		1000
 
 
 struct pdiscovery_device {
@@ -39,6 +39,7 @@ struct pdiscovery_request {
 	const char	* name;
 	const char	* imei;
 	const char	* imsi;
+	const char	* serial;
 };
 
 struct pdiscovery_cache_item {
@@ -67,8 +68,6 @@ static const struct pdiscovery_device device_ids[] = {
 	{ 0x12d1, 0x1001, { 2, 1, /* 0 */ } },		/* E1550 and generic */
 //	{ 0x12d1, 0x1465, { 2, 1, /* 0 */ } },		/* K3520 */
 	{ 0x12d1, 0x140c, { 3, 2, /* 0 */ } },		/* E17xx */
-	{ 0x12d1, 0x1436, { 4, 3, /* 0 */ } },		/* E1750 */
-	{ 0x12d1, 0x1506, { 1, 2, /* 0 */ } },		/* E171 firmware 21.x : thanks Sergey Ivanov */
 };
 
 static struct discovery_cache cache;
@@ -120,6 +119,12 @@ static void info_free(struct pdiscovery_result * res)
 		ast_free(res->imei);
 		res->imei = NULL;
 	}		
+
+	if(res->serial) {
+		ast_free(res->serial);
+		res->serial = NULL;
+	}		
+
 }
 
 #/* */
@@ -129,6 +134,9 @@ static void info_copy(struct pdiscovery_result * dst, const struct pdiscovery_re
 		dst->imei = ast_strdup(src->imei);
 	if(src->imsi)
 		dst->imsi = ast_strdup(src->imsi);
+	if(src->serial)
+		dst->serial = ast_strdup(src->serial);
+
 }
 
 #/* */
@@ -210,7 +218,8 @@ static int cache_lookup(struct discovery_cache * cache, const struct pdiscovery_
 	if(item) {
 		res->imei = item->res.imei ? ast_strdup(item->res.imei) : NULL;
 		res->imsi = item->res.imsi ? ast_strdup(item->res.imsi) : NULL;
-		found = item->status || ((req->imei || item->res.imei) && (req->imsi || item->res.imsi));
+		res->serial = item->res.serial ? ast_strdup(item->res.serial) : NULL;
+		found = item->status || ((req->imei || item->res.imei) && (req->imsi || item->res.imsi) && (req->serial || item->res.serial));
 		if(found) {
 			*failed = item->status;
 		}
@@ -445,6 +454,32 @@ static char * pdiscovery_handle_ati(const char * devname, char * str)
 	return NULL;
 }
 
+static char * pdiscovery_handle_sn(const char * devname, char * str)
+{
+	static const char SERIAL[] = "\r\n^SN:";
+	char * serial = strstr(str, SERIAL);
+
+	if(serial) {
+		serial += STRLEN(SERIAL);
+		while(serial[0] == ' ')
+			serial++;
+		str = serial;
+
+		while((str[0] >= '0' && str[0] <= '9')||(str[0] >= 'A' && str[0] <= 'Z'))
+			str++;
+		if((str - serial) == SERIAL_SIZE && str[0] == '\r' && str[1] == '\n') {
+			str[0] = 0;
+			serial = ast_strdup(serial);
+			str[0] = '\r';
+			ast_debug(4, "[%s discovery] found S %s\n", devname, serial);
+			return serial;
+		}
+	}
+
+	return NULL;
+}
+
+
 #/* 0D 0A 15 digits 0D 0A */
 static char * pdiscovery_handle_cimi(const char * devname, char * str)
 {
@@ -534,6 +569,10 @@ static int pdiscovery_handle_response(const struct pdiscovery_request * req, con
 			res->imei = pdiscovery_handle_ati(req->name, str);
 		if(req->imsi && res->imsi == NULL)
 			res->imsi = pdiscovery_handle_cimi(req->name, str);
+		if(req->serial && res->serial == NULL)
+			res->serial = pdiscovery_handle_sn(req->name, str);
+			
+
 		/* restore tail of string for collect data in buffer */
 		str[len] = sym;
 	}
@@ -591,11 +630,12 @@ static int pdiscovery_get_info(const char * port, const struct pdiscovery_reques
 		{ "AT+CIMI\r", 8 },		/* IMSI */
 		{ "ATI\r", 4 },			/* IMEI */
 		{ "ATI; +CIMI\r" , 11 },	/* IMSI + IMEI */
+		{ "AT^SN\r" , 6 },	/* serial */
 	};
 
-	static const int want_map[2][2] = {
-		{ 2, 0 },	// want_imei = 0
-		{ 1, 2 }	// want_imei = 1
+	static const int want_map[2][2][2] = {
+		{ {2,3}, {0,3},  },	// want_imei = 0
+		{ {1,3}, {2,3},  }	// want_imei = 1
 	};
 
 	int fail = 1;
@@ -605,7 +645,9 @@ static int pdiscovery_get_info(const char * port, const struct pdiscovery_reques
 	if(fd >= 0) {
 		unsigned want_imei = req->imei && res->imei == NULL;		// 1 && 0
 		unsigned want_imsi = req->imsi && res->imsi == NULL;		// 1 && 1
-		unsigned cmd = want_map[want_imei][want_imsi];
+		unsigned want_serial = req->serial && res->serial == NULL;		// 1 && 1
+		
+		unsigned cmd = want_map[want_imei][want_imsi][want_serial];
 		
 		/* clean queue first ? */
 		fail = pdiscovery_do_cmd(req, fd, port, cmds[cmd].cmd, cmds[cmd].length, res);
@@ -664,13 +706,16 @@ static int pdiscovery_check_req(const struct pdiscovery_request * req, struct pd
 
 		match = ((req->imei == 0) || (res->imei && strcmp(req->imei, res->imei) == 0))
 			&&
-			((req->imsi == 0) || (res->imsi && strcmp(req->imsi, res->imsi) == 0));
+			((req->imsi == 0) || (res->imsi && strcmp(req->imsi, res->imsi) == 0))
+			&&
+			((req->serial == 0) || (res->serial && strcmp(req->serial, res->serial) == 0));
 
-		ast_debug(4, "[%s discovery] %smatched IMEI=%s/%s IMSI=%s/%s\n",
+		ast_debug(4, "[%s discovery] %smatched IMEI=%s/%s IMSI=%s/%s S=%s/%s\n",
 			req->name,
 			match ? "" : "un" ,
 			S_OR(req->imei, "") , S_OR(res->imei, ""),
-			S_OR(req->imsi, ""),  S_OR(res->imsi, "")
+			S_OR(req->imsi, ""),  S_OR(res->imsi, ""),
+			S_OR(req->serial, "") , S_OR(res->serial, "")
 			);
 	}
 
@@ -745,7 +790,7 @@ EXPORT_DEF void pdiscovery_fini()
 }
 
 #/* */
-EXPORT_DEF int pdiscovery_lookup(const char * devname, const char * imei, const char * imsi, char ** dport, char ** aport)
+EXPORT_DEF int pdiscovery_lookup(const char * devname, const char * imei, const char * imsi, const char * serial, char ** dport, char ** aport)
 {
 	int found;
 	struct pdiscovery_result res;
@@ -753,6 +798,7 @@ EXPORT_DEF int pdiscovery_lookup(const char * devname, const char * imei, const 
 		devname, 
 		((imei && imei[0]) ? imei : NULL),
 		((imsi && imsi[0]) ? imsi : NULL),
+		((serial && serial[0]) ? serial : NULL),
 		};
 
 	memset(&res, 0, sizeof(res));

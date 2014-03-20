@@ -4,6 +4,8 @@
 #ifndef CHAN_DONGLE_APP_H_INCLUDED
 #define CHAN_DONGLE_APP_H_INCLUDED
 
+#include "share.h"
+
 #ifdef BUILD_APPLICATIONS
 
 #include "export.h"		/* EXPORT_DECL EXPORT_DEF */

@@ -19,6 +19,7 @@ typedef enum {
 	CMD_AT_A,
 	CMD_AT_CCWA_STATUS,
 	CMD_AT_CCWA_SET,
+	CMD_AT_CFUN_V,
 	CMD_AT_CFUN,
 
 	CMD_AT_CGMI,
@@ -43,6 +44,7 @@ typedef enum {
 
 	CMD_AT_COPS,
 	CMD_AT_COPS_INIT,
+	CMD_AT_SPN,
 	CMD_AT_CPIN,
 	CMD_AT_CPMS,
 
@@ -54,6 +56,7 @@ typedef enum {
 	CMD_AT_CSSN,
 	CMD_AT_CUSD,
 	CMD_AT_CVOICE,
+	CMD_AT_CARDLOCK,
 	CMD_AT_D,
 
 	CMD_AT_DDSETEX,
@@ -69,7 +72,12 @@ typedef enum {
 	CMD_AT_CHLD_2x,
 	CMD_AT_CHLD_2,
 	CMD_AT_CHLD_3,
-	CMD_AT_CLCC
+	CMD_AT_CLCC,
+	CMD_AT_SN,
+	CMD_AT_ICCID,
+	CMD_AT_FREQLOCK,
+	CMD_AT_CSNR,
+	CMD_AT_SYSINFO,
 } at_cmd_t;
 
 /*!
@@ -88,6 +96,7 @@ INLINE_DECL const char* at_cmd2str (at_cmd_t cmd)
 		"ATA",
 		"AT+CCWA?",
 		"AT+CCWA=",
+		"AT+CFUN?",
 		"AT+CFUN",
 
 		"AT+CGMI",
@@ -112,6 +121,7 @@ INLINE_DECL const char* at_cmd2str (at_cmd_t cmd)
 
 		"AT+COPS?",
 		"AT+COPS=",
+		"AT^SPN=0",
 		"AT+CPIN?",
 		"AT+CPMS",
 
@@ -123,6 +133,7 @@ INLINE_DECL const char* at_cmd2str (at_cmd_t cmd)
 		"AT+CSSN",
 		"AT+CUSD",
 		"AT^CVOICE",
+		"AT^CARDLOCK",
 		"ATD",
 
 		"AT^DDSETEX",
@@ -138,7 +149,12 @@ INLINE_DECL const char* at_cmd2str (at_cmd_t cmd)
 		"AT+CHLD=2x",
 		"AT+CHLD=2",
 		"AT+CHLD=3",
-		"AT+CLCC"
+		"AT+CLCC",
+		"AT^SN",
+		"AT^ICCID?"
+		"AT^FREQLOCK?",
+		"AT^CSNR?",
+		"AT^SYSINFO"
 	};
 	return enum2str_def(cmd, cmds, ITEMS_OF(cmds), "UNDEFINED");
 }
@@ -148,8 +164,21 @@ struct cpvt;
 
 EXPORT_DECL const char* at_cmd2str (at_cmd_t cmd);
 EXPORT_DECL int at_enque_initialization(struct cpvt * cpvt, at_cmd_t from_command);
+EXPORT_DECL int at_enque_initialization_sim(struct cpvt* cpvt);
+EXPORT_DECL int at_enque_initialization_modem(struct cpvt* cpvt);
 EXPORT_DECL int at_enque_ping (struct cpvt * cpvt);
 EXPORT_DECL int at_enque_cops (struct cpvt * cpvt);
+EXPORT_DECL int at_enque_spn (struct cpvt * cpvt);
+EXPORT_DECL int at_enque_iccid (struct cpvt * cpvt);
+EXPORT_DECL int at_enque_sn (struct cpvt * cpvt);
+EXPORT_DECL int at_enque_cmd_proc (struct cpvt * cpvt, const char* cmd);
+EXPORT_DECL int at_enque_cpin_v (struct cpvt * cpvt);
+EXPORT_DECL int at_enque_cfun_v (struct cpvt * cpvt);
+EXPORT_DECL int at_enque_cfun1 (struct cpvt * cpvt);
+EXPORT_DECL int at_enque_cfun5 (struct cpvt * cpvt);
+EXPORT_DECL int at_enque_cfun6 (struct cpvt * cpvt);
+EXPORT_DECL int at_enque_sysinfo (struct cpvt * cpvt);
+
 EXPORT_DECL int at_enque_sms (struct cpvt * cpvt, const char * number, const char * msg, unsigned validity_min, int report_req, void ** id);
 EXPORT_DECL int at_enque_pdu (struct cpvt * cpvt, const char * pdu, attribute_unused const char *, attribute_unused unsigned, attribute_unused int, void ** id);
 EXPORT_DECL int at_enque_ussd (struct cpvt * cpvt, const char * code, attribute_unused const char *, attribute_unused unsigned, attribute_unused int, void ** id);

@@ -84,6 +84,9 @@ EXPORT_DEF ssize_t at_read (int fd, const char * dev, struct ringbuffer* rb)
 
 			iovcnt = rb_read_all_iov (rb, iov);
 
+			ast_debug (5, "[%s] iovcnt=%d\n", 
+				dev, iovcnt);
+
 			if (iovcnt > 0)
 			{
 				if (iovcnt == 2)
@@ -181,6 +184,12 @@ EXPORT_DEF int at_read_result_iov (const char * dev, int * read_result, struct r
 
 				return iovcnt;
 			}
+			else if (rb_memcmp (rb, "+CDS:", 5) == 0)
+			{
+				*read_result = 0;
+				return rb_read_until_char_after_iov (rb, iov, '\r',10);
+			}
+
 			else
 			{
 				iovcnt = rb_read_until_mem_iov (rb, iov, "\r\n", 2);
