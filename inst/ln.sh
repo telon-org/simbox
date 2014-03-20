@@ -1,1 +1,1 @@
-ln -s /usr/simbox/asterisk/extensions /etc/asterisk/extensions
+ln -s /usr/simbox/etc/asterisk /etc/asterisk
