@@ -10,7 +10,7 @@ TEMP=`mktemp /tmp/call_XXXXXXXXXXXX`.call
 cat <<EOF > $TEMP
 Channel: Local/$NUMBER@makecall4
 Extension: 100
-Context: wait3
+Context: wait10
 Priority: 1
 Set: dongle=$DONGLE
 Set: numberb=$NUMBER
