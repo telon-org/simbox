@@ -20,6 +20,9 @@ if(isset($_POST['upgrade_svn']))
     //svn_auth_set_parameter(SVN_AUTH_PARAM_DEFAULT_PASSWORD, 'simbox4385');
     //$res=svn_update("/usr/simbox");
     //if($res) echo ("OK"); else echo ("FAILED");
+
+
+    exec_br("cd /usr/simbox && sudo hg add");
     exec_br("cd /usr/simbox && sudo hg pull");
     exec_br("cd /usr/simbox && sudo hg merge");
     exec_br("cd /usr/simbox && sudo hg commit -m \"autocommit\"");
