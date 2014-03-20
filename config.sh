@@ -1,5 +1,7 @@
 ASTERISK=/usr/sbin/asterisk
 MAKECALL=/usr/simbox/system/makecall.sh
+MAKECALL5=/usr/simbox/system/makecall5.sh
+MAKECALL10=/usr/simbox/system/makecall10.sh
 
 DIR_DONGLES=/var/svistok/dongles
 
