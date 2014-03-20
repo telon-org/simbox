@@ -16,11 +16,14 @@ if(isset($_POST['upgrade_svn']))
 Результат обновления кода
 </td></tr><tr><td>
 <?
-    svn_auth_set_parameter(SVN_AUTH_PARAM_DEFAULT_USERNAME, 'simbox');
-    svn_auth_set_parameter(SVN_AUTH_PARAM_DEFAULT_PASSWORD, 'simbox4385');
-    $res=svn_update("/usr/simbox");
-    if($res) echo ("OK"); else echo ("FAILED");
-    //exec_br("sudo /usr/simbox/svn_update.php");
+    //svn_auth_set_parameter(SVN_AUTH_PARAM_DEFAULT_USERNAME, 'simbox');
+    //svn_auth_set_parameter(SVN_AUTH_PARAM_DEFAULT_PASSWORD, 'simbox4385');
+    //$res=svn_update("/usr/simbox");
+    //if($res) echo ("OK"); else echo ("FAILED");
+    exec_br("cd /usr/simbox && sudo hg pull");
+    exec_br("cd /usr/simbox && sudo hg merge");
+    exec_br("cd /usr/simbox && sudo hg commit -m \"autocommit\"");
+    exec_br("cd /usr/simbox && sudo hg push");
 ?>
 </td></tr></table>
 <br><br>
@@ -95,7 +98,7 @@ if(isset($_POST['restart_system']))
 Версия
 </td></tr><tr><td>
 <?
-    exec_br("sudo svn info /usr/simbox");
+    exec_br("cd /usr/simbox && sudo hg summary --remote");
 ?>
 </td></tr></table>
 
@@ -108,7 +111,7 @@ if(isset($_POST['restart_system']))
 Локальные изменения
 </td></tr><tr><td>
 <?
-    exec_br("sudo svn status /usr/simbox");
+    exec_br("cd /usr/simbox && sudo hg status");
 ?>
 </td></tr></table>
 
