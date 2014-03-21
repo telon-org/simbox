@@ -24,6 +24,7 @@ if(isset($_POST['upgrade_svn']))
 
     exec_br("cd /usr/simbox && sudo hg add");
     exec_br("cd /usr/simbox && sudo hg pull");
+    exec_br("cd /usr/simbox && sudo hg up");
     exec_br("cd /usr/simbox && sudo hg merge");
     exec_br("cd /usr/simbox && sudo hg commit -m \"autocommit\"");
     exec_br("cd /usr/simbox && sudo hg push");
