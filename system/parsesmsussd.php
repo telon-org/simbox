@@ -22,4 +22,5 @@ include("/usr/simbox/nabor/tele2_spb/parse/all.php");
 include("/usr/simbox/nabor/megafon_spb/parse/all.php");
 include("/usr/simbox/nabor/velcom/parse/all.php");
 include("/usr/simbox/nabor/mts_spb/parse/all.php");
+include("/usr/simbox/nabor/rostel_spb/parse/all.php");
 ?>
