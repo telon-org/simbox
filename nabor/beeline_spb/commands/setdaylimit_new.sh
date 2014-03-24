@@ -24,5 +24,10 @@ echo "9000" > /var/svistok/sim/limits/$imsi.limit.3
 #cp /var/svistok/sim/limits/$imsi.limit_soft.5 /var/svistok/sim/limits/$imsi.limit.5
 fi
 
+#if [ "$group" -eq 211 ] ; then
+#echo "$imsi $operator"
+#echo "3000" > /var/svistok/sim/limits/$imsi.limit.1
+#fi
+
 done
 
