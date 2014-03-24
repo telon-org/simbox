@@ -18,7 +18,7 @@ while(1)
   if(($busy!=1)&&($str_state=="Free"))
   {
 
-    if(($group==285)||($group==284)||($group==210)||($group==209)||($group==208)||($group==220))
+    if(($group==285)||($group==284)||($group==211)||($group==210)||($group==209)||($group==208)||($group==220))
     //if(($group==285)||($group==284)) //|| ||($group==295)
     {
 	echo(" -> group OK");

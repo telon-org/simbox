@@ -18,6 +18,17 @@ file_put_contents("/var/simbox/sim/settings/$imsi.tarif",$tarif);
 upload_tarif($imsi, $tarif);
 }
 
+if(preg_match("/((Тариф)|(tarif))\s*([^.]*)\s*((установлен)|(ustanovlen))/",$text,$res))
+{
+print_r($res);
+$tarif=$res[4];
+
+echo "$dongle>$imsi>$tarif";
+file_put_contents("/var/simbox/sim/settings/$imsi.tarif",$tarif);
+upload_tarif($imsi, $tarif);
+}
+
+
 if(preg_match("/((Vash novyi tarif)|(Vash tekushhij tarifny'j plan))\s*\n*([^.]*)/",$text,$res))
 {
 print_r($res);
