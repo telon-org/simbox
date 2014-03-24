@@ -9,12 +9,20 @@ IMSI=$3     #TO
 
 TEMP=`mktemp /tmp/call_XXXXXXXXXXXX`.call
 
+#Channel: Local/$NUMBER#SOU$IMSI@maingateway 
 
 cat <<EOF > $TEMP
-Channel: Local/$NUMBER#SOU$IMSI@maingateway 
+Channel: Local/$NUMBER@maingateway 
 Extension: $NUMBER
 Context: samsebe-out
 Priority: 1
+Set: numberb=$NUMBER
+Set: souimsito=$IMSI
+Set: qos=SOU
+Set: spec=SOU
+Set: IMA2=999999999999999
+Set: IMB2=999999999999999
+
 EOF
 
 mv $TEMP /var/spool/asterisk/outgoing/
