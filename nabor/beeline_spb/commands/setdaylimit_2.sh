@@ -10,6 +10,12 @@ for imsi in $list
 do
 echo "$imsi"
 echo "4000" > $imsi
+
+group=`cat $PATH_SVISTOK_SIM_SETTINGS/$imsi.group`
+if [ "$group" -eq 211 ] ; then
+echo "3000" > $imsi
+fi
+
 done
 
 
@@ -19,4 +25,12 @@ done
 #echo "$imsi"
 #echo "0" > $imsi
 #done
+
+
+
+
+
+
+
+
 
