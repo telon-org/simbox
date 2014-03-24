@@ -59,8 +59,8 @@ function html_napr($billing_direction)
     if($billing_direction=="dna_fi") $napr="<img src=imgs/napravleine/dna.ico>";
     if($billing_direction=="sonera_fi") $napr="<img src=imgs/napravleine/sonera.ico>";
 
-    if($billing_direction=="rostel_spb_mob") $napr="<img src=imgs/napravleine/rostel_spb_mob.ico>";
-    if($billing_direction=="rostel_spb_gor") $napr="<img src=imgs/napravleine/proper_spb_gor.ico>";
+    if($billing_direction=="rostel_spb_mob") $napr="<img src=imgs/napravleine/rostel_spb_mob.png>";
+    if($billing_direction=="rostel_spb_gor") $napr="<img src=imgs/napravleine/rostel_spb_gor.png>";
 
 
     if($billing_direction=="HZ") $napr="<img src=imgs/napravleine/hz.ico>";
@@ -79,8 +79,8 @@ function html_napr($billing_direction)
     if($billing_direction=="SU") $napr="<img src=imgs/napravleine/mts_u.ico>";
     if($billing_direction=="SB") $napr="<img src=imgs/napravleine/mts_by.ico>";
 
-    if($billing_direction=="SR") $napr="<img src=imgs/napravleine/rostel_spb_mob.ico>";
-    if($billing_direction=="PR") $napr="<img src=imgs/napravleine/proper_spb_gor.ico>";
+    if($billing_direction=="SR") $napr="<img src=imgs/napravleine/rostel_spb_mob.png>";
+    if($billing_direction=="PR") $napr="<img src=imgs/napravleine/rostel_spb_gor.png>";
 
     if($billing_direction=="KU") $napr="<img src=imgs/napravleine/kievstar.ico>";
 
