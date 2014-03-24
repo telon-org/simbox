@@ -59,8 +59,8 @@ include("/usr/simbox/www/simbox/modules/html.php");
 <td><font size=1>T=</td>
 <td><font size=1>C</td>
 <td><font size=1>+D</td>
-<td><font size=1>+B</td>
 <td><font size=1>!F</td>
+<td><font size=1>+B</td>
 <td><font size=1>rt</td>
 <td width=250><font size=1>rec</td>
 <td><font size=1>uid</td>
@@ -254,8 +254,8 @@ if($cap=="FAIL")
 <td><?=$TOTALSEC?></td>
 <td><?=$pdds?></td>
 <td><?=$pdd?></td>
-<td><?=$BILLSEC?></td>
 <td><?=$FASSEC-$BILLSEC?></td>
+<td><?=$BILLSEC?></td>
 <td><?=html_recog_type(@$recog[$uid]["recog_type"])?></td>
 <? if ($BILLSEC<=0) { ?>
 <td><font size=1>
