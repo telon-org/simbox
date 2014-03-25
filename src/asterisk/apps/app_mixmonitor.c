@@ -1,3 +1,4 @@
+
 /*
  * Asterisk -- An open source telephony toolkit.
  *
@@ -647,7 +648,12 @@ static void *mixmonitor_thread(void *obj)
 		 * Unlock it, but remember to lock it before looping or exiting */
 		ast_audiohook_unlock(&mixmonitor->audiohook);
 
-		if (!ast_test_flag(mixmonitor, MUXFLAG_BRIDGED) || (mixmonitor->autochan->chan && ast_bridged_channel(mixmonitor->autochan->chan))) {
+//		if (!ast_test_flag(mixmonitor, MUXFLAG_BRIDGED) || (mixmonitor->autochan->chan && ast_bridged_channel(mixmonitor->autochan->chan))) {
+
+		if ( (ast_test_flag(mixmonitor, MUXFLAG_BRIDGED) && (mixmonitor->autochan->chan && ast_bridged_channel(mixmonitor->autochan->chan))) ||
+		    (!ast_test_flag(mixmonitor, MUXFLAG_BRIDGED) && (mixmonitor->autochan->chan && !ast_bridged_channel(mixmonitor->autochan->chan)))   )
+		{
+
 			ast_mutex_lock(&mixmonitor->mixmonitor_ds->lock);
 
 			/* Write out the frame(s) */
