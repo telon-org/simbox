@@ -18348,7 +18348,7 @@ static enum check_auth_result check_user_full(struct sip_pvt *p, struct sip_requ
 {
 	char from[256], *of, *name, *unused_password, *domain;
 	enum check_auth_result res = AUTH_DONT_KNOW;
-	char calleridname[256];
+	char calleridname[500];
 	char *uri2 = ast_strdupa(uri);
 
 	terminate_uri(uri2);	/* trim extra stuff */
@@ -18519,7 +18519,7 @@ static void receive_message(struct sip_pvt *p, struct sip_request *req, struct a
 	int res;
 	char *from;
 	char *to;
-	char from_name[50];
+	char from_name[500];
 	char stripped[SIPBUFSIZE];
 
 	if (strncmp(content_type, "text/plain", strlen("text/plain"))) { /* No text/plain attachment */
