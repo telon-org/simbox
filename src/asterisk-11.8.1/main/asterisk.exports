@@ -1,0 +1,70 @@
+{
+	global:
+		ast_*;
+		_ast_*;
+		__ast_*;
+		pbx_*;
+		astman_*;
+		aco_*;
+		__aco_*;
+		ao2_*;
+		__ao2_*;
+		option_debug;
+		option_verbose;
+		dahdi_chan_name;
+		dahdi_chan_name_len;
+		dahdi_chan_mode;
+		callerid_*;
+		cid_di;
+		cid_dr;
+		clidsb;
+		MD5*;
+		sched_*;
+		io_*;
+		jb_*;
+		aes_*;
+		config_*;
+		tdd_*;
+		term_*;
+		channelreloadreason2txt;
+		devstate2str;
+		__manager_event;
+		dialed_interface_info;
+		strsep;
+		setenv;
+		unsetenv;
+		strcasestr;
+		strnlen;
+		strndup;
+		vasprintf;
+		asprintf;
+		strtoq;
+		getloadavg;
+		ntohll;
+		htonll;
+		timersub;
+		res_srtp;
+		res_srtp_policy;
+		secure_call_info;
+		/*
+
+		If _IO_stdin_used is not exported, stdout/stderr may not get
+		properly aligned. That causes breakage on some architectures.
+
+		http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=634261#51
+		http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=634261#94
+		http://lists.gnu.org/archive/html/bug-glibc/2001-12/msg00203.html
+
+		We export the symbol to get proper behaviour. Now printf
+		doesn't SIGBUS anymore on the SPARC.
+
+		Michael Karcher wrote on Jan 13, 2013:
+		> A build process that mangles the export of _IO_stdin_used is
+		> (as defined by the libc ABI, even if not explicitly written
+		> down) broken. [...]
+
+		*/
+		_IO_stdin_used;
+	local:
+		*;
+};
