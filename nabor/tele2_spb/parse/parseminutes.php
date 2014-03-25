@@ -3,6 +3,28 @@
 //$text="Остаток: 300.00 минут";
 //$text=", 100 SMS";
 //$text="Остаток: 0.00 минут из 300 в месяц, 0 SMS из 100 в сутки";
+//$text="Остаток беспл.мин.внутри сети 37 минут до конца дня";
+
+
+if(preg_match("/сети\s([\d]+)\sминут/",$text,$res))
+{
+print_r($res);
+$minutes=(int)$res[1];
+
+echo "$dongle>$imsi>$minutes";
+
+
+//$balance=file_get_contents("/var/simbox/sim/statistics/$imsi.balance");
+//limit_hard= `cat /var/svistok/sim/limits/$imsi.limit_hard.3`
+
+
+$min1=$minutes*60-600;
+
+
+echo "$dongle>$imsi>$min1";
+file_put_contents("/var/svistok/sim/limits/$imsi.limit.1",$min1);
+}
+
 
 
 if(preg_match("/Остаток:\s([\d]+.[\d]+) минут/",$text,$res))
@@ -30,6 +52,8 @@ echo "$dongle>$imsi>$min1>$min2>$min5!";
 file_put_contents("/var/svistok/sim/limits/$imsi.limit.3",$min5);
 file_put_contents("/var/svistok/sim/limits/$imsi.limit.4",$min6);
 }
+
+
 
 
 if(preg_match("/,\s([\d]+)\sSMS из 100/",$text,$res))
