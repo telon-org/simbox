@@ -1,0 +1,13 @@
+#!/bin/sh
+
+. /usr/simbox/config.sh
+. /usr/simbox/nabor/tele2_spb/config.sh
+
+echo "-- Activating work"
+
+#/usr/simbox/system/makecalldtmf.sh $DONGLE 630 wwww2wwwww1wwww1wwwww#wwwww#wwww
+#/usr/simbox/system/makecalldtmf.sh $DONGLE 630 wwww2wwwww1wwww1wwwww#wwwww#wwww
+#/usr/simbox/system/makecalldtmf.sh $DONGLE 630 wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww2wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww1wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww#wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww#wwwwwwwwwwww
+#/usr/simbox/system/makecalldtmf.sh $DONGLE 630 wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww2wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww1wwwwwwwwwwwwwwwwwwwwwwwwwwwwww#wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww#wwww
+
+/usr/simbox/system/makecalldtmf.sh $DONGLE 630 wwwwww2wwwwwwwwwww1wwwwwwwwww#wwwwwwwww#wwwwwwww
