@@ -23,12 +23,12 @@ do
     #Выключаем
     echo "OFF"
     $hubctrl -b $b -d $d -P $port -p 0
-    sleep 10
+    sleep 20
 
     #Включаем
     echo "ON"
     $hubctrl -b $b -d $d -P $port -p 1
-    sleep 10
+    sleep 20
 
 #exit
 done
