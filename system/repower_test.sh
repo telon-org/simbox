@@ -1,21 +1,18 @@
 #!/bin/sh
 
+
+#exit 0
 #    sleep 30
 
+asterisk -rx "core stop now"
 hubctrl="/usr/simbox/bin/hub-ctrl"
 
 
-hubs=`lsusb | grep DUB-H7 | grep -o -R "[0-9]* Device [0-9]*" | sed 's/ Device /:/g'`
-hubs2=`lsusb | grep 1a40:0101 | grep -o -R "[0-9]* Device [0-9]*" | sed 's/ Device /:/g'`
-hubs3=`lsusb | grep Terminus | grep -o -R "[0-9]* Device [0-9]*" | sed 's/ Device /:/g'`
-
-hubs="$hubs $hubs2 $hubs3"
-
-for hub in $hubs
-do
+hub=002:002
     echo "HUB=$hub"
 
     ports=`lsusb -v -s $hub | grep -o -R "Port [0-9]: " | grep -o -R "[0-9]:" | sed 's/://g'`
+
 for port in $ports
 do
     echo "HUB=$hub PORT=$port"
@@ -25,17 +22,17 @@ do
 
     #Выключаем
     echo "OFF"
+    echo "$hubctrl -b $b -d $d -P $port -p 0"
     $hubctrl -b $b -d $d -P $port -p 0
-    sleep 20
+    sleep 10
 
     #Включаем
     echo "ON"
+    echo "$hubctrl -b $b -d $d -P $port -p 1"
     $hubctrl -b $b -d $d -P $port -p 1
-    sleep 20
-
-#exit
-done
+    sleep 10
 done
 
+asterisk
 
-echo "DONE"
+echo "DONE2"

@@ -9,7 +9,7 @@ list=`ls /var/svistok/sim/limits/*.limit.1`
 for imsi in $list
 do
 echo "$imsi"
-echo "5400" > $imsi
+echo "0" > $imsi
 
 #group=`cat $PATH_SVISTOK_SIM_SETTINGS/$imsi.group`
 #if [ "$group" -eq 211 ] ; then
