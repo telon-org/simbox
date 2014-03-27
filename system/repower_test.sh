@@ -4,11 +4,11 @@
 #exit 0
 #    sleep 30
 
-asterisk -rx "core stop now"
+#asterisk -rx "core stop now"
 hubctrl="/usr/simbox/bin/hub-ctrl"
 
 
-hub=002:002
+hub=001:001
     echo "HUB=$hub"
 
     ports=`lsusb -v -s $hub | grep -o -R "Port [0-9]: " | grep -o -R "[0-9]:" | sed 's/://g'`
@@ -33,6 +33,6 @@ do
     sleep 10
 done
 
-asterisk
+#asterisk
 
 echo "DONE2"
