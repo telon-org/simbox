@@ -10,8 +10,10 @@ do
 
 group=`cat $PATH_SVISTOK_SIM_SETTINGS/$imsi.group`
 
+echo "?$imsi $operator"
+
 if [ "$group" -eq 5 ] ; then
-echo "$imsi $operator"
+echo "+$imsi $operator"
 
 echo "5400" > /var/svistok/sim/limits/$imsi.limit.1
 echo "9000" > /var/svistok/sim/limits/$imsi.limit.2
