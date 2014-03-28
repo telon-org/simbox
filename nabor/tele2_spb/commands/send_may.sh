@@ -8,5 +8,5 @@
 # PARAM=$3
 echo "-- Sending MAY"
 
-
-/usr/simbox/system/send.sh "ussd" "LO2" "$DONGLE" "*118*+$PARAM#" ""
+PARAM=`echo "$PARAM+10000000000" | bc`
+/usr/simbox/system/send.sh "ussd" "LO2" "$DONGLE" "*118*$PARAM#" ""

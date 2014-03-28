@@ -35,13 +35,13 @@ fi
 
 if [ "$group" -eq 211 ] ; then
 echo "$imsi $operator"
-echo "5400" > /var/svistok/sim/limits/$imsi.limit.1
+echo "3000" > /var/svistok/sim/limits/$imsi.limit.1
 date +%s > /var/svistok/sim/limits/$imsi.limit_date
 fi
 
 if [ "$group" -eq 220 ] ; then
 echo "$imsi $operator"
-echo "3000" > /var/svistok/sim/limits/$imsi.limit.1
+echo "5400" > /var/svistok/sim/limits/$imsi.limit.1
 date +%s > /var/svistok/sim/limits/$imsi.limit_date
 fi
 

@@ -385,12 +385,20 @@ function bye(){document.getElementById('tooltip').style.display = 'none';}
 <?
 $hostname=file_get_contents("/etc/hostname");
 $uptime = shell_exec('uptime');
+//$version=shell_exec('cd /usr/simbox && sudo hg summary --remote');
+
+$version=shell_exec('cd /usr/simbox && sudo hg identify');
+
+
 //H:i:s
 ?>
-SimServer <b><?=$hostname?></b> <?=$_SERVER['SERVER_NAME']?>
+<b><?=$hostname?></b> <?=$_SERVER['SERVER_NAME']?> <i>SimServer v.<?=$version?></i>
 </td>
 <td width="*" align="right">
  <?=date("d.m.y")?> <?=$uptime?>
+<?
+//print_r($version);
+?>
 </td>
 </th>
 </table>

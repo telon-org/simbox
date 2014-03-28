@@ -2390,8 +2390,8 @@ static int at_response_creg (struct pvt* pvt, char* str, size_t len)
 	{
 //#ifdef ISSUE_CCWA_STATUS_CHECK
 		/* only if gsm_registered 0 -> 1 ? */
-		if(!pvt->gsm_registered && CONF_SHARED(pvt, callwaiting) != CALL_WAITING_AUTO)
-			at_enque_set_ccwa(&pvt->sys_chan, 0, 0, CONF_SHARED(pvt, callwaiting));
+//		if(!pvt->gsm_registered && CONF_SHARED(pvt, callwaiting) != CALL_WAITING_AUTO)
+//			at_enque_set_ccwa(&pvt->sys_chan, 0, 0, CONF_SHARED(pvt, callwaiting));
 //#endif
 		pvt->gsm_registered = 1;
 		manager_event_device_status(PVT_ID(pvt), "Register");
