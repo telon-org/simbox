@@ -379,8 +379,21 @@ function bye(){document.getElementById('tooltip').style.display = 'none';}
 <body>
 
 
-
-SimServer <?=$_SERVER['SERVER_NAME']?> <?=date("H:i:s d.m.y")?>
+<table border=0 width=100%>
+<th>
+<td width="*">
+<?
+$hostname=file_get_contents("/etc/hostname");
+$uptime = shell_exec('uptime');
+//H:i:s
+?>
+SimServer <b><?=$hostname?></b> <?=$_SERVER['SERVER_NAME']?>
+</td>
+<td width="*" align="right">
+ <?=date("d.m.y")?> <?=$uptime?>
+</td>
+</th>
+</table>
 <br><br>
 <a href="?p=sim">Симки</a> :: 
 <a href="?p=dongle">Свистки (nm)</a> :: 
