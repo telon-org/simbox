@@ -395,10 +395,12 @@ $version=shell_exec('cd /usr/simbox && sudo hg identify');
 <b><?=$hostname?></b> <?=$_SERVER['SERVER_NAME']?> <i>SimServer</i> <font size="-1"><?=$version?></font>
 </td>
 <td width="*" align="right">
+<font size="-1">
  <?=date("d.m.y")?> <?=$uptime?>
 <?
 //print_r($version);
 ?>
+</font>
 </td>
 </th>
 </table>
@@ -406,23 +408,26 @@ $version=shell_exec('cd /usr/simbox && sudo hg identify');
 <a href="?p=sim">Симки</a> :: 
 <a href="?p=dongle">Свистки (nm)</a> :: 
 <a href="?p=diagmode">Свистки (um)</a> :: 
-<a href="?p=readers">Ридеры</a> :: 
-<a href="?p=adapters">Адаптеры</a> :: 
 <a href="?p=hubs">Хабы</a> :: 
-<a href="?p=calls">Звонки</a> :: 
-<a href="?p=qos">Качество</a> :: 
 
-<a href="?p=multisim">Мульти-сим</a> :: 
-<a href="?p=bs">Вышки</a> :: 
 <a href="?p=nabor">Наборы команд</a> :: 
 <a href="?p=plan">Планы</a> :: 
-<a href="?p=nagruz">Нагрузка</a> :: 
+
 <a href="?p=proc">Процессы</a> :: 
 <a href="?p=upgrade">Обновление</a> :: 
+<!--
+<a href="?p=adapters">Адаптеры</a> :: 
+<a href="?p=readers">Ридеры</a> :: 
+<a href="?p=calls">Звонки</a> :: 
+<a href="?p=qos">Качество</a> :: 
+<a href="?p=multisim">Мульти-сим</a> :: 
+<a href="?p=bs">Вышки</a> :: 
+<a href="?p=nagruz">Нагрузка</a> :: 
 <a href="?p=firmware">Перепрошивка</a> :: 
 <a href="?p=bablo">Биллинг</a> :: 
 <a href="?p=settings">Настройка</a> :: 
-<a href="?p=version">Версия</a> :: 
+<a href="?p=version">Версия</a> ::
+-->
 <a href="?p=debug">Debug</a>
 <hr>
 <?
