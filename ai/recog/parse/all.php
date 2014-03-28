@@ -119,6 +119,18 @@ if (($group>=100)&&($group<=295))
 }
 }
 
+//rostel
+//сумма на вашем лицевом счёте недостаточно для соединения набрать номер пожалуйста пополните ваш лицевой счет или воспользуйтесь ус
+//
+if (strstr($full_out,"на вашем лицевом счёте недостаточно")||strstr($full_out,"недостаточно для соединения")||strstr($full_out,"пополните ваш лицевой счет"))
+{
+echo "NOMONEY!";
+if (($group>=100)&&($group<=295))
+{
+    echo ('/usr/sbin/asterisk -rx "dongle setgroupimsi '.$imsi.' 335"');
+    system ('/usr/sbin/asterisk -rx "dongle setgroupimsi '.$imsi.' 335"');
+}
+}
 
 
 // velcom - заблокирован пожалуйста скажите ходила слушать || ваш номер заблокирован
