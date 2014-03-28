@@ -392,7 +392,7 @@ $version=shell_exec('cd /usr/simbox && sudo hg identify');
 
 //H:i:s
 ?>
-<b><?=$hostname?></b> <?=$_SERVER['SERVER_NAME']?> <i>SimServer v.<?=$version?></i>
+<b><?=$hostname?></b> <?=$_SERVER['SERVER_NAME']?> <i>SimServer</i> <font size="-1"><?=$version?></font>
 </td>
 <td width="*" align="right">
  <?=date("d.m.y")?> <?=$uptime?>
