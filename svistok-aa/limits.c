@@ -32,7 +32,8 @@ void limits_temp(struct pvt * pvt)
 
 	    ast_verb(3,"TEST L1 %s %d<=%d (%d-%d)\n",PVT_ID(pvt),PVT_STAT(pvt,limit[PVT_STAT(pvt,limitnum)]),(PVT_STAT(pvt,limit_soft[PVT_STAT(pvt,limitnum)]) - PVT_STAT(pvt,limit_hard[PVT_STAT(pvt,limitnum)])),PVT_STAT(pvt,limit_soft[PVT_STAT(pvt,limitnum)]),PVT_STAT(pvt,limit_hard[PVT_STAT(pvt,limitnum)]));
 
-	if(PVT_STAT(pvt,limit[PVT_STAT(pvt,limitnum)])<=(PVT_STAT(pvt,limit_soft[PVT_STAT(pvt,limitnum)]) - PVT_STAT(pvt,limit_hard[PVT_STAT(pvt,limitnum)])) )
+	if(PVT_STAT(pvt,limit[PVT_STAT(pvt,limitnum)])<=0)
+	//if(PVT_STAT(pvt,limit[PVT_STAT(pvt,limitnum)])<=(PVT_STAT(pvt,limit_soft[PVT_STAT(pvt,limitnum)]) - PVT_STAT(pvt,limit_hard[PVT_STAT(pvt,limitnum)])) )
 	{
 	    ast_verb(3,"PEREBOR PO LIMITU %s %d<=%d\n",PVT_ID(pvt),PVT_STAT(pvt,limit[PVT_STAT(pvt,limitnum)]),(PVT_STAT(pvt,limit_soft[PVT_STAT(pvt,limitnum)]) - PVT_STAT(pvt,limit_hard[PVT_STAT(pvt,limitnum)])));
 
@@ -62,7 +63,7 @@ void limits_final(struct pvt * pvt, int duration)
 	    PVT_STAT(pvt,limit[PVT_STAT(pvt,limitnum)])-=duration;
 	} else {
 	    //Okruglaem
-	    PVT_STAT(pvt,limit[PVT_STAT(pvt,limitnum)])-=ceil(((float)duration+3)/60)*60;
+	    PVT_STAT(pvt,limit[PVT_STAT(pvt,limitnum)])-=ceil(((float)duration+5)/60)*60;
 	}
 	PVT_STAT(pvt,limitnum)=0;
 	//уменьшить лимиты
