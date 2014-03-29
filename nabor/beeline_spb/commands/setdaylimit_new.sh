@@ -15,7 +15,7 @@ echo "?$imsi $operator"
 if [ "$group" -eq 5 ] ; then
 echo "+$imsi $operator"
 
-echo "5400" > /var/svistok/sim/limits/$imsi.limit.1
+echo "5960" > /var/svistok/sim/limits/$imsi.limit.1
 echo "9000" > /var/svistok/sim/limits/$imsi.limit.2
 echo "9000" > /var/svistok/sim/limits/$imsi.limit.3
 fi
