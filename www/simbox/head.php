@@ -392,7 +392,7 @@ $version=shell_exec('cd /usr/simbox && sudo hg identify');
 
 //H:i:s
 ?>
-<b><?=$hostname?></b> <font size="-1"> <?=$_SERVER['SERVER_NAME']?> </font> <i>SimServer</i> <font size="-1"><?=$version?></font>
+<b><?=$hostname?></b> <font size="-1"> <?=$_SERVER['SERVER_NAME']?> </font> <i>SimBox</i> <font size="-1"><?=$version?></font>
 </td>
 <td width="*" align="right">
 <font size="-1">
