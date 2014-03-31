@@ -37,7 +37,7 @@ configure:1529: checking for issetugid
 configure:1557: gcc -o conftest -pthread -I../..//include -I/usr/include/libxml2 -pipe -Wall -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -g3 -O6 -march=native       conftest.c -ltermcap  1>&5
 configure:1541:1: warning: function declaration isn't a prototype [-Wstrict-prototypes]
 configure:1543:5: warning: function declaration isn't a prototype [-Wstrict-prototypes]
-/tmp/ccelCyUf.o: In function `main':
+/tmp/ccfXyZr5.o: In function `main':
 /usr/simbox/src/asterisk-11.8.1/main/editline/configure:1551: undefined reference to `issetugid'
 collect2: ld returned 1 exit status
 configure: failed program was:
@@ -67,7 +67,7 @@ configure:1584: checking for fgetln
 configure:1612: gcc -o conftest -pthread -I../..//include -I/usr/include/libxml2 -pipe -Wall -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -g3 -O6 -march=native       conftest.c -ltermcap  1>&5
 configure:1596:1: warning: function declaration isn't a prototype [-Wstrict-prototypes]
 configure:1598:5: warning: function declaration isn't a prototype [-Wstrict-prototypes]
-/tmp/ccs8q4ah.o: In function `main':
+/tmp/cczwVjc7.o: In function `main':
 /usr/simbox/src/asterisk-11.8.1/main/editline/configure:1606: undefined reference to `fgetln'
 collect2: ld returned 1 exit status
 configure: failed program was:
@@ -97,7 +97,7 @@ configure:1640: checking for strvis
 configure:1668: gcc -o conftest -pthread -I../..//include -I/usr/include/libxml2 -pipe -Wall -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -g3 -O6 -march=native       conftest.c -ltermcap  1>&5
 configure:1652:1: warning: function declaration isn't a prototype [-Wstrict-prototypes]
 configure:1654:5: warning: function declaration isn't a prototype [-Wstrict-prototypes]
-/tmp/ccLNtFhl.o: In function `main':
+/tmp/ccW8aDTb.o: In function `main':
 /usr/simbox/src/asterisk-11.8.1/main/editline/configure:1662: undefined reference to `strvis'
 collect2: ld returned 1 exit status
 configure: failed program was:
@@ -127,7 +127,7 @@ configure:1696: checking for strunvis
 configure:1724: gcc -o conftest -pthread -I../..//include -I/usr/include/libxml2 -pipe -Wall -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -g3 -O6 -march=native       conftest.c -ltermcap  1>&5
 configure:1708:1: warning: function declaration isn't a prototype [-Wstrict-prototypes]
 configure:1710:5: warning: function declaration isn't a prototype [-Wstrict-prototypes]
-/tmp/cccRmQQr.o: In function `main':
+/tmp/cc26ROli.o: In function `main':
 /usr/simbox/src/asterisk-11.8.1/main/editline/configure:1718: undefined reference to `strunvis'
 collect2: ld returned 1 exit status
 configure: failed program was:
@@ -157,7 +157,7 @@ configure:1752: checking for strlcpy
 configure:1780: gcc -o conftest -pthread -I../..//include -I/usr/include/libxml2 -pipe -Wall -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -g3 -O6 -march=native       conftest.c -ltermcap  1>&5
 configure:1764:1: warning: function declaration isn't a prototype [-Wstrict-prototypes]
 configure:1766:5: warning: function declaration isn't a prototype [-Wstrict-prototypes]
-/tmp/ccz6IUDw.o: In function `main':
+/tmp/ccmWEEwj.o: In function `main':
 /usr/simbox/src/asterisk-11.8.1/main/editline/configure:1774: undefined reference to `strlcpy'
 collect2: ld returned 1 exit status
 configure: failed program was:
@@ -187,7 +187,7 @@ configure:1808: checking for strlcat
 configure:1836: gcc -o conftest -pthread -I../..//include -I/usr/include/libxml2 -pipe -Wall -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -g3 -O6 -march=native       conftest.c -ltermcap  1>&5
 configure:1820:1: warning: function declaration isn't a prototype [-Wstrict-prototypes]
 configure:1822:5: warning: function declaration isn't a prototype [-Wstrict-prototypes]
-/tmp/ccj4p6my.o: In function `main':
+/tmp/ccjPzWNn.o: In function `main':
 /usr/simbox/src/asterisk-11.8.1/main/editline/configure:1830: undefined reference to `strlcat'
 collect2: ld returned 1 exit status
 configure: failed program was:
