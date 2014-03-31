@@ -11,14 +11,25 @@
 #
 # By default this script does nothing.
 
+#/usr/bin/boinccmd --project_attach www.worldcommunitygrid.org e7355ef8ee92b81ca4230841babc0648 &
 
-echo --myehci
-/etc/init.d/myehci start
-echo --myirq
-/etc/init.d/myirq start
-echo --myiptables
-/etc/init.d/myiptables start
-echo --myrouting
-/etc/init.d/myrouting start
+#ionice -c 3 nice -n 19 /home/user/test.sh >>/tmp/test.1 &
+#ionice -c 3 nice -n 19 /home/user/test.sh >>/tmp/test.2 &
+#ionice -c 3 nice -n 19 /home/user/test.sh >>/tmp/test.3 &
+#ionice -c 3 nice -n 19 /home/user/test.sh >>/tmp/test.4 &
 
+/etc/init.d/myehci &
+/etc/init.d/setirq.sh &
+
+sudo /usr/bin/php /usr/simbox/ai/sms/autosms.php > /tmp/as &
+
+/usr/simbox/cron/everyminute.sh &
+/usr/simbox/cron/every5minutes.sh &
+/usr/simbox/cron/everyhour.sh &
+
+
+#/etc/init.d/myiptables start &
+#/etc/init.d/myrouting &
+
+sudo /usr/simbox/system/repower_test.sh > /tmp/repowerall.onboot.tmp &
 exit 0
