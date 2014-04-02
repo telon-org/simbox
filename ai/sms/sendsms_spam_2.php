@@ -38,7 +38,10 @@ echo($cmd."\n");
 $sms=system($cmd);
 if(strlen($sms)<4) die("NULL RESPONSE\n");
 @list($action,$smsoutid,$numberb,$text)=explode("|",$sms);
+
+
 if($action=="NOTHING NEW") die("NOTHING NEW\n");
+if($action=="OK") die("NE OK\n");
 echo("=>$action\n  smsoutid:$smsoutid\n  to:$numberb\n  text:$text\n");
 
 
