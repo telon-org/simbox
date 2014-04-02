@@ -41,7 +41,7 @@ if(strlen($sms)<4) die("NULL RESPONSE\n");
 
 
 if($action=="NOTHING NEW") die("NOTHING NEW\n");
-if($action=="OK") die("NE OK\n");
+if($action!="SENDSMS") die("NE SENDSMS\n");
 echo("=>$action\n  smsoutid:$smsoutid\n  to:$numberb\n  text:$text\n");
 
 

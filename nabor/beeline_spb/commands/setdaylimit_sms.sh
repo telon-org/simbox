@@ -8,7 +8,6 @@ list=`cat $FILE_IMSILIST`
 
 
 
-#/usr/simbox/nabor/beeline_spb/commands/setdaylimit_2.sh
 
 for imsi in $list
 do
