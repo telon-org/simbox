@@ -2,7 +2,7 @@
 
 
 #exit 0
-#    sleep 30
+sleep 30
 
 #asterisk -rx "core stop now"
 hubctrl="/usr/simbox/bin/hub-ctrl"
