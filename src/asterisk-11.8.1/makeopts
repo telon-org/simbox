@@ -49,7 +49,7 @@ HOST_VENDOR=unknown
 HOST_OS=linux-gnu
 
 OSARCH=linux-gnu
-OSREV=3.11.0-18-generic
+OSREV=3.8.13.12-simbox-debug
 
 GC_CFLAGS=-ffunction-sections
 GC_LDFLAGS=-Wl,--gc-sections
