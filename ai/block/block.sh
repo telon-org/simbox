@@ -29,13 +29,14 @@ if [ $group -gt "99" ] ; then
 if [ "290" -gt $group ] ; then
 
 
-
+if [ $group -ne "222" ] ; then
 if [ $high_datt -gt "0" ] ; then
 echo "!!!"
 $ASTERISK -r -x "dongle setgroupimsi $imsi 333"
 #echo $CMD
 #$CMD
 date +"%Y-%m-%d %H:%M:%S" > $PATH_SIMBOX_SIM_STATE/$imsi.date_blocked
+fi
 fi
 
 if [ $low_acdl -gt "0" ] ; then

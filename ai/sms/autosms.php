@@ -23,7 +23,7 @@ while(1)
     {
 	echo(" -> group OK");
 	system('/usr/simbox/ai/sms/sendsms_imsi.php "'.$imsi.'"');
-	//sleep(1);
+	usleep(500000);
     } else 
 
     {

@@ -4,8 +4,8 @@
 
 
 maxdatt=10
-maxdatt1=20
-maxdatt2=20
+maxdatt1=14
+maxdatt2=15
 
 maxdatt_day=15
 maxdatt_night=30

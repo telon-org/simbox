@@ -243,6 +243,18 @@ curl_setopt($ch, CURLOPT_HTTPHEADER, array("Content-Type: audio/x-flac; rate=800
 curl_setopt($ch, CURLOPT_POSTFIELDS, $file_to_upload);
 curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);
 $res=curl_exec ($ch);
+
+
+$er=curl_error($ch);
+
+	//$header_size = curl_getinfo($ch,CURLINFO_HEADER_SIZE);
+        //$r['header'] = substr($response, 0, $header_size);
+        //$r['body'] = substr( $response, $header_size );
+        $r['http_code'] = curl_getinfo($ch,CURLINFO_HTTP_CODE);
+        $r['last_url'] = curl_getinfo($ch,CURLINFO_EFFECTIVE_URL);
+	print_r($r);
+
+
 curl_close ($ch);
 
 $json_array = json_decode($res, true);
@@ -250,6 +262,7 @@ $result = $json_array["hypotheses"][0]["utterance"];
 
 print_r($json_array);
 echo("\n".$result);
+echo("\ner:".$er);
 //if (strlen($result)<=0) print_r($json_array); else echo($result);
 echo("\n");
 

@@ -2188,6 +2188,9 @@ IATT - количество исходящих подряд<br>
 <tr><td>161</td><td>dna</td><td><img src=imgs/napravleine/dna.ico></td></tr>
 <tr><td>203</td><td>юр питерские симки МТС</td><td><img src=imgs/napravleine/mts_ru.ico></td></tr>
 <tr><td>209</td><td>юр питерские симки TELE2</td><td><img src=imgs/napravleine/tele2_ru.ico></td></tr>
+
+<tr><td>222</td><td>питерские симки Ростелеком (на фикс)</td><td><img src=imgs/napravleine/rostel_spb.ico></td></tr>
+<tr><td>232</td><td>питерские симки Ростелеком (на СНГ)</td><td><img src=imgs/napravleine/rostel_spb.ico></td></tr>
 <tr><td colspan=3><hr></td></tr>
 <tr><td>333</td><td>автоблокировка по DATT<td><img src=imgs/high_datt.ico></td></tr>
 <tr><td>334</td><td>автоблокировка по ACDL<td><img src=imgs/low_acdl.ico></td></tr>
