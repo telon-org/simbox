@@ -12,3 +12,5 @@ programmator/unlock_all.sh
 programmator/u2diag_all.sh
 svistok-aa/chan_dongle.so
 svistok-aa/config.log
+*.o_a
+*.so.1
