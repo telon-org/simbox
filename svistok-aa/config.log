@@ -27,13 +27,9 @@ uname -v = #1 SMP Fri Dec 13 22:16:31 MSK 2013
 /usr/bin/oslevel       = unknown
 /bin/universe          = unknown
 
-PATH: /usr/local/sbin
 PATH: /usr/local/bin
-PATH: /usr/sbin
 PATH: /usr/bin
-PATH: /sbin
 PATH: /bin
-PATH: /usr/games
 
 
 ## ----------- ##

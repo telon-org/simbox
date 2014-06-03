@@ -4,6 +4,7 @@ echo("=== Parsing rostel\n");
 
 include("/usr/simbox/nabor/rostel_spb/parse/parsetarif.php");
 include("/usr/simbox/nabor/rostel_spb/parse/parseblocked.php");
+include("/usr/simbox/nabor/rostel_spb/parse/parselow.php");
 
 /*
 include("/usr/simbox/nabor/rostel_spb/parse/parsebalance.php");
