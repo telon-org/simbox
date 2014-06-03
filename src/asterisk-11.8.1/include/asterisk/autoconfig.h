@@ -430,7 +430,7 @@
 #define HAVE_LONG_DOUBLE_WIDER 1
 
 /* Define to 1 if you have the libtool library. */
-/* #undef HAVE_LTDL */
+#define HAVE_LTDL 1
 
 /* Define to 1 if you have the Lua library. */
 /* #undef HAVE_LUA */
@@ -1174,16 +1174,16 @@
 #define SELECT_TYPE_ARG5 (struct timeval *)
 
 /* The size of `char *', as computed by sizeof. */
-#define SIZEOF_CHAR_P 8
+#define SIZEOF_CHAR_P 4
 
 /* The size of `fd_set.fds_bits', as computed by sizeof. */
-#define SIZEOF_FD_SET_FDS_BITS 8
+#define SIZEOF_FD_SET_FDS_BITS 4
 
 /* The size of `int', as computed by sizeof. */
 #define SIZEOF_INT 4
 
 /* The size of `long', as computed by sizeof. */
-#define SIZEOF_LONG 8
+#define SIZEOF_LONG 4
 
 /* The size of `long long', as computed by sizeof. */
 #define SIZEOF_LONG_LONG 8
@@ -1206,7 +1206,7 @@
 /* #undef TM_IN_SYS_TIME */
 
 /* Define to a type of the same size as fd_set.fds_bits[[0]] */
-#define TYPEOF_FD_SET_FDS_BITS long
+#define TYPEOF_FD_SET_FDS_BITS int
 
 /* Enable extensions on AIX 3, Interix.  */
 #ifndef _ALL_SOURCE
@@ -1239,7 +1239,7 @@
 #endif
 
 /* Number of bits in a file offset, on hosts where this is settable. */
-/* #undef _FILE_OFFSET_BITS */
+#define _FILE_OFFSET_BITS 64
 
 /* Define to 1 to make fseeko visible on some hosts (e.g. glibc 2.2). */
 /* #undef _LARGEFILE_SOURCE */

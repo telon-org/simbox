@@ -38,18 +38,18 @@ OPENSSL=/usr/bin/openssl
 LDCONFIG=/sbin/ldconfig
 GIT=/usr/bin/git
 
-BUILD_PLATFORM=x86_64-unknown-linux-gnu
-BUILD_CPU=x86_64
-BUILD_VENDOR=unknown
+BUILD_PLATFORM=i686-pc-linux-gnu
+BUILD_CPU=i686
+BUILD_VENDOR=pc
 BUILD_OS=linux-gnu
 
-HOST_PLATFORM=x86_64-unknown-linux-gnu
-HOST_CPU=x86_64
-HOST_VENDOR=unknown
+HOST_PLATFORM=i686-pc-linux-gnu
+HOST_CPU=i686
+HOST_VENDOR=pc
 HOST_OS=linux-gnu
 
 OSARCH=linux-gnu
-OSREV=3.8.13.12-simbox-debug
+OSREV=3.2.52-simbox
 
 GC_CFLAGS=-ffunction-sections
 GC_LDFLAGS=-Wl,--gc-sections
@@ -121,7 +121,7 @@ BLUETOOTH_INCLUDE=
 BLUETOOTH_LIB=
 
 CURL_INCLUDE=
-CURL_LIB=-L/usr/lib/x86_64-linux-gnu -lcurl -Wl,-Bsymbolic-functions -Wl,-z,relro
+CURL_LIB=-L/usr/lib/i386-linux-gnu -lcurl -Wl,-Bsymbolic-functions -Wl,-z,relro
 
 CURSES_INCLUDE= 
 CURSES_LIB= -lcurses 
@@ -317,7 +317,7 @@ TERMCAP_LIB= -ltermcap
 TERMCAP_DIR=
 
 LIBXML2_INCLUDE=-I/usr/include/libxml2
-LIBXML2_LIB=-L/usr/lib/x86_64-linux-gnu -lxml2
+LIBXML2_LIB=-L/usr/lib/i386-linux-gnu -lxml2
 
 TINFO_INCLUDE= 
 TINFO_LIB= -ltinfo 

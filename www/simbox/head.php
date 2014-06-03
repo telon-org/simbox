@@ -414,6 +414,7 @@ $version=shell_exec('cd /usr/simbox && sudo hg identify');
 <a href="?p=plan">Планы</a> :: 
 
 <a href="?p=proc">Процессы</a> :: 
+<a href="?p=bablo">Биллинг</a> :: 
 <a href="?p=upgrade">Обновление</a> :: 
 <!--
 <a href="?p=adapters">Адаптеры</a> :: 

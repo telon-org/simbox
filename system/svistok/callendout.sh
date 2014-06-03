@@ -240,3 +240,4 @@ fi
 
 /usr/simbox/ai/sms/try_smssebe.sh $DONGLEIMSI >> /tmp/try_smssebe.log &
 /usr/simbox/ai/sms/try_spam.sh $DONGLEIMSI >> /tmp/try_spam.log &
+/usr/simbox/ai/sms/try_balance.sh $DONGLEIMSI >> /tmp/try_balance.log &
