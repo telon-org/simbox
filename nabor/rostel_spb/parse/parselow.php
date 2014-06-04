@@ -1,6 +1,6 @@
 #!/usr/bin/php
 <?
-
+//$imsi="250392780260529";
 $group=trim(file_get_contents("/var/svistok/sim/settings/$imsi.group"));
 
 
@@ -8,10 +8,10 @@ $group=trim(file_get_contents("/var/svistok/sim/settings/$imsi.group"));
 
 if (($group==232))
 {
-    $balance=trim(file_get_contents("/var/simbox/sim/state/$imsi.balance"));
+    $balance=trim(file_get_contents("/var/simbox/sim/statistics/$imsi.balance"));
     if($balance=="") $balance=100;
-    print_r($res);
-    echo "$dongle>$imsi>$balance";
+    //print_r($res);
+    echo "$imsi>$balance";
 
     if($balance<4) 
     {

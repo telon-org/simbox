@@ -96,7 +96,7 @@ function history2($filename)
     system("sox /var/spool/asterisk/monitor/$filename.wav /tmp/$filename.min.wav trim 0 0:59");
     system("flac -f -s /tmp/$filename.min.wav -o /var/spool/asterisk/monitor.flac/$filename.flac");
     unlink("/tmp/$filename.min.wav");
-    unlink("/var/spool/asterisk/monitor/$filename.wav");
+    // !!! unlink("/var/spool/asterisk/monitor/$filename.wav");
 }
 
 
