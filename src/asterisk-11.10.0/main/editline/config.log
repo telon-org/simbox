@@ -1,0 +1,253 @@
+This file contains any messages produced by compilers while
+running configure, to aid debugging if configure makes a mistake.
+
+configure:534: checking for gcc
+configure:647: checking whether the C compiler (gcc -pthread -I../..//include -I/usr/include/libxml2 -pipe -Wall -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -g3 -O3 -march=native     ) works
+configure:663: gcc -o conftest -pthread -I../..//include -I/usr/include/libxml2 -pipe -Wall -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -g3 -O3 -march=native       conftest.c  1>&5
+configure:660:1: warning: return type defaults to 'int' [-Wreturn-type]
+ main(){return(0);}
+ ^
+configure:660:1: warning: function declaration isn't a prototype [-Wstrict-prototypes]
+configure:689: checking whether the C compiler (gcc -pthread -I../..//include -I/usr/include/libxml2 -pipe -Wall -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -g3 -O3 -march=native     ) is a cross-compiler
+configure:694: checking whether we are using GNU C
+configure:703: gcc -E conftest.c
+configure:722: checking whether gcc accepts -g
+configure:764: checking how to run the C preprocessor
+configure:785: gcc -E  conftest.c >/dev/null 2>conftest.out
+configure:848: checking for mawk
+configure:904: checking host system type
+configure:1001: checking for a BSD compatible install
+configure:1056: checking for ranlib
+configure:1088: checking for ar
+configure:1125: checking for tgetent in -ltermcap
+configure:1144: gcc -o conftest -pthread -I../..//include -I/usr/include/libxml2 -pipe -Wall -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -g3 -O3 -march=native       conftest.c -ltermcap   1>&5
+configure:1137:1: warning: function declaration isn't a prototype [-Wstrict-prototypes]
+ char tgetent();
+ ^
+configure:1139:5: warning: function declaration isn't a prototype [-Wstrict-prototypes]
+ int main() {
+     ^
+configure:1322: checking for termcap.h
+configure:1332: gcc -E  conftest.c >/dev/null 2>conftest.out
+configure:1489: checking for sys/cdefs.h
+configure:1499: gcc -E  conftest.c >/dev/null 2>conftest.out
+configure:1489: checking for vis.h
+configure:1499: gcc -E  conftest.c >/dev/null 2>conftest.out
+configure:1495:17: fatal error: vis.h: No such file or directory
+ #include <$ac_hdr>
+                 ^
+compilation terminated.
+configure: failed program was:
+#line 1494 "configure"
+#include "confdefs.h"
+#include <vis.h>
+configure:1529: checking for issetugid
+configure:1557: gcc -o conftest -pthread -I../..//include -I/usr/include/libxml2 -pipe -Wall -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -g3 -O3 -march=native       conftest.c -ltermcap  1>&5
+configure:1541:1: warning: function declaration isn't a prototype [-Wstrict-prototypes]
+ char $ac_func();
+ ^
+configure:1543:5: warning: function declaration isn't a prototype [-Wstrict-prototypes]
+ int main() {
+     ^
+/tmp/ccXhzi2W.o: In function `main':
+/usr/simbox/src/asterisk-11.10.0/main/editline/configure:1551: undefined reference to `issetugid'
+collect2: error: ld returned 1 exit status
+configure: failed program was:
+#line 1534 "configure"
+#include "confdefs.h"
+/* System header to define __stub macros and hopefully few prototypes,
+    which can conflict with char issetugid(); below.  */
+#include <assert.h>
+/* Override any gcc2 internal prototype to avoid an error.  */
+/* We use char because int might match the return type of a gcc2
+    builtin and then its argument prototype would still apply.  */
+char issetugid();
+
+int main() {
+
+/* The GNU C library defines this for functions which it implements
+    to always fail with ENOSYS.  Some functions are actually named
+    something starting with __ and the normal name is an alias.  */
+#if defined (__stub_issetugid) || defined (__stub___issetugid)
+choke me
+#else
+issetugid();
+#endif
+
+; return 0; }
+configure:1584: checking for fgetln
+configure:1612: gcc -o conftest -pthread -I../..//include -I/usr/include/libxml2 -pipe -Wall -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -g3 -O3 -march=native       conftest.c -ltermcap  1>&5
+configure:1596:1: warning: function declaration isn't a prototype [-Wstrict-prototypes]
+ char $ac_func();
+ ^
+configure:1598:5: warning: function declaration isn't a prototype [-Wstrict-prototypes]
+ int main() {
+     ^
+/tmp/ccileWq0.o: In function `main':
+/usr/simbox/src/asterisk-11.10.0/main/editline/configure:1606: undefined reference to `fgetln'
+collect2: error: ld returned 1 exit status
+configure: failed program was:
+#line 1589 "configure"
+#include "confdefs.h"
+/* System header to define __stub macros and hopefully few prototypes,
+    which can conflict with char fgetln(); below.  */
+#include <assert.h>
+/* Override any gcc2 internal prototype to avoid an error.  */
+/* We use char because int might match the return type of a gcc2
+    builtin and then its argument prototype would still apply.  */
+char fgetln();
+
+int main() {
+
+/* The GNU C library defines this for functions which it implements
+    to always fail with ENOSYS.  Some functions are actually named
+    something starting with __ and the normal name is an alias.  */
+#if defined (__stub_fgetln) || defined (__stub___fgetln)
+choke me
+#else
+fgetln();
+#endif
+
+; return 0; }
+configure:1640: checking for strvis
+configure:1668: gcc -o conftest -pthread -I../..//include -I/usr/include/libxml2 -pipe -Wall -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -g3 -O3 -march=native       conftest.c -ltermcap  1>&5
+configure:1652:1: warning: function declaration isn't a prototype [-Wstrict-prototypes]
+ char $ac_func();
+ ^
+configure:1654:5: warning: function declaration isn't a prototype [-Wstrict-prototypes]
+ int main() {
+     ^
+/tmp/ccpFbYt1.o: In function `main':
+/usr/simbox/src/asterisk-11.10.0/main/editline/configure:1662: undefined reference to `strvis'
+collect2: error: ld returned 1 exit status
+configure: failed program was:
+#line 1645 "configure"
+#include "confdefs.h"
+/* System header to define __stub macros and hopefully few prototypes,
+    which can conflict with char strvis(); below.  */
+#include <assert.h>
+/* Override any gcc2 internal prototype to avoid an error.  */
+/* We use char because int might match the return type of a gcc2
+    builtin and then its argument prototype would still apply.  */
+char strvis();
+
+int main() {
+
+/* The GNU C library defines this for functions which it implements
+    to always fail with ENOSYS.  Some functions are actually named
+    something starting with __ and the normal name is an alias.  */
+#if defined (__stub_strvis) || defined (__stub___strvis)
+choke me
+#else
+strvis();
+#endif
+
+; return 0; }
+configure:1696: checking for strunvis
+configure:1724: gcc -o conftest -pthread -I../..//include -I/usr/include/libxml2 -pipe -Wall -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -g3 -O3 -march=native       conftest.c -ltermcap  1>&5
+configure:1708:1: warning: function declaration isn't a prototype [-Wstrict-prototypes]
+ char $ac_func();
+ ^
+configure:1710:5: warning: function declaration isn't a prototype [-Wstrict-prototypes]
+ int main() {
+     ^
+/tmp/ccodRiX6.o: In function `main':
+/usr/simbox/src/asterisk-11.10.0/main/editline/configure:1718: undefined reference to `strunvis'
+collect2: error: ld returned 1 exit status
+configure: failed program was:
+#line 1701 "configure"
+#include "confdefs.h"
+/* System header to define __stub macros and hopefully few prototypes,
+    which can conflict with char strunvis(); below.  */
+#include <assert.h>
+/* Override any gcc2 internal prototype to avoid an error.  */
+/* We use char because int might match the return type of a gcc2
+    builtin and then its argument prototype would still apply.  */
+char strunvis();
+
+int main() {
+
+/* The GNU C library defines this for functions which it implements
+    to always fail with ENOSYS.  Some functions are actually named
+    something starting with __ and the normal name is an alias.  */
+#if defined (__stub_strunvis) || defined (__stub___strunvis)
+choke me
+#else
+strunvis();
+#endif
+
+; return 0; }
+configure:1752: checking for strlcpy
+configure:1780: gcc -o conftest -pthread -I../..//include -I/usr/include/libxml2 -pipe -Wall -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -g3 -O3 -march=native       conftest.c -ltermcap  1>&5
+configure:1764:1: warning: function declaration isn't a prototype [-Wstrict-prototypes]
+ char $ac_func();
+ ^
+configure:1766:5: warning: function declaration isn't a prototype [-Wstrict-prototypes]
+ int main() {
+     ^
+/tmp/ccotVjW9.o: In function `main':
+/usr/simbox/src/asterisk-11.10.0/main/editline/configure:1774: undefined reference to `strlcpy'
+collect2: error: ld returned 1 exit status
+configure: failed program was:
+#line 1757 "configure"
+#include "confdefs.h"
+/* System header to define __stub macros and hopefully few prototypes,
+    which can conflict with char strlcpy(); below.  */
+#include <assert.h>
+/* Override any gcc2 internal prototype to avoid an error.  */
+/* We use char because int might match the return type of a gcc2
+    builtin and then its argument prototype would still apply.  */
+char strlcpy();
+
+int main() {
+
+/* The GNU C library defines this for functions which it implements
+    to always fail with ENOSYS.  Some functions are actually named
+    something starting with __ and the normal name is an alias.  */
+#if defined (__stub_strlcpy) || defined (__stub___strlcpy)
+choke me
+#else
+strlcpy();
+#endif
+
+; return 0; }
+configure:1808: checking for strlcat
+configure:1836: gcc -o conftest -pthread -I../..//include -I/usr/include/libxml2 -pipe -Wall -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -g3 -O3 -march=native       conftest.c -ltermcap  1>&5
+configure:1820:1: warning: function declaration isn't a prototype [-Wstrict-prototypes]
+ char $ac_func();
+ ^
+configure:1822:5: warning: function declaration isn't a prototype [-Wstrict-prototypes]
+ int main() {
+     ^
+/tmp/cc1EZLtc.o: In function `main':
+/usr/simbox/src/asterisk-11.10.0/main/editline/configure:1830: undefined reference to `strlcat'
+collect2: error: ld returned 1 exit status
+configure: failed program was:
+#line 1813 "configure"
+#include "confdefs.h"
+/* System header to define __stub macros and hopefully few prototypes,
+    which can conflict with char strlcat(); below.  */
+#include <assert.h>
+/* Override any gcc2 internal prototype to avoid an error.  */
+/* We use char because int might match the return type of a gcc2
+    builtin and then its argument prototype would still apply.  */
+char strlcat();
+
+int main() {
+
+/* The GNU C library defines this for functions which it implements
+    to always fail with ENOSYS.  Some functions are actually named
+    something starting with __ and the normal name is an alias.  */
+#if defined (__stub_strlcat) || defined (__stub___strlcat)
+choke me
+#else
+strlcat();
+#endif
+
+; return 0; }
+gcc: error: '-D__RCSID(x)=': No such file or directory
+gcc: error: '-D__RCSID(x)=': No such file or directory
+gcc: error: '-D__COPYRIGHT(x)=': No such file or directory
+gcc: error: '-D__RCSID(x)=': No such file or directory
+gcc: error: '-D__COPYRIGHT(x)=': No such file or directory
+gcc: error: '-D__RENAME(x)=': No such file or directory

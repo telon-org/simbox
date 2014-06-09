@@ -132,7 +132,7 @@ References:
 extern "C" {
 #endif
 
-#define AST_MAX_EXTENSION	80	/*!< Max length of an extension */
+#define AST_MAX_EXTENSION	800	/*!< Max length of an extension */
 #define AST_MAX_CONTEXT		80	/*!< Max length of a context */
 #define AST_CHANNEL_NAME	80	/*!< Max length of an ast_channel name */
 #define MAX_LANGUAGE		40	/*!< Max length of the language setting */

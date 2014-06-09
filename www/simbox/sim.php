@@ -8,6 +8,8 @@
 		
 		//exec_fon('/usr/simbox/system/parseussdsms.sh');
 
+print_r($_POST);
+
 function fulltrim($t)
 {
     $t1=str_replace(" ","",$t);
@@ -1837,7 +1839,7 @@ $palevo5=file_get_contents_def2("/var/simbox/sim/settings/".$imsi.'.6.palevo',"0
 
 
 				<input type="hidden" name="i_mode[<?=$imsi;?>]" value=0>
-			<td><input type="checkbox" name="i_mode[<?=$imsi;?>]" value=1 <?if(file_get_contents($path_svistok_sim_settings.$imsi.'.i_mode')==1)echo 'checked';?>></td>
+			<td><input type="checkbox" name="i_mode[<?=$imsi;?>]" value=1 <?if(@file_get_contents($path_svistok_sim_settings.$imsi.'.i_mode')==1)echo 'checked';?>></td>
 
 			<td><?=file_get_contents_def2($path_svistok_sim_state.$imsi.'.lac','');?></td>
 			<td><?=file_get_contents_def2($path_svistok_sim_state.$imsi.'.cell','');?></td>
@@ -1905,16 +1907,18 @@ $palevo5=file_get_contents_def2("/var/simbox/sim/settings/".$imsi.'.6.palevo',"0
 <input type="hidden" name="5xx" value="2">
 
 
-<input type="checkbox" name="0xx" value="1" <?if($_POST['0xx']!="2") echo("checked");?>> 0xx
-<input type="checkbox" name="1xx" value="1" <?if($_POST['1xx']!="2") echo("checked");?>> 1xx
-<input type="checkbox" name="3xx" value="1" <?if($_POST['3xx']!="2") echo("checked");?>> 3xx
-<input type="checkbox" name="5xx" value="1" <?if($_POST['5xx']!="2") echo("checked");?>> 5xx
+<input type="checkbox" name="0xx" value="1" <?if(@$_POST['0xx']!="2") echo("checked");?>> 0xx
+<input type="checkbox" name="1xx" value="1" <?if(@$_POST['1xx']!="2") echo("checked");?>> 1xx
+<input type="checkbox" name="3xx" value="1" <?if(@$_POST['3xx']!="2") echo("checked");?>> 3xx
+<input type="checkbox" name="5xx" value="1" <?if(@$_POST['5xx']!="2") echo("checked");?>> 5xx
 
 <br>
 <input type="submit" name="refresh" value="Обновить"> 
+<!--
 <hr>
-<input type="submit" name="save" value="Сохранить"> <!--сохраняет параметры--> 
 
+<input type="submit" name="save" value="Сохранить"> 
+-->
 </td></tr></table>
 
 
@@ -2099,8 +2103,8 @@ dat_smsc: <input type="text" name="dat_smsc" value="<?=@$_POST['dat_smsc']?>"> <
 <td>
 Rotator (поиск среди старых)
 </td></tr><tr><td>
-<input type="checkbox" name="rot_ki" value='1' <? if($_POST['rot_ki']) echo "checked"; ?>> New KI<br>
-<input type="checkbox" name="rot_lo" value='1' <? if($_POST['rot_lo']) echo "checked"; ?>> Цикл<br>
+<input type="checkbox" name="rot_ki" value='1' <? if(@$_POST['rot_ki']) echo "checked"; ?>> New KI<br>
+<input type="checkbox" name="rot_lo" value='1' <? if(@$_POST['rot_lo']) echo "checked"; ?>> Цикл<br>
 <input type="text" name="rot_owner" value="<?=@$_POST['rot_owner']?>"><br>
 <input type="submit" name="rotki" value="Rotator"><br>
 

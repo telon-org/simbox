@@ -501,11 +501,11 @@ where
 	$str_state=trim(@file_get_contents($path_svistok_dongles_state.$dongle.'.str_state'));
 	$imei2=$imei;
 	$firmware=trim(@file_get_contents($path_svistok_dongles_state.$dongle.'.firmware'));
-	if(substr_count(@file_get_contents($path_svistok_dongles.'imei.black'),$imei)) $imei='<b style="color:red;">'.$imei.'</b>';
+	if(@substr_count(@file_get_contents($path_svistok_dongles.'imei.black'),$imei)) $imei='<b style="color:red;">'.$imei.'</b>';
 
 	?>
 	<tr <?if($cnt%2==0)echo 'class="zebra"';?>>
-		<td><input type="checkbox" name="id[]" class="id" value='<?=$dongle;?>' <? if(in_array($dongle,$_POST['id'])) echo "checked"; ?>></td>
+		<td><input type="checkbox" name="id[]" class="id" value='<?=$dongle;?>' <? if(@in_array($dongle,$_POST['id'])) echo "checked"; ?>></td>
 
 <td>
 <?

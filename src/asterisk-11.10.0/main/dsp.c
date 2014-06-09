@@ -136,7 +136,7 @@ enum busy_detect {
 
 /*! All THRESH_XXX values are in GSAMP_SIZE chunks (us = 22ms) */
 enum gsamp_thresh {
-	THRESH_RING = 8,		/*!< Need at least 150ms ring to accept */
+	THRESH_RING = 2, //8		/*!< Need at least 150ms ring to accept */
 	THRESH_TALK = 2,		/*!< Talk detection does not work continuously */
 	THRESH_BUSY = 4,		/*!< Need at least 80ms to accept */
 	THRESH_CONGESTION = 4,		/*!< Need at least 80ms to accept */
@@ -1601,9 +1601,9 @@ struct ast_frame *ast_dsp_process(struct ast_channel *chan, struct ast_dsp *dsp,
 				dsp->f.frametype = AST_FRAME_CONTROL;
 				dsp->f.subclass.integer = res;
 				dsp->f.src = "dsp_progress";
-				if (chan) {
+				/*if (chan) {
 					ast_queue_frame(chan, &dsp->f);
-				}
+				}*/
 				break;
 			default:
 				ast_log(LOG_WARNING, "Don't know how to represent call progress message %d\n", res);
