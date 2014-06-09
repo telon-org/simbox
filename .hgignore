@@ -14,3 +14,4 @@ svistok-aa/chan_dongle.so
 svistok-aa/config.log
 *.o_a
 *.so.1
+*.0
