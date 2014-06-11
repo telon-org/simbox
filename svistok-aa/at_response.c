@@ -920,18 +920,19 @@ static int at_response_cend (struct pvt * pvt, const char* str)
 	int bs_acdl;
 	int bs_asrl;
 	
-	int pdd=0;
-	int pdds=0;
+	long int pdd=0;
+	long int pdds=0;
 
 	
 	int call_index = 0;
-	int duration_total=0;
-	int duration   = 0;
+	long int duration_total=0;
+	long int duration   = 0;
 	int end_status = 0;
 	int cc_cause   = 0;
 	struct cpvt * cpvt;
 	struct ast_channel * chan;
 	long int fassec,pddcsec;
+	long int td;
 
 	//long duration_total;
 
@@ -1017,7 +1018,7 @@ static int at_response_cend (struct pvt * pvt, const char* str)
 				putfilei("sim",pvt->imsi,"outdone",1);
 			}
 			
-			long td=(long)time(NULL)-PVT_STAT(pvt,stat_call_start)-duration;
+			td=(long)time(NULL)-PVT_STAT(pvt,stat_call_start)-duration;
 
 			PVT_STAT(pvt, stat_wait_duration[1]) +=td;
 			PVT_STAT(pvt, stat_wait_duration[2]) +=td;
@@ -1145,8 +1146,8 @@ else
 				pvt->spec,
 				pvt->qos,
 				pvt->vip,
-				(long int)pdd,
-				(long int)pdds,
+				pdd,
+				pdds,
 				pvt->naprstr,
 				pvt->im,
 				pvt->uid,
@@ -1258,8 +1259,8 @@ else
 				"NUMBERMY",
 				pvt->serial,
 				PVT_ID(pvt),
-				(long int)duration_total,
-				(long int)duration,
+				duration_total,
+				duration,
 				pvt->imei,
 				pvt->imsi,
 				pvt->location_area_code,

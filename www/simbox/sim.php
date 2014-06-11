@@ -8,7 +8,7 @@
 		
 		//exec_fon('/usr/simbox/system/parseussdsms.sh');
 
-print_r($_POST);
+//print_r($_POST);
 
 function fulltrim($t)
 {
@@ -1141,6 +1141,7 @@ $('.tooltip_file').tooltip();
 <td>LIMIT4</td>                  
 <td>LIMIT5</td>                 
 
+<!--
 <td><img src=imgs/state_wait.png><img src=imgs/inew.png><br><font size=2 color=#cccccc>diff_min</td>
 <td><img src=imgs/state_wait.png><img src=imgs/igoo.png><img src=imgs/inor.png><br><font size=2 color=#cccccc>diff_min_out</td>
 <td><img src=imgs/state_wait.png><img src=imgs/state_sout.png><br><font size=2 color=#cccccc>diff_min_sout</td>
@@ -1148,6 +1149,9 @@ $('.tooltip_file').tooltip();
 
 <td>start time</td>              
 <td>end time</td>                
+-->
+
+<!--
 <td><img src=imgs/state_in.png alt="can in"></td>                 
 <td><img src=imgs/state_out.png alt="can out"></td>                 
 <td><img src=imgs/state_sout.png alt="can out"></td>                
@@ -1157,6 +1161,7 @@ $('.tooltip_file').tooltip();
 <td><img src=imgs/inew.png alt=iNEW></td>                     
 <td><img src=imgs/inos.png alt=iNOS></td>                     
 <td><img src=imgs/imode.png alt=iM></td>                    
+-->
 <td>LAC</td>                    
 <td>CELL</td>                    
 <td>IMEI</td>                   
@@ -1719,8 +1724,8 @@ echo(html_srvst($srvst,$simst));
 			</td>
 			<td><?=file_get_contents_def2($path_svistok_sim_statistics.$imsi.'.stat_calls_answered','');?><br><?=file_get_contents_def2($path_svistok_sim_statistics.$imsi.'.stat_in_answered','');?></td>
 			<td><?=minsec(file_get_contents_def2($path_svistok_sim_statistics.$imsi.'.stat_calls_duration',''));?><br><?=minsec(file_get_contents_def2($path_svistok_sim_statistics.$imsi.'.stat_in_duration',''));?></td>
-			<td><?=minsec(acd(file_get_contents($path_svistok_sim_statistics.$imsi.'.stat_calls_duration'),file_get_contents($path_svistok_sim_statistics.$imsi.'.stat_calls_answered')));?> / <br><input type="text" name="acdo_min[<?=$imsi;?>]" size=2 value="<?=minsec(file_get_contents_def($path_simbox_sim_settings.$imsi.'.acdo_min',180));?>"></td>
-			<td><?=minsec(acd(file_get_contents($path_svistok_sim_statistics.$imsi.'.stat_in_duration'),file_get_contents($path_svistok_sim_statistics.$imsi.'.stat_in_answered')));?> / <br><input type="text" name="acdo_min[<?=$imsi;?>]" size=2  value="<?=minsec(file_get_contents_def($path_simbox_sim_settings.$imsi.'.acdi_min',180));?>"></td>
+			<td><?=minsec(acd(file_get_contents($path_svistok_sim_statistics.$imsi.'.stat_calls_duration'),file_get_contents($path_svistok_sim_statistics.$imsi.'.stat_calls_answered')));?> / <br><!--input type="text" name="acdo_min[<?=$imsi;?>]" size=2 value="<?=minsec(file_get_contents_def($path_simbox_sim_settings.$imsi.'.acdo_min',180));?>"--></td>
+			<td><?=minsec(acd(file_get_contents($path_svistok_sim_statistics.$imsi.'.stat_in_duration'),file_get_contents($path_svistok_sim_statistics.$imsi.'.stat_in_answered')));?> / <br><!--input type="text" name="acdo_min[<?=$imsi;?>]" size=2  value="<?=minsec(file_get_contents_def($path_simbox_sim_settings.$imsi.'.acdi_min',180));?>"--></td>
 			<td><center><font size=2 color="#cccccc">
 			<? if ((file_get_contents_def2($path_simbox_sim_state.$imsi.'.low_acdl','0'))==1) echo("<font color=#cc0000><img src=imgs/low_acdl.ico>"); ?><br>
 			
@@ -1783,7 +1788,7 @@ echo(html_srvst($srvst,$simst));
 			<td><?=file_get_contents($path_svistok_sim_statistics.$imsi.'.stat_asrl')/1000;?></td>
 			<td><?=minsec(file_get_contents($path_svistok_sim_statistics.$imsi.'.stat_pddl0'));?></td>
 			<td><?=minsec(file_get_contents($path_svistok_sim_statistics.$imsi.'.stat_pddl1'));?></td>
-			<td><input type="text" name="priority[<?=$imsi?>]" size=1 value="<?=file_get_contents($path_svistok_sim_settings.$imsi.'.priority');?>"></td>
+			<td><!--input type="text" name="priority[<?=$imsi?>]" size=1 value="<?=file_get_contents($path_svistok_sim_settings.$imsi.'.priority');?>"--></td>
 <?
 
 $palevo=file_get_contents_def2("/var/simbox/sim/settings/".$imsi.'.palevo',"0");
@@ -1798,19 +1803,22 @@ $palevo5=file_get_contents_def2("/var/simbox/sim/settings/".$imsi.'.6.palevo',"0
 
 ?>
 
-			<td> <? if($palevo=="1")  echo("<img src=imgs/ipalevo.png>");?> <?=file_get_contents_def2($path_svistok_sim_limits.$imsi.'.limit.0',"");?> <br><br></td>
-			<td><? if($palevo1=="1")  echo("<img src=imgs/ipalevo.png>");?> <?=file_get_contents_def2($path_svistok_sim_limits.$imsi.'.limit.1',"");?> / <br><input type="text" name="limit_max1[<?=$imsi?>]" size=2 value="<?=file_get_contents_def2($path_svistok_sim_limits.$imsi.'.limit_max.1',"");?>"></td>
-			<td><? if($palevo2=="1")  echo("<img src=imgs/ipalevo.png>");?> <?=file_get_contents_def2($path_svistok_sim_limits.$imsi.'.limit.2',"");?> / <br><input type="text" name="limit_max2[<?=$imsi?>]" size=2 value="<?=file_get_contents_def2($path_svistok_sim_limits.$imsi.'.limit_max.2',"");?>"></td>
-			<td><? if($palevo3=="1")  echo("<img src=imgs/ipalevo.png>");?> <?=file_get_contents_def2($path_svistok_sim_limits.$imsi.'.limit.3',"");?> / <br><input type="text" name="limit_max3[<?=$imsi?>]" size=2 value="<?=file_get_contents_def2($path_svistok_sim_limits.$imsi.'.limit_max.3',"");?>"></td>
-			<td><? if($palevo4=="1")  echo("<img src=imgs/ipalevo.png>");?> <?=file_get_contents_def2($path_svistok_sim_limits.$imsi.'.limit.4',"");?> / <br><input type="text" name="limit_max4[<?=$imsi?>]" size=2 value="<?=file_get_contents_def2($path_svistok_sim_limits.$imsi.'.limit_max.4',"");?>"></td>
-			<td><? if($palevo5=="1")  echo("<img src=imgs/ipalevo.png>");?> <?=file_get_contents_def2($path_svistok_sim_limits.$imsi.'.limit.5',"");?> / <br><input type="text" name="limit_max5[<?=$imsi?>]" size=2 value="<?=file_get_contents_def2($path_svistok_sim_limits.$imsi.'.limit_max.5',"");?>"></td>
+			<td> <? if($palevo=="1")  echo("<img src=imgs/ipalevo.png>");?> <?=file_get_contents_def2($path_svistok_sim_limits.$imsi.'.limit.0',"");?> / <br><?=file_get_contents_def2($path_svistok_sim_limits.$imsi.'.limit_max.0',"");?></td>
+			<td><? if($palevo1=="1")  echo("<img src=imgs/ipalevo.png>");?> <?=file_get_contents_def2($path_svistok_sim_limits.$imsi.'.limit.1',"");?> / <br><?=file_get_contents_def2($path_svistok_sim_limits.$imsi.'.limit_max.1',"");?></td>
+			<td><? if($palevo2=="1")  echo("<img src=imgs/ipalevo.png>");?> <?=file_get_contents_def2($path_svistok_sim_limits.$imsi.'.limit.2',"");?> / <br><?=file_get_contents_def2($path_svistok_sim_limits.$imsi.'.limit_max.2',"");?></td>
+			<td><? if($palevo3=="1")  echo("<img src=imgs/ipalevo.png>");?> <?=file_get_contents_def2($path_svistok_sim_limits.$imsi.'.limit.3',"");?> / <br><?=file_get_contents_def2($path_svistok_sim_limits.$imsi.'.limit_max.3',"");?></td>
+			<td><? if($palevo4=="1")  echo("<img src=imgs/ipalevo.png>");?> <?=file_get_contents_def2($path_svistok_sim_limits.$imsi.'.limit.4',"");?> / <br><?=file_get_contents_def2($path_svistok_sim_limits.$imsi.'.limit_max.4',"");?></td>
+			<td><? if($palevo5=="1")  echo("<img src=imgs/ipalevo.png>");?> <?=file_get_contents_def2($path_svistok_sim_limits.$imsi.'.limit.5',"");?> / <br><?=file_get_contents_def2($path_svistok_sim_limits.$imsi.'.limit_max.5',"");?></td>
+<!--
 			<td><input type="text" name="diff_min[<?=$imsi?>]" size=3 value="<?=file_get_contents($path_svistok_sim_settings.$imsi.'.diff_min');?>"></td>
 			<td><input type="text" name="diff_min_out[<?=$imsi?>]" size=3 value="<?=file_get_contents($path_svistok_sim_settings.$imsi.'.diff_min_out');?>"></td>
 			<td><input type="text" name="diff_min_sout[<?=$imsi?>]" size=3 value="<?=file_get_contents($path_svistok_sim_settings.$imsi.'.diff_min_sout');?>"></td>
 			<td><input type="text" name="diff_min_imode[<?=$imsi?>]" size=3 value="<?=file_get_contents($path_svistok_sim_settings.$imsi.'.diff_min_imode');?>"></td>
 			<td><input type="text" name="start_time[<?=$imsi?>]" size=2 value="<?=file_get_contents_def2($path_svistok_sim_settings.$imsi.'.start_time',"");?>"></td>
 			<td><input type="text" name="end_time[<?=$imsi?>]" size=2 value="<?=file_get_contents_def2($path_svistok_sim_settings.$imsi.'.end_time',"");?>"></td>
+-->
 
+<!--
 				<input type="hidden" name="can_in[<?=$imsi;?>]" value=0>
 			<td><input type="checkbox" name="can_in[<?=$imsi;?>]" value=1 <?if(file_get_contents($path_svistok_sim_settings.$imsi.'.can_in')==1)echo 'checked';?>></td>
 
@@ -1839,8 +1847,9 @@ $palevo5=file_get_contents_def2("/var/simbox/sim/settings/".$imsi.'.6.palevo',"0
 
 
 				<input type="hidden" name="i_mode[<?=$imsi;?>]" value=0>
-			<td><input type="checkbox" name="i_mode[<?=$imsi;?>]" value=1 <?if(@file_get_contents($path_svistok_sim_settings.$imsi.'.i_mode')==1)echo 'checked';?>></td>
+			<td><input type="checkbox" name="i_mode[<?=$imsi;?>]" value=1 <? //if(file_get_contents($path_svistok_sim_settings.$imsi.'.i_mode')==1)echo 'checked';?>></td>
 
+-->
 			<td><?=file_get_contents_def2($path_svistok_sim_state.$imsi.'.lac','');?></td>
 			<td><?=file_get_contents_def2($path_svistok_sim_state.$imsi.'.cell','');?></td>
 			<td><?=$imei;?></td>
@@ -1899,7 +1908,7 @@ $palevo5=file_get_contents_def2("/var/simbox/sim/settings/".$imsi.'.6.palevo',"0
 				?></select>
 <br>
 
-
+<!--
 
 <input type="hidden" name="0xx" value="2">
 <input type="hidden" name="1xx" value="2">
@@ -1911,6 +1920,9 @@ $palevo5=file_get_contents_def2("/var/simbox/sim/settings/".$imsi.'.6.palevo',"0
 <input type="checkbox" name="1xx" value="1" <?if(@$_POST['1xx']!="2") echo("checked");?>> 1xx
 <input type="checkbox" name="3xx" value="1" <?if(@$_POST['3xx']!="2") echo("checked");?>> 3xx
 <input type="checkbox" name="5xx" value="1" <?if(@$_POST['5xx']!="2") echo("checked");?>> 5xx
+
+-->
+
 
 <br>
 <input type="submit" name="refresh" value="Обновить"> 
@@ -2103,10 +2115,14 @@ dat_smsc: <input type="text" name="dat_smsc" value="<?=@$_POST['dat_smsc']?>"> <
 <td>
 Rotator (поиск среди старых)
 </td></tr><tr><td>
+
+<!--
 <input type="checkbox" name="rot_ki" value='1' <? if(@$_POST['rot_ki']) echo "checked"; ?>> New KI<br>
 <input type="checkbox" name="rot_lo" value='1' <? if(@$_POST['rot_lo']) echo "checked"; ?>> Цикл<br>
 <input type="text" name="rot_owner" value="<?=@$_POST['rot_owner']?>"><br>
 <input type="submit" name="rotki" value="Rotator"><br>
+-->
+
 
 </td></tr></table>
 

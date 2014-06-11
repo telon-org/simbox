@@ -197,11 +197,11 @@ char* uid,
 char* pro,
 char* cap,
 
-int fas_i,
-int epdd_i,
-int fpdd_i,
-int hem_i,
-int hoa_i,
+long int fas_i,
+long int epdd_i,
+long int fpdd_i,
+long int hem_i,
+long int hoa_i,
 int em_type_i
 );
 
@@ -235,11 +235,11 @@ char* im,
 char* uid,
 char* pro,
 char* cap,
-int fas_i,
-int epdd_i,
-int fpdd_i,
-int hem_i,
-int hoa_i,
+long int fas_i,
+long int epdd_i,
+long int fpdd_i,
+long int hem_i,
+long int hoa_i,
 int em_type_i
 )
 
@@ -282,11 +282,11 @@ char em_type[256];
     sprintf(pdd,"%ld",pdd_i);
     sprintf(pdds,"%ld",pdds_i);
 
-    sprintf(fas,"%d",fas_i);
-    sprintf(epdd,"%d",epdd_i);
-    sprintf(fpdd,"%d",fpdd_i);
-    sprintf(hem,"%d",hem_i);
-    sprintf(hoa,"%d",hoa_i);
+    sprintf(fas,"%ld",fas_i);
+    sprintf(epdd,"%ld",epdd_i);
+    sprintf(fpdd,"%ld",fpdd_i);
+    sprintf(hem,"%ld",hem_i);
+    sprintf(hoa,"%ld",hoa_i);
     sprintf(em_type,"%d",em_type_i);
 
 
