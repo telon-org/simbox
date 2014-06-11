@@ -122,7 +122,7 @@ echo($result);
 
 $cmd = exec('curl --silent -F "Content-Type=audio/x-pcm;bit=16;rate=16000" -F "audio=@'.$filename.'" asr.yandex.net/asr_xml\?key='.$key.'\&uuid='.$uuid .'\&topic='.$topic.'\&lang='.$lang, $xml);
 
-$res_xml = implode($xml)
+$res_xml = implode($xml);
 
 /*
 if (preg_match('!<variant .*?>(.*)</variant>!si', $res_xml, $arr)) $voice_text = $arr[1];

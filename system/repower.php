@@ -13,28 +13,26 @@ print_r($devices);
 foreach($devices as $k=>$line)
 {
     echo($line);
-    $r=grep("[0-9]* Device [0-9]*");
-}
-#for port in $ports
-#do
-#    echo "HUB=$hub PORT=$port"
-#    b=`echo "$hub" | grep -o -R "[0-9]*:" | sed 's/://g'`
-#    d=`echo "$hub" | grep -o -R ":[0-9]*" | sed 's/://g'`
-#
-#
-#    #Выключаем
-#    echo "OFF"
-#    echo "$hubctrl -b $b -d $d -P $port -p 0"
-#    $hubctrl -b $b -d $d -P $port -p 0
-#    sleep 10
-#
-#    #Включаем
-#    echo "ON"
-#    echo "$hubctrl -b $b -d $d -P $port -p 1"
-#    $hubctrl -b $b -d $d -P $port -p 1
-#    sleep 10
-#done
+    if (preg_match("/([0-9]*) Device ([0-9]*)/",$line,$r))
+    {
+        print_r($r);
+	$b=$r[1];
+	$d=$r[2];
+	for($port=1;$port<=4;$port++)
+	{
 
-#asterisk
+        echo "OFF";
+	exec("$hubctrl -b $b -d $d -P $port -p 0",$o);
+	print_r($o);
+	sleep(5);
+
+	echo "ON";
+	exec("$hubctrl -b $b -d $d -P $port -p 1",$o);
+	print_r($o);
+	sleep(5);
+	}
+
+    }
+}
 
 ?>
