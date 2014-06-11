@@ -1,19 +1,20 @@
-#!/bin/bash
+#!/usr/bin/php
+<?php
 
 
-#exit 0
-#sleep 30
-
-#asterisk -rx "core stop now"
-hubctrl="/usr/simbox/bin/hub-ctrl"
+$hubctrl="/usr/simbox/bin/hub-ctrl";
 
 
-hub=001:001
-    echo "HUB=$hub"
+$hub="001:001";
+//grep -o -R "[0-9]* Device [0-9]*"
+exec('lsusb | grep Terminus',$devices);
+print_r($devices);
 
-    ports=`lsusb -v -s $hub | grep -o -R "Port [0-9]: " | grep -o -R "[0-9]:" | sed 's/://g'`
-
-echo "$ports"
+foreach($devices as $k=>$line)
+{
+    echo($line);
+    $r=grep("[0-9]* Device [0-9]*");
+}
 #for port in $ports
 #do
 #    echo "HUB=$hub PORT=$port"
@@ -36,4 +37,4 @@ echo "$ports"
 
 #asterisk
 
-echo "DONE2"
+?>

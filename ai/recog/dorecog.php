@@ -1,5 +1,4 @@
 #!/usr/bin/php
-
 <?
 //die();
 echo ("YASPEECH\n");
@@ -14,6 +13,7 @@ $billsec=$argv[5];
 
 if (strlen($uid)<=0) die("No uid");
 echo "uid=$uid imsi=$imsi\n";
+
 dorecog2($uid,$dialstatus,$imsi,$numberb,$billsec);
 
 die();
@@ -93,9 +93,6 @@ function history2($filename)
 
 
 
-
-
-
 function yandexspeech($filename)
 {
 
@@ -123,33 +120,35 @@ curl_close ($ch);
 echo($result);
 */
 
-$cmd = exec('curl --silent -F "Content-Type=audio/x-pcm;bit=16;rate=16000" -F "audio=@'.$filename.'" asr.yandex.net/asr_xml\?key='.$key.'\&uuid='.$uuid .'\&topic='.$topic.'\&lang='.$lang, $xml); 
+//$cmd = exec('curl --silent -F "Content-Type=audio/x-pcm;bit=16;rate=16000" -F "audio=@'.$filename.'" asr.yandex.net/asr_xml\?key='.$key.'\&uuid='.$uuid .'\&topic='.$topic.'\&lang='.$lang, $xml);
 
-$res_xml = implode($xml);
+//$res_xml = implode($xml)
 
-
+/*
 if (preg_match('!<variant .*?>(.*)</variant>!si', $res_xml, $arr)) $voice_text = $arr[1];
     else $voice_text='';
-    
+*/
 
-print_r($xml);
-echo($voice_text);
+print_r($res_xml);
+
+$p = xml_parser_create();
+xml_parse_into_struct($p, $res_xml, $vals, $index);
+xml_parser_free($p);
+//print_r($vals);
+$r="";
+foreach ($vals as $k=>$v)
+{
+    if($v['tag']=="VARIANT") $r=$r.$v['value']."/";
+}
+//echo($r);
+$voice_text=$r;
+
+
+echo($voice_text."\n");
 return($voice_text);
-
-/*echo 'SET VARIABLE TEXT "'.$voice_text.'"'."\n";
-fgets(STDIN);
-echo 'VERBOSE ("'.$voice_text.'")'."\n";
-fgets(STDIN);
-exit(0);*/
 
 
 }
-
-//system('sox '.$filename.'.wav -r 8000 -b 16 -c 1 '.$filename.'-pcm.wav');
-//yandexspeech("test3-pcm.wav");
-
-
-
 
 
 ?>

@@ -2,8 +2,28 @@
 
 <?
 
+/*
+$simple=implode(array(0 => '<?xml version="1.0" encoding="utf-8"?>',
+    1 => '<recognitionResults success="1">',
+    2 => '	<variant confidence="1">э</variant>',
+    3 => '</recognitionResults>'));
 
+print_r($simple);
 
+//$simple = "<para><note>simple note</note></para>";
+
+$p = xml_parser_create();
+xml_parse_into_struct($p, $simple, $vals, $index);
+xml_parser_free($p);
+print_r($vals);
+$r="";
+foreach ($vals as $k=>$v)
+{
+    if($v['tag']=="VARIANT") $r=$r.$v['value']."/";
+}
+echo($r);
+die();
+*/
 
 function yandexspeech($filename)
 {
