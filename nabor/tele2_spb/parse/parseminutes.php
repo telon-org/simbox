@@ -44,7 +44,7 @@ $min1=$minutes*60;
 $min2=$minutes*60+($balance*60);
 $min3=$minutes*60+($balance*60)+600;
 $min4=$minutes*60+($balance*60)+20000;
-$min5=($minutes-5)*60/4*3;
+$min5=($minutes)*60*5/4;
 $min6=($minutes-5)*60/4*1;
 
 
@@ -101,7 +101,7 @@ $min1=$minutes*60;
 $min2=$minutes*60+($balance*60);
 $min3=$minutes*60+($balance*60)+600;
 $min4=$minutes*60+($balance*60)+20000;
-$min5=($minutes-5)*60/4*3;
+$min5=($minutes)*60*5/4;
 $min6=($minutes-5)*60/4*1;
 
 echo "$dongle>$imsi>$min1>$min2";

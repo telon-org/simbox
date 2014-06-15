@@ -29,7 +29,7 @@ foreach($devices as $k=>$line)
 	echo "ON";
 	exec("$hubctrl -b $b -d $d -P $port -p 1",$o);
 	print_r($o);
-	sleep(5);
+	sleep(60);
 	}
 
     }
