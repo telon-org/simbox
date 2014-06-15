@@ -65,3 +65,6 @@ mkdir /mnt/disk/var/samsebe
 mkdir /mnt/disk/var/samsebe/g729
 mkdir /mnt/disk/var/samsebe/g729/out
 mkdir /mnt/disk/var/samsebe/g729/in
+
+chmod -R 777 /mnt/disk/var/simbox
+chmod -R 777 /mnt/disk/var/svistok
