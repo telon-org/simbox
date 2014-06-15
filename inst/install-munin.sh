@@ -7,6 +7,9 @@ ln -s /usr/share/munin/plugins/multiping /etc/munin/plugins/multiping
 ln -s /usr/share/munin/plugins/multiping_ping /etc/munin/plugins/multiping_ping
 ln -s /usr/share/munin/plugins/multiping_loss /etc/munin/plugins/multiping_loss
 
+ln -s /usr/share/munin/plugins/sensors_ /etc/munin/plugins/sensors_fan
+ln -s /usr/share/munin/plugins/sensors_ /etc/munin/plugins/sensors_volt
+ln -s /usr/share/munin/plugins/sensors_ /etc/munin/plugins/sensors_temp
 
 
 echo "" >> /etc/munin/plugin-conf.d/munin-node
