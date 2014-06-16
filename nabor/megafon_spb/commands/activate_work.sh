@@ -5,4 +5,7 @@
 
 echo "-- Activating work"
 
-/usr/simbox/system/makecalldtmf.sh $DONGLE 0206 wwww1wwwwww1wwww
+/usr/simbox/system/send.sh "ussd" "LOC" "$DONGLE" "*105*0082#" ""
+sleep 7
+/usr/simbox/system/send.sh "ussd" "LOC" "$DONGLE" "1" ""
+#$ASTERISK -r -x "dongle ussd $DONGLE *162#"
