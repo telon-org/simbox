@@ -1,3 +1,4 @@
+#!/usr/bin/php
 <?
 
 
@@ -10,7 +11,7 @@ while(1)
     $imsi=trim($imsi);
     $group=file_get_contents("/var/svistok/sim/settings/".$imsi.".group");
 
-    $busy=file_get_contents("/var/svistok/sim/state/$imsi.busy");
+    $busy=@file_get_contents("/var/svistok/sim/state/$imsi.busy");
     $str_state=file_get_contents("/var/svistok/sim/state/$imsi.str_state");
 
     echo("\n$imsi -> $group");
@@ -24,6 +25,7 @@ while(1)
 	echo(" -> group OK");
 	system('/usr/simbox/ai/sms/sendsms_imsi.php "'.$imsi.'"');
 	usleep(500000);
+	//usleep(200000);
     } else 
 
     {

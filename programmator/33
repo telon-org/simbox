@@ -1,1 +1,1 @@
-./fupdate4.sh /dev/ttyUSB61 2-1.6.2.3 1550
+./fupdate4.sh /dev/ttyUSB234 2-1.6.4.4 1550

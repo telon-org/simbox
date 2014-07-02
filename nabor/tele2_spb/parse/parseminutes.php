@@ -55,7 +55,7 @@ file_put_contents("/var/svistok/sim/limits/$imsi.limit.4",$min6);
 
 
 
-
+/*
 if(preg_match("/,\s([\d]+)\sSMS из 100/",$text,$res))
 {
 print_r($res);
@@ -78,7 +78,7 @@ file_put_contents("/var/svistok/sim/limits/$imsi.limit.smsday",$sms);
 
 file_put_contents("/var/simbox/sim/settings/$imsi.smsout_sended",100-$sms);
 
-}
+}*/
 
 
 
@@ -110,6 +110,7 @@ file_put_contents("/var/svistok/sim/limits/$imsi.limit.4",$min6);
 }
 
 
+/*
 if(preg_match("/,\s([\d]+)\sSMS/",$text,$res))
 {
 print_r($res);
@@ -120,5 +121,6 @@ echo "$dongle>$imsi>$sms";
 file_put_contents("/var/svistok/sim/limits/$imsi.limit.smsday",$sms);
 }
 
+*/
 
 ?>
