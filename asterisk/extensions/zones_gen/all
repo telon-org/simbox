@@ -8,27 +8,27 @@ rm ./res/codes.csv
 rm ./res/price.csv
 rm ./res/extensions_zones.conf
 
-./gen3.php "./tmp/ABC-8x.csv" "Ростелеком" "Санкт - Петербург" "rostel_spb_gor" "0.0045"
-./gen3.php "./tmp/DEF-9x.csv" "Ростелеком" "Санкт - Петербург" "rostel_spb_mob" "0.01"
+#./gen3.php "./tmp/ABC-8x.csv" "Ростелеком" "Санкт - Петербург" "rostel_spb_gor" "0.01"
+#./gen3.php "./tmp/DEF-9x.csv" "Ростелеком" "Санкт - Петербург" "rostel_spb_mob" "0.015"
 
-./gen3.php "./tmp/DEF-9x.csv" "Ростелеком" "Санкт - Петербург" "rostel_spb_mob" "0.01"
-./gen3.php "./tmp/DEF-9x.csv" "Вымпел-Коммуникации" "Санкт - Петербург" "bee_spb" "0.01"
+./gen3.php "./tmp/DEF-9x.csv" "Ростелеком" "Санкт - Петербург" "rostel_spb_mob" "0.016"
+./gen3.php "./tmp/DEF-9x.csv" "Вымпел-Коммуникации" "Санкт - Петербург" "bee_spb" "0.02"
 
-./gen3.php "./tmp/DEF-9x.csv" "МегаФон" "Санкт - Петербург" "meg_spb" "0.01"
-./gen3.php "./tmp/DEF-9x.csv" "Мобильные ТелеСистемы" "Санкт - Петербург" "mts_spb" "0.01"
-./gen3.php "./tmp/DEF-9x.csv" "Санкт-Петербург Телеком" "Санкт - Петербург" "tele2_spb" "0.01"
+./gen3.php "./tmp/DEF-9x.csv" "МегаФон" "Санкт - Петербург" "meg_spb" "0.02"
+./gen3.php "./tmp/DEF-9x.csv" "Мобильные ТелеСистемы" "Санкт - Петербург" "mts_spb" "0.02"
+./gen3.php "./tmp/DEF-9x.csv" "Санкт-Петербург Телеком" "Санкт - Петербург" "tele2_spb" "0.015"
 
-./gen3.php "./tmp/DEF-9x.csv" "" "Санкт - Петербург" "all_spb" "0.01"
+./gen3.php "./tmp/DEF-9x.csv" "" "Санкт - Петербург" "all_spb" "0.02"
 
-./gen3.php "./tmp/DEF-9x.csv" "Вымпел-Коммуникации" "Санкт - Петербург" "bee_sz" "999"
-./gen3.php "./tmp/DEF-9x.csv" "МегаФон" "Санкт - Петербург" "meg_sz" "999"
+#./gen3.php "./tmp/DEF-9x.csv" "Вымпел-Коммуникации" "Санкт - Петербург" "bee_sz" "999"
+#./gen3.php "./tmp/DEF-9x.csv" "МегаФон" "Санкт - Петербург" "meg_sz" "999"
 
-./gen3.php "./tmp/DEF-9x.csv" "Вымпел-Коммуникации" "Моск" "bee_msk" "999"
-./gen3.php "./tmp/DEF-9x.csv" "МегаФон" "Моск" "meg_msk" "999"
-./gen3.php "./tmp/DEF-9x.csv" "Мобильные ТелеСистемы" "Моск" "mts_msk" "999"
+#./gen3.php "./tmp/DEF-9x.csv" "Вымпел-Коммуникации" "Моск" "bee_msk" "999"
+#./gen3.php "./tmp/DEF-9x.csv" "МегаФон" "Моск" "meg_msk" "999"
+#./gen3.php "./tmp/DEF-9x.csv" "Мобильные ТелеСистемы" "Моск" "mts_msk" "999"
 
-<<<<<<< local
-./gen3.php "./tmp/DEF-9x.csv" "МегаФон" "" "megafon_ru" "999"
-./gen3.php "./tmp/DEF-9x.csv" "Вымпел-Коммуникации" "" "beeline_ru" "999"=======
-./gen3.php "./tmp/DEF-9x.csv" "МегаФон" "" "meg_ru" "999"
-./gen3.php "./tmp/DEF-9x.csv" "Вымпел-Коммуникации" "" "bee_ru" "999">>>>>>> other
+#<<<<<<< local
+#./gen3.php "./tmp/DEF-9x.csv" "МегаФон" "" "megafon_ru" "999"
+#./gen3.php "./tmp/DEF-9x.csv" "Вымпел-Коммуникации" "" "beeline_ru" "999"=======
+#./gen3.php "./tmp/DEF-9x.csv" "МегаФон" "" "meg_ru" "999"
+#./gen3.php "./tmp/DEF-9x.csv" "Вымпел-Коммуникации" "" "bee_ru" "999">>>>>>> other
