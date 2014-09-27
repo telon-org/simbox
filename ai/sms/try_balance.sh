@@ -9,7 +9,7 @@ dongle=`cat /var/svistok/sim/state/$imsi.dongle`
 
 echo "try_may imsi=$imsi number=$number group=$group"
 
-if [ $group -eq 232 ] ; then
-/usr/simbox/system/sleep_rand.php 20 40
-/usr/simbox/actions/get_balance.sh $dongle $imsi
-fi
+#if [ $group -eq 232 ] ; then
+#/usr/simbox/system/sleep_rand.php 20 40
+#/usr/simbox/actions/get_balance.sh $dongle $imsi
+#fi

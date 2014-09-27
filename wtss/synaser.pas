@@ -1858,7 +1858,7 @@ end;
 {$IFDEF LINUX}
 procedure TBlockSerial.Purge;
 begin
-  SerialCheck(fpioctl(Longint(FHandle), TCFLSH, TCIOFLUSH));
+  SerialCheck(fpioctl(Longint(FHandle), TCFLSH, TCIOFLUSH)); 
   FBuffer := '';
   ExceptCheck;
 end;
