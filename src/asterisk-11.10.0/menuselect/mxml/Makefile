@@ -23,11 +23,11 @@
 AR		=	/usr/bin/ar
 ARFLAGS		=	crvs
 CC		=	gcc
-CFLAGS		=	$(OPTIM) -Wall -Os -g -Wall   
+CFLAGS		=	$(OPTIM) -Wall -Os -g -Wall -Os -g -Wall    
 CP		=	/bin/cp
 DSO		=	:
 DSOFLAGS	=	
-LDFLAGS		=	$(OPTIM) -Os -g 
+LDFLAGS		=	$(OPTIM) -Os -g -Os -g 
 INSTALL		=	/usr/bin/install -c
 LIBMXML		=	libmxml.a
 LN		=	/bin/ln -s

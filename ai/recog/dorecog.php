@@ -1,5 +1,5 @@
 #!/usr/bin/php
-<?
+<?php
 //die();
 echo ("YASPEECH\n");
 

@@ -9,10 +9,13 @@ if(@isset($_POST['show_callback'])) $show_callback=$_POST['show_callback']; else
 ?>
 
 <?
+//var_dump($_POST['items']);
+//exit();
 if(isset($_POST['save'])){
 	
 	$cmd='chmod -R 0777 /var/simbox/';
 	$res=system("sudo ".$cmd);
+
 
 
 	foreach($_POST['items'] as $v=>$plan)

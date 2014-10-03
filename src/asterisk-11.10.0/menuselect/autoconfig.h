@@ -43,7 +43,7 @@
 #define HAVE_GETLOADAVG 1
 
 /* Define if your system has the GTK2 libraries. */
-/* #undef HAVE_GTK2 */
+#define HAVE_GTK2 1
 
 /* Define to 1 if you have the <inttypes.h> header file. */
 #define HAVE_INTTYPES_H 1
@@ -55,7 +55,7 @@
 #define HAVE_NCURSES 1
 
 /* Define to indicate the ${NEWT_DESCRIP} library */
-#define HAVE_NEWT 1
+/* #undef HAVE_NEWT */
 
 /* Define to 1 if you have the `setenv' function. */
 #define HAVE_SETENV 1

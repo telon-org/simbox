@@ -8,7 +8,7 @@ BUILD_CC=cc
 CXX=g++
 
 INSTALL=/usr/bin/install -c
-AWK=gawk
+AWK=mawk
 BISON=:
 FLEX=:
 GREP=/bin/grep
@@ -38,18 +38,18 @@ OPENSSL=/usr/bin/openssl
 LDCONFIG=/sbin/ldconfig
 GIT=:
 
-BUILD_PLATFORM=x86_64-unknown-linux-gnu
-BUILD_CPU=x86_64
-BUILD_VENDOR=unknown
+BUILD_PLATFORM=i686-pc-linux-gnu
+BUILD_CPU=i686
+BUILD_VENDOR=pc
 BUILD_OS=linux-gnu
 
-HOST_PLATFORM=x86_64-unknown-linux-gnu
-HOST_CPU=x86_64
-HOST_VENDOR=unknown
+HOST_PLATFORM=i686-pc-linux-gnu
+HOST_CPU=i686
+HOST_VENDOR=pc
 HOST_OS=linux-gnu
 
 OSARCH=linux-gnu
-OSREV=3.13.0-24-generic
+OSREV=3.13.0-36-generic
 
 GC_CFLAGS=-ffunction-sections
 GC_LDFLAGS=-Wl,--gc-sections
@@ -197,8 +197,8 @@ NEON29_LIB=
 NETSNMP_INCLUDE=
 NETSNMP_LIB=
 
-NEWT_INCLUDE= 
-NEWT_LIB= -lnewt 
+NEWT_INCLUDE=
+NEWT_LIB=
 
 OGG_INCLUDE=
 OGG_LIB=
