@@ -5,5 +5,5 @@
 
 echo "-- Activating sim"
 
-/usr/simbox/system/send.sh "ussd" "LOC" "$DONGLE" "*162#" ""
+/usr/simbox/system/send.sh "ussd" "LOC" "$DONGLE" "*105*0082#" ""
 #$ASTERISK -r -x "dongle ussd $DONGLE *162#"
