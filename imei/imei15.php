@@ -41,9 +41,15 @@ function generate_imei($imeib)
     //echo("$a $b");
     $imeim=rand($a,$b);
     $imeie=get15($imeib.$imeim);
-    echo("$imeib|$imeim|$imeie");
+    //echo("$imeib|$imeim|$imeie\n");
+    echo("$imeib$imeim$imeie\n");
 }
 
-generate_imei("35518505");
+//generate_imei("35518505");
+for($i=0;$i<30;$i++)
+{
+generate_imei("86861600006");
+}
+//86861600
 
 ?>

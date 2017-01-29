@@ -4,7 +4,7 @@
 #numlist=`cat /var/log/asterisk/ussd2 | grep "Ваш абонентский номер"` # | sed 's/ - 03#BB860: Ваш номер //g' | grep -o -R "dongle[0-9]*:[0-9]*:[0-9]*."  | sed 's/\./,/g'`
 #cat /var/log/asterisk/ussd2 | grep "Ваш абонентский номер" | sed 's/: Ваш абонентский номер +/:/g'
 
-
+#| grep "Ваш номер: " 
 numlist=`cat /var/log/asterisk/ussd.txt.tmp | grep "Ваш абонентский номер" | sed 's/: Ваш абонентский номер +/:/g'`
 
 for num in $numlist
