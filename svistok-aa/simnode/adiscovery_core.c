@@ -93,6 +93,9 @@ defdev_t defdevs[] = {
 	},
 
 
+//reader and 1616 - same!!!
+//reader
+/*
 	{1001, 1002, 0x67b, 0x2303, {
 				    {1,{0x00,0x02,0x00,0x81,0x00,0x83,0x00},{0}},
 				    {0,{0x00,0x00,0x00,0x00,0x00,0x00,0x00},{0}},
@@ -100,8 +103,10 @@ defdev_t defdevs[] = {
 				    {0,{0x00,0x00,0x00,0x00,0x00,0x00,0x00},{0}}
 				}, 0, -1
 	},
+*/
 
-	{16, 1, 0x67b, 0x2303, {
+//1616
+	{1616, 1, 0x67b, 0x2303, {
 				    {1,{0x00,0x02,0x00,0x81,0x00,0x83,0x00},{0}},
 				    {0,{0x00,0x00,0x00,0x00,0x00,0x00,0x00},{0}},
 				    {0,{0x00,0x00,0x00,0x00,0x00,0x00,0x00},{0}},
@@ -669,11 +674,13 @@ void usbdev_createdef(sysdev_t * sysdev, usbdev_t * usbdev, int defdev)
         strcpy(usbdev->dataport,sysdev->iface[defdevs[defdev].dataport_num].port);
     else
 	*usbdev->dataport=0;
+        //strcpy(usbdev->dataport,"/dev/null");
 	
     if(defdevs[defdev].audioport_num!=-1)
 	strcpy(usbdev->audioport,sysdev->iface[defdevs[defdev].audioport_num].port);
     else
 	*usbdev->audioport=0;
+        //strcpy(usbdev->audioport,"/dev/null");
 
     strcpy(usbdev->devfile,sysdev->devfile);
 }

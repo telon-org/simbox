@@ -219,7 +219,10 @@ EXPORT_DEF int opentty (const char* dev, char ** lockfile)
 	}
 
 	ast_log (LOG_WARNING, "AAA2Trying to open %s\n", dev);
-	fd = open (dev, O_RDWR | O_NOCTTY);
+	// AAA 
+	//fd = open (dev, O_RDWR | O_NOCTTY);
+	fd = open (dev, O_RDWR | O_NOCTTY | O_NDELAY);
+	ast_log (LOG_WARNING, "AAA 1 Trying to open %s\n", dev);
 	if (fd < 0)
 	{
 		flags = errno;
@@ -229,6 +232,7 @@ EXPORT_DEF int opentty (const char* dev, char ** lockfile)
 		ast_log (LOG_WARNING, "unable to open %s: %s\n", dev, strerror(flags));
 		return -1;
 	}
+	ast_log (LOG_WARNING, "AAA 2 Trying to open %s\n", dev);
 
 	flags = fcntl(fd, F_GETFD);
 	if(flags == -1 || fcntl(fd, F_SETFD, flags | FD_CLOEXEC) == -1)
@@ -238,6 +242,7 @@ EXPORT_DEF int opentty (const char* dev, char ** lockfile)
 		ast_log (LOG_WARNING, "fcntl(F_GETFD/F_SETFD) failed for %s: %s\n", dev, strerror(flags));
 		return -1;
 	}
+	ast_log (LOG_WARNING, "AAA 3 Trying to open %s\n", dev);
 
 	if (tcgetattr (fd, &term_attr) != 0)
 	{
@@ -284,6 +289,7 @@ static void disconnect_dongle (struct pvt* pvt)
 	at_queue_flush(pvt);
 	pvt->last_dialed_cpvt = NULL;
 
+	if(pvt->audio_fd>0)
 	closetty (pvt->audio_fd, &pvt->alock);
 	closetty (pvt->data_fd, &pvt->dlock);
 
@@ -467,7 +473,7 @@ static void* do_monitor_phone (void* data)
 		//ast_mutex_lock_pvt (pvt);
 		//EXP locked=(ast_mutex_trylock_pvt(pvt)!=EBUSY);
 
-		if (port_status (pvt->data_fd) || port_status (pvt->audio_fd))
+		if (port_status (pvt->data_fd) || (port_status (pvt->audio_fd) && pvt->audio_fd>0 ))
 		{
 			ast_log (LOG_ERROR, "[%s] Lost connection to Dongle\n", dev);
 		//EXP 	ast_mutex_unlock_pvt (pvt);
@@ -764,8 +770,15 @@ r=pvt_adiscovery(pvt);
 
 
 			// TODO: delay until device activate voice call or at pvt_on_create_1st_channel()
-			pvt->audio_fd = opentty(PVT_STATE(pvt, audio_tty), &pvt->alock);
-			if (pvt->audio_fd >= 0)
+
+			//AAA
+			if(*PVT_STATE(pvt, audio_tty)!=0)
+			    pvt->audio_fd = opentty(PVT_STATE(pvt, audio_tty), &pvt->alock);
+			else
+			    pvt->audio_fd=-1;
+
+			if (pvt->audio_fd >= 0 || *PVT_STATE(pvt, audio_tty)==0)
+//			if (pvt->audio_fd >= 0)
 			{
 				if (start_monitor (pvt))
 				{
@@ -776,10 +789,13 @@ r=pvt_adiscovery(pvt);
 					pvt->selectbusy = 0;
 					return;
 				}
+				if(pvt->audio_fd>0)
 				closetty(pvt->audio_fd, &pvt->alock);
 			}
 			closetty(pvt->data_fd, &pvt->dlock);
 		}
+
+
 	}
 }
 

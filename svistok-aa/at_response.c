@@ -2195,6 +2195,8 @@ static int at_response_cpin (struct pvt* pvt, char* str, size_t len)
 {
 	int rv = at_parse_cpin (str, len);
 
+	ast_log (LOG_ERROR, "[%s] rv %d\n", PVT_ID(pvt), rv);
+
 	switch(rv)
 	{
 		case 0:
@@ -2205,7 +2207,9 @@ static int at_response_cpin (struct pvt* pvt, char* str, size_t len)
 			    {
 				pvt->sim_start=1;
 				at_enque_initialization_sim (&pvt->sys_chan);
+
 			    }
+			    return rv; //AAA
 			}
 			if(pvt->cfun==5)
 			{
@@ -2372,10 +2376,13 @@ static int at_response_creg (struct pvt* pvt, char* str, size_t len)
 		ast_log (LOG_ERROR, "[%s] Error sending query for provider name\n", PVT_ID(pvt));
 	}
 
+//AAA
+/*
 	if (at_enque_spn (&pvt->sys_chan))
 	{
 		ast_log (LOG_ERROR, "[%s] Error sending query for provider name2\n", PVT_ID(pvt));
 	}
+*/
 
 	putfileslog("dongles/state",PVT_ID(pvt),"laccell",str);
 
@@ -2674,6 +2681,8 @@ static int at_response_cfun_v (struct pvt* pvt, const char* str)
 		    {
 			pvt->sim_ready=1;
 			//at_enque_cpin_v (&pvt->sys_chan);
+
+
 		    }
 		}
 
@@ -2694,6 +2703,14 @@ static int at_response_cfun_v (struct pvt* pvt, const char* str)
 			at_enque_cpin_v (&pvt->sys_chan);
 		    }
 		}
+
+///AAA
+			    if(pvt->sim_start==0)
+			    {
+				pvt->sim_start=1;
+				at_enque_initialization_sim (&pvt->sys_chan);
+			    }
+
 
 	    return 0;
 	} else if (pvt->cfun==4)

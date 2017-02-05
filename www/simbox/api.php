@@ -29,6 +29,9 @@ foreach($data as $i=>$imsi) {
   $dongle = @file_get_contents($path_svistok_sim_state.$imsi.'.dongle');
   $number = @file_get_contents(DIR_SIM.$imsi.'.number');
 
+  $iccid = @file_get_contents("/var/svistok/dongles/state/".$dongle.'.iccid');
+  $operator = @file_get_contents("/var/svistok/dongles/state/".$dongle.'.operator');
+
   if (!$number) {
     //echo("!!!$dongle");
     $r=exec('sudo /usr/simbox/system/send.sh "ussd" "LOC" "'.$dongle.'" "*205#" ""');
@@ -45,7 +48,13 @@ foreach($data as $i=>$imsi) {
   $smsussd_j="[".@file_get_contents("/var/svistok/sim/log/".$imsi.".smsussd3")."{}]";
   $smsussd=json_decode($smsussd_j);
 
-  array_push( $imsilist, array('dongle'=>$dongle, 'imsi'=>$imsi, 'number'=>$number,'smsussd'=>$smsussd) );
+  array_push( $imsilist, array(
+	'dongle'=>$dongle,
+	'imsi'=>$imsi,
+	'iccid'=>$iccid,
+	'number'=>$number,
+	'operator'=>$operator,
+	'smsussd'=>$smsussd) );
 
 }
 
