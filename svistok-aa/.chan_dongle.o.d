@@ -6,10 +6,10 @@ chan_dongle.o: chan_dongle.c /usr/include/stdc-predef.h config.h \
  /usr/include/i386-linux-gnu/bits/wordsize.h \
  /usr/include/i386-linux-gnu/gnu/stubs.h \
  /usr/include/i386-linux-gnu/gnu/stubs-32.h \
- /usr/lib/gcc/i686-linux-gnu/4.8/include/stdint.h /usr/include/stdint.h \
+ /usr/lib/gcc/i686-linux-gnu/5/include/stdint.h /usr/include/stdint.h \
  /usr/include/i386-linux-gnu/bits/wchar.h \
- /usr/lib/gcc/i686-linux-gnu/4.8/include-fixed/limits.h \
- /usr/lib/gcc/i686-linux-gnu/4.8/include-fixed/syslimits.h \
+ /usr/lib/gcc/i686-linux-gnu/5/include-fixed/limits.h \
+ /usr/lib/gcc/i686-linux-gnu/5/include-fixed/syslimits.h \
  /usr/include/limits.h /usr/include/i386-linux-gnu/bits/posix1_lim.h \
  /usr/include/i386-linux-gnu/bits/local_lim.h /usr/include/linux/limits.h \
  /usr/include/i386-linux-gnu/bits/posix2_lim.h \
@@ -19,7 +19,7 @@ chan_dongle.o: chan_dongle.c /usr/include/stdc-predef.h config.h \
  /usr/include/i386-linux-gnu/bits/environments.h \
  /usr/include/i386-linux-gnu/bits/types.h \
  /usr/include/i386-linux-gnu/bits/typesizes.h \
- /usr/lib/gcc/i686-linux-gnu/4.8/include/stddef.h \
+ /usr/lib/gcc/i686-linux-gnu/5/include/stddef.h \
  /usr/include/i386-linux-gnu/bits/confname.h /usr/include/getopt.h \
  /usr/include/i386-linux-gnu/bits/unistd.h \
  /usr/include/i386-linux-gnu/sys/types.h /usr/include/time.h \
@@ -33,7 +33,7 @@ chan_dongle.o: chan_dongle.c /usr/include/stdc-predef.h config.h \
  /usr/include/i386-linux-gnu/bits/select2.h \
  /usr/include/i386-linux-gnu/sys/sysmacros.h \
  /usr/include/i386-linux-gnu/bits/pthreadtypes.h \
- /usr/lib/gcc/i686-linux-gnu/4.8/include/stdarg.h /usr/include/stdlib.h \
+ /usr/lib/gcc/i686-linux-gnu/5/include/stdarg.h /usr/include/stdlib.h \
  /usr/include/i386-linux-gnu/bits/waitflags.h \
  /usr/include/i386-linux-gnu/bits/waitstatus.h /usr/include/xlocale.h \
  /usr/include/alloca.h /usr/include/i386-linux-gnu/bits/stdlib-bsearch.h \
@@ -150,15 +150,15 @@ config.h:
 
 /usr/include/i386-linux-gnu/gnu/stubs-32.h:
 
-/usr/lib/gcc/i686-linux-gnu/4.8/include/stdint.h:
+/usr/lib/gcc/i686-linux-gnu/5/include/stdint.h:
 
 /usr/include/stdint.h:
 
 /usr/include/i386-linux-gnu/bits/wchar.h:
 
-/usr/lib/gcc/i686-linux-gnu/4.8/include-fixed/limits.h:
+/usr/lib/gcc/i686-linux-gnu/5/include-fixed/limits.h:
 
-/usr/lib/gcc/i686-linux-gnu/4.8/include-fixed/syslimits.h:
+/usr/lib/gcc/i686-linux-gnu/5/include-fixed/syslimits.h:
 
 /usr/include/limits.h:
 
@@ -184,7 +184,7 @@ config.h:
 
 /usr/include/i386-linux-gnu/bits/typesizes.h:
 
-/usr/lib/gcc/i686-linux-gnu/4.8/include/stddef.h:
+/usr/lib/gcc/i686-linux-gnu/5/include/stddef.h:
 
 /usr/include/i386-linux-gnu/bits/confname.h:
 
@@ -218,7 +218,7 @@ config.h:
 
 /usr/include/i386-linux-gnu/bits/pthreadtypes.h:
 
-/usr/lib/gcc/i686-linux-gnu/4.8/include/stdarg.h:
+/usr/lib/gcc/i686-linux-gnu/5/include/stdarg.h:
 
 /usr/include/stdlib.h:
 

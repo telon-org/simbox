@@ -34,7 +34,8 @@ foreach($data as $i=>$imsi) {
 
   if (!$number) {
     //echo("!!!$dongle");
-    $r=exec('sudo /usr/simbox/system/send.sh "ussd" "LOC" "'.$dongle.'" "*205#" ""');
+//ВРЕМЕННО ОТКЛЮЧИЛ
+//    $r=exec('sudo /usr/simbox/system/send.sh "ussd" "LOC" "'.$dongle.'" "*205#" ""');
     //echo("$r");
     // execAsync('sudo /usr/simbox/system/send.sh "ussd" "LOC" "'.$dongle.'" "*205#" ""');
     $number = null;
