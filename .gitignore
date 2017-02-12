@@ -1,5 +1,5 @@
 # comments
-syntax: glob
+# syntax: glob
 *.o
 *.o.d
 *.so
