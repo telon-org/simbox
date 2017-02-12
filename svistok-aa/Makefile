@@ -38,7 +38,7 @@ INSTALL = /usr/bin/install -c
 CHMOD = chmod
 
 DEFS    = -DASTERISK_VERSION_NUM=110000
-CFLAGS  = -g -O2 -O6 -I$(srcdir)  -D_GNU_SOURCE -I/usr/include -I/usr/include $(DEFS) -DHAVE_CONFIG_H  -fvisibility=hidden -fPIC -Wall -Wextra -MD -MT $@ -MF .$(subst /,_,$@).d -MP
+CFLAGS  = -g -O2 -O6 -I$(srcdir)  -D_GNU_SOURCE -I/usr/simbox/src/asterisk-11.8.1/include -I/usr/include $(DEFS) -DHAVE_CONFIG_H  -fvisibility=hidden -fPIC -Wall -Wextra -MD -MT $@ -MF .$(subst /,_,$@).d -MP
 
 #CFLAGS  =  -I$(srcdir) -DHAVE_CONFIG_H
 LDFLAGS =   

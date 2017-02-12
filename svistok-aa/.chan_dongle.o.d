@@ -1,8 +1,11 @@
 chan_dongle.o: chan_dongle.c /usr/include/stdc-predef.h config.h \
- /usr/include/asterisk.h /usr/include/asterisk/autoconfig.h \
- /usr/include/asterisk/buildopts.h /usr/include/asterisk/compat.h \
- /usr/include/asterisk/compiler.h /usr/include/inttypes.h \
- /usr/include/features.h /usr/include/i386-linux-gnu/sys/cdefs.h \
+ /usr/simbox/src/asterisk-11.8.1/include/asterisk.h \
+ /usr/simbox/src/asterisk-11.8.1/include/asterisk/autoconfig.h \
+ /usr/simbox/src/asterisk-11.8.1/include/asterisk/buildopts.h \
+ /usr/simbox/src/asterisk-11.8.1/include/asterisk/compat.h \
+ /usr/simbox/src/asterisk-11.8.1/include/asterisk/compiler.h \
+ /usr/include/inttypes.h /usr/include/features.h \
+ /usr/include/i386-linux-gnu/sys/cdefs.h \
  /usr/include/i386-linux-gnu/bits/wordsize.h \
  /usr/include/i386-linux-gnu/gnu/stubs.h \
  /usr/include/i386-linux-gnu/gnu/stubs-32.h \
@@ -52,10 +55,12 @@ chan_dongle.o: chan_dongle.c /usr/include/stdc-predef.h config.h \
  /usr/include/i386-linux-gnu/bits/errno.h /usr/include/linux/errno.h \
  /usr/include/i386-linux-gnu/asm/errno.h /usr/include/asm-generic/errno.h \
  /usr/include/asm-generic/errno-base.h /usr/include/glob.h \
- /usr/include/asterisk/ast_version.h /usr/include/asterisk/stringfields.h \
- /usr/include/asterisk/inline_api.h /usr/include/asterisk/manager.h \
- /usr/include/asterisk/network.h /usr/include/netinet/in.h \
- /usr/include/i386-linux-gnu/sys/socket.h \
+ /usr/simbox/src/asterisk-11.8.1/include/asterisk/ast_version.h \
+ /usr/simbox/src/asterisk-11.8.1/include/asterisk/stringfields.h \
+ /usr/simbox/src/asterisk-11.8.1/include/asterisk/inline_api.h \
+ /usr/simbox/src/asterisk-11.8.1/include/asterisk/manager.h \
+ /usr/simbox/src/asterisk-11.8.1/include/asterisk/network.h \
+ /usr/include/netinet/in.h /usr/include/i386-linux-gnu/sys/socket.h \
  /usr/include/i386-linux-gnu/sys/uio.h \
  /usr/include/i386-linux-gnu/bits/uio.h \
  /usr/include/i386-linux-gnu/bits/socket.h \
@@ -78,7 +83,8 @@ chan_dongle.o: chan_dongle.c /usr/include/stdc-predef.h config.h \
  /usr/include/i386-linux-gnu/asm/ioctl.h /usr/include/asm-generic/ioctl.h \
  /usr/include/i386-linux-gnu/bits/ioctl-types.h \
  /usr/include/i386-linux-gnu/sys/ttydefaults.h \
- /usr/include/asterisk/lock.h /usr/include/pthread.h /usr/include/sched.h \
+ /usr/simbox/src/asterisk-11.8.1/include/asterisk/lock.h \
+ /usr/include/pthread.h /usr/include/sched.h \
  /usr/include/i386-linux-gnu/bits/sched.h \
  /usr/include/i386-linux-gnu/bits/timex.h \
  /usr/include/i386-linux-gnu/bits/setjmp.h \
@@ -91,36 +97,56 @@ chan_dongle.o: chan_dongle.c /usr/include/stdc-predef.h config.h \
  /usr/include/i386-linux-gnu/bits/sigthread.h \
  /usr/include/i386-linux-gnu/bits/param.h /usr/include/linux/param.h \
  /usr/include/i386-linux-gnu/asm/param.h /usr/include/asm-generic/param.h \
- /usr/include/execinfo.h /usr/include/asterisk/logger.h \
- /usr/include/asterisk/options.h /usr/include/asterisk/autoconfig.h \
- /usr/include/asterisk/datastore.h /usr/include/asterisk/linkedlists.h \
- /usr/include/asterisk/xmldoc.h /usr/include/asterisk/xml.h \
- /usr/include/asterisk/strings.h /usr/include/ctype.h \
- /usr/include/asterisk/utils.h /usr/include/asterisk/time.h \
- /usr/include/i386-linux-gnu/sys/time.h /usr/include/asterisk/localtime.h \
+ /usr/include/execinfo.h \
+ /usr/simbox/src/asterisk-11.8.1/include/asterisk/logger.h \
+ /usr/simbox/src/asterisk-11.8.1/include/asterisk/options.h \
+ /usr/simbox/src/asterisk-11.8.1/include/asterisk/autoconfig.h \
+ /usr/simbox/src/asterisk-11.8.1/include/asterisk/datastore.h \
+ /usr/simbox/src/asterisk-11.8.1/include/asterisk/linkedlists.h \
+ /usr/simbox/src/asterisk-11.8.1/include/asterisk/xmldoc.h \
+ /usr/simbox/src/asterisk-11.8.1/include/asterisk/xml.h \
+ /usr/simbox/src/asterisk-11.8.1/include/asterisk/strings.h \
+ /usr/include/ctype.h \
+ /usr/simbox/src/asterisk-11.8.1/include/asterisk/utils.h \
+ /usr/simbox/src/asterisk-11.8.1/include/asterisk/time.h \
+ /usr/include/i386-linux-gnu/sys/time.h \
+ /usr/simbox/src/asterisk-11.8.1/include/asterisk/localtime.h \
  /usr/include/locale.h /usr/include/i386-linux-gnu/bits/locale.h \
- /usr/include/asterisk/threadstorage.h /usr/include/asterisk/dsp.h \
- /usr/include/asterisk/callerid.h /usr/include/asterisk/format.h \
- /usr/include/asterisk/astobj2.h /usr/include/asterisk/compat.h \
- /usr/include/asterisk/silk.h /usr/include/asterisk/celt.h \
- /usr/include/asterisk/module.h /usr/include/asterisk/timing.h \
+ /usr/simbox/src/asterisk-11.8.1/include/asterisk/threadstorage.h \
+ /usr/simbox/src/asterisk-11.8.1/include/asterisk/dsp.h \
+ /usr/simbox/src/asterisk-11.8.1/include/asterisk/callerid.h \
+ /usr/simbox/src/asterisk-11.8.1/include/asterisk/format.h \
+ /usr/simbox/src/asterisk-11.8.1/include/asterisk/astobj2.h \
+ /usr/simbox/src/asterisk-11.8.1/include/asterisk/compat.h \
+ /usr/simbox/src/asterisk-11.8.1/include/asterisk/silk.h \
+ /usr/simbox/src/asterisk-11.8.1/include/asterisk/celt.h \
+ /usr/simbox/src/asterisk-11.8.1/include/asterisk/module.h \
+ /usr/simbox/src/asterisk-11.8.1/include/asterisk/timing.h \
  /usr/include/i386-linux-gnu/sys/stat.h \
  /usr/include/i386-linux-gnu/bits/stat.h /usr/include/termios.h \
  /usr/include/i386-linux-gnu/bits/termios.h /usr/include/fcntl.h \
  /usr/include/i386-linux-gnu/bits/fcntl.h \
  /usr/include/i386-linux-gnu/bits/fcntl-linux.h \
  /usr/include/i386-linux-gnu/bits/fcntl2.h chan_dongle.h mixbuffer.h \
- ringbuffer.h export.h cpvt.h /usr/include/asterisk/frame.h \
- /usr/include/asterisk/format_pref.h /usr/include/asterisk/format_cap.h \
- /usr/include/asterisk/endian.h mutils.h dc_config.h \
- /usr/include/asterisk/channel.h /usr/include/asterisk/abstract_jb.h \
- /usr/include/asterisk/poll-compat.h /usr/include/asterisk/select.h \
- /usr/include/asterisk/chanvars.h /usr/include/asterisk/config.h \
- /usr/include/asterisk/cdr.h /usr/include/asterisk/data.h \
- /usr/include/asterisk/channelstate.h /usr/include/asterisk/ccss.h \
- /usr/include/asterisk/devicestate.h /usr/include/asterisk/framehook.h \
- select.h at_response.h at_queue.h at_command.h at_read.h cli.h app.h \
- share.h manager.h channel.h pdiscovery.h simnode/adiscovery_svistok.c \
+ ringbuffer.h export.h cpvt.h \
+ /usr/simbox/src/asterisk-11.8.1/include/asterisk/frame.h \
+ /usr/simbox/src/asterisk-11.8.1/include/asterisk/format_pref.h \
+ /usr/simbox/src/asterisk-11.8.1/include/asterisk/format_cap.h \
+ /usr/simbox/src/asterisk-11.8.1/include/asterisk/endian.h mutils.h \
+ dc_config.h /usr/simbox/src/asterisk-11.8.1/include/asterisk/channel.h \
+ /usr/simbox/src/asterisk-11.8.1/include/asterisk/abstract_jb.h \
+ /usr/simbox/src/asterisk-11.8.1/include/asterisk/poll-compat.h \
+ /usr/simbox/src/asterisk-11.8.1/include/asterisk/select.h \
+ /usr/simbox/src/asterisk-11.8.1/include/asterisk/chanvars.h \
+ /usr/simbox/src/asterisk-11.8.1/include/asterisk/config.h \
+ /usr/simbox/src/asterisk-11.8.1/include/asterisk/cdr.h \
+ /usr/simbox/src/asterisk-11.8.1/include/asterisk/data.h \
+ /usr/simbox/src/asterisk-11.8.1/include/asterisk/channelstate.h \
+ /usr/simbox/src/asterisk-11.8.1/include/asterisk/ccss.h \
+ /usr/simbox/src/asterisk-11.8.1/include/asterisk/devicestate.h \
+ /usr/simbox/src/asterisk-11.8.1/include/asterisk/framehook.h select.h \
+ at_response.h at_queue.h at_command.h at_read.h cli.h app.h share.h \
+ manager.h channel.h pdiscovery.h simnode/adiscovery_svistok.c \
  simnode/adiscovery_core.c /usr/include/dirent.h \
  /usr/include/i386-linux-gnu/bits/dirent.h select.c
 
@@ -128,15 +154,15 @@ chan_dongle.o: chan_dongle.c /usr/include/stdc-predef.h config.h \
 
 config.h:
 
-/usr/include/asterisk.h:
+/usr/simbox/src/asterisk-11.8.1/include/asterisk.h:
 
-/usr/include/asterisk/autoconfig.h:
+/usr/simbox/src/asterisk-11.8.1/include/asterisk/autoconfig.h:
 
-/usr/include/asterisk/buildopts.h:
+/usr/simbox/src/asterisk-11.8.1/include/asterisk/buildopts.h:
 
-/usr/include/asterisk/compat.h:
+/usr/simbox/src/asterisk-11.8.1/include/asterisk/compat.h:
 
-/usr/include/asterisk/compiler.h:
+/usr/simbox/src/asterisk-11.8.1/include/asterisk/compiler.h:
 
 /usr/include/inttypes.h:
 
@@ -278,15 +304,15 @@ config.h:
 
 /usr/include/glob.h:
 
-/usr/include/asterisk/ast_version.h:
+/usr/simbox/src/asterisk-11.8.1/include/asterisk/ast_version.h:
 
-/usr/include/asterisk/stringfields.h:
+/usr/simbox/src/asterisk-11.8.1/include/asterisk/stringfields.h:
 
-/usr/include/asterisk/inline_api.h:
+/usr/simbox/src/asterisk-11.8.1/include/asterisk/inline_api.h:
 
-/usr/include/asterisk/manager.h:
+/usr/simbox/src/asterisk-11.8.1/include/asterisk/manager.h:
 
-/usr/include/asterisk/network.h:
+/usr/simbox/src/asterisk-11.8.1/include/asterisk/network.h:
 
 /usr/include/netinet/in.h:
 
@@ -350,7 +376,7 @@ config.h:
 
 /usr/include/i386-linux-gnu/sys/ttydefaults.h:
 
-/usr/include/asterisk/lock.h:
+/usr/simbox/src/asterisk-11.8.1/include/asterisk/lock.h:
 
 /usr/include/pthread.h:
 
@@ -388,55 +414,55 @@ config.h:
 
 /usr/include/execinfo.h:
 
-/usr/include/asterisk/logger.h:
+/usr/simbox/src/asterisk-11.8.1/include/asterisk/logger.h:
 
-/usr/include/asterisk/options.h:
+/usr/simbox/src/asterisk-11.8.1/include/asterisk/options.h:
 
-/usr/include/asterisk/autoconfig.h:
+/usr/simbox/src/asterisk-11.8.1/include/asterisk/autoconfig.h:
 
-/usr/include/asterisk/datastore.h:
+/usr/simbox/src/asterisk-11.8.1/include/asterisk/datastore.h:
 
-/usr/include/asterisk/linkedlists.h:
+/usr/simbox/src/asterisk-11.8.1/include/asterisk/linkedlists.h:
 
-/usr/include/asterisk/xmldoc.h:
+/usr/simbox/src/asterisk-11.8.1/include/asterisk/xmldoc.h:
 
-/usr/include/asterisk/xml.h:
+/usr/simbox/src/asterisk-11.8.1/include/asterisk/xml.h:
 
-/usr/include/asterisk/strings.h:
+/usr/simbox/src/asterisk-11.8.1/include/asterisk/strings.h:
 
 /usr/include/ctype.h:
 
-/usr/include/asterisk/utils.h:
+/usr/simbox/src/asterisk-11.8.1/include/asterisk/utils.h:
 
-/usr/include/asterisk/time.h:
+/usr/simbox/src/asterisk-11.8.1/include/asterisk/time.h:
 
 /usr/include/i386-linux-gnu/sys/time.h:
 
-/usr/include/asterisk/localtime.h:
+/usr/simbox/src/asterisk-11.8.1/include/asterisk/localtime.h:
 
 /usr/include/locale.h:
 
 /usr/include/i386-linux-gnu/bits/locale.h:
 
-/usr/include/asterisk/threadstorage.h:
+/usr/simbox/src/asterisk-11.8.1/include/asterisk/threadstorage.h:
 
-/usr/include/asterisk/dsp.h:
+/usr/simbox/src/asterisk-11.8.1/include/asterisk/dsp.h:
 
-/usr/include/asterisk/callerid.h:
+/usr/simbox/src/asterisk-11.8.1/include/asterisk/callerid.h:
 
-/usr/include/asterisk/format.h:
+/usr/simbox/src/asterisk-11.8.1/include/asterisk/format.h:
 
-/usr/include/asterisk/astobj2.h:
+/usr/simbox/src/asterisk-11.8.1/include/asterisk/astobj2.h:
 
-/usr/include/asterisk/compat.h:
+/usr/simbox/src/asterisk-11.8.1/include/asterisk/compat.h:
 
-/usr/include/asterisk/silk.h:
+/usr/simbox/src/asterisk-11.8.1/include/asterisk/silk.h:
 
-/usr/include/asterisk/celt.h:
+/usr/simbox/src/asterisk-11.8.1/include/asterisk/celt.h:
 
-/usr/include/asterisk/module.h:
+/usr/simbox/src/asterisk-11.8.1/include/asterisk/module.h:
 
-/usr/include/asterisk/timing.h:
+/usr/simbox/src/asterisk-11.8.1/include/asterisk/timing.h:
 
 /usr/include/i386-linux-gnu/sys/stat.h:
 
@@ -464,41 +490,41 @@ export.h:
 
 cpvt.h:
 
-/usr/include/asterisk/frame.h:
+/usr/simbox/src/asterisk-11.8.1/include/asterisk/frame.h:
 
-/usr/include/asterisk/format_pref.h:
+/usr/simbox/src/asterisk-11.8.1/include/asterisk/format_pref.h:
 
-/usr/include/asterisk/format_cap.h:
+/usr/simbox/src/asterisk-11.8.1/include/asterisk/format_cap.h:
 
-/usr/include/asterisk/endian.h:
+/usr/simbox/src/asterisk-11.8.1/include/asterisk/endian.h:
 
 mutils.h:
 
 dc_config.h:
 
-/usr/include/asterisk/channel.h:
+/usr/simbox/src/asterisk-11.8.1/include/asterisk/channel.h:
 
-/usr/include/asterisk/abstract_jb.h:
+/usr/simbox/src/asterisk-11.8.1/include/asterisk/abstract_jb.h:
 
-/usr/include/asterisk/poll-compat.h:
+/usr/simbox/src/asterisk-11.8.1/include/asterisk/poll-compat.h:
 
-/usr/include/asterisk/select.h:
+/usr/simbox/src/asterisk-11.8.1/include/asterisk/select.h:
 
-/usr/include/asterisk/chanvars.h:
+/usr/simbox/src/asterisk-11.8.1/include/asterisk/chanvars.h:
 
-/usr/include/asterisk/config.h:
+/usr/simbox/src/asterisk-11.8.1/include/asterisk/config.h:
 
-/usr/include/asterisk/cdr.h:
+/usr/simbox/src/asterisk-11.8.1/include/asterisk/cdr.h:
 
-/usr/include/asterisk/data.h:
+/usr/simbox/src/asterisk-11.8.1/include/asterisk/data.h:
 
-/usr/include/asterisk/channelstate.h:
+/usr/simbox/src/asterisk-11.8.1/include/asterisk/channelstate.h:
 
-/usr/include/asterisk/ccss.h:
+/usr/simbox/src/asterisk-11.8.1/include/asterisk/ccss.h:
 
-/usr/include/asterisk/devicestate.h:
+/usr/simbox/src/asterisk-11.8.1/include/asterisk/devicestate.h:
 
-/usr/include/asterisk/framehook.h:
+/usr/simbox/src/asterisk-11.8.1/include/asterisk/framehook.h:
 
 select.h:
 

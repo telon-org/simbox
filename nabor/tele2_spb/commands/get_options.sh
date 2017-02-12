@@ -5,4 +5,6 @@
 
 echo "-- Getting options"
 
+/usr/simbox/system/send.sh "ussd" "LOC" "$DONGLE" "*153#" ""
+
 /usr/simbox/system/send.sh "ussd" "LOC" "$DONGLE" "*155*21#" ""

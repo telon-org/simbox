@@ -36,6 +36,18 @@
 #define CLCC_CALL_TYPE_DATA	1
 #define CLCC_CALL_TYPE_FAX	2
 
+/*
+^DSFLOWRPT: N1, N2, N3, N4, N5, N6, N7 
+        N1: Connection duration in seconds 
+        N2: measured upload speed 
+        N3: measured download speed 
+        N4: number of sent data 
+        N5: number of received data  
+        N6: connection, supported by the maximum upload speed
+        N7: connection, supported by a maximum download speed 
+*/
+
+
 /* magic!!! must be in same order as elements of enums in at_res_t */
 static const at_response_t at_responses_list[] = {
 	{ RES_PARSE_ERROR,"PARSE ERROR", 0, 0 },
