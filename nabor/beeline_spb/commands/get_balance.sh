@@ -5,5 +5,5 @@
 
 echo "-- Getting balance"
 
-/usr/simbox/system/send.sh "ussd" "LOC" "$DONGLE" "*102#" ""
+/usr/simbox/system/send.sh "ussd" "LOC" "$DONGLE" "#102#" ""
 #$ASTERISK -r -x "dongle ussd $DONGLE *102#"

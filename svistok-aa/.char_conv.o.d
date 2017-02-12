@@ -6,7 +6,7 @@ char_conv.o: char_conv.c /usr/include/stdc-predef.h config.h \
  /usr/include/i386-linux-gnu/gnu/stubs-32.h \
  /usr/include/i386-linux-gnu/bits/types.h \
  /usr/include/i386-linux-gnu/bits/typesizes.h /usr/include/time.h \
- /usr/lib/gcc/i686-linux-gnu/5/include/stddef.h /usr/include/endian.h \
+ /usr/lib/gcc/i686-linux-gnu/4.8/include/stddef.h /usr/include/endian.h \
  /usr/include/i386-linux-gnu/bits/endian.h \
  /usr/include/i386-linux-gnu/bits/byteswap.h \
  /usr/include/i386-linux-gnu/bits/byteswap-16.h \
@@ -22,7 +22,7 @@ char_conv.o: char_conv.c /usr/include/stdc-predef.h config.h \
  /usr/include/i386-linux-gnu/bits/string2.h /usr/include/stdlib.h \
  /usr/include/i386-linux-gnu/bits/string3.h /usr/include/stdio.h \
  /usr/include/libio.h /usr/include/_G_config.h /usr/include/wchar.h \
- /usr/lib/gcc/i686-linux-gnu/5/include/stdarg.h \
+ /usr/lib/gcc/i686-linux-gnu/4.8/include/stdarg.h \
  /usr/include/i386-linux-gnu/bits/stdio_lim.h \
  /usr/include/i386-linux-gnu/bits/sys_errlist.h \
  /usr/include/i386-linux-gnu/bits/stdio.h \
@@ -53,7 +53,7 @@ config.h:
 
 /usr/include/time.h:
 
-/usr/lib/gcc/i686-linux-gnu/5/include/stddef.h:
+/usr/lib/gcc/i686-linux-gnu/4.8/include/stddef.h:
 
 /usr/include/endian.h:
 
@@ -99,7 +99,7 @@ config.h:
 
 /usr/include/wchar.h:
 
-/usr/lib/gcc/i686-linux-gnu/5/include/stdarg.h:
+/usr/lib/gcc/i686-linux-gnu/4.8/include/stdarg.h:
 
 /usr/include/i386-linux-gnu/bits/stdio_lim.h:
 
