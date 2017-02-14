@@ -6,9 +6,9 @@
 
 
 
-$ASTERISK -rx dongle cmd "$DONGLE" AT^NDISDUP=1,0
-sleep 5
-$ASTERISK -rx dongle cmd "$DONGLE" AT^NDISDUP=1,1
+#$ASTERISK -rx "dongle cmd $DONGLE AT^NDISDUP=1,0"
+#sleep 7
+$ASTERISK -rx "dongle cmd $DONGLE AT^NDISDUP=1,1"
 
 
 #if [ $NABOR -ne "" ] ; then 

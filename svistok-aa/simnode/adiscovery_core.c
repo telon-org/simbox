@@ -607,6 +607,7 @@ strcpy(settings.unique.dev,usbdev->devfile);
 	if(pvt)
 	{
 		strcpy(PVT_STATE(pvt,dev),usbdev->devfile);
+		strcpy(PVT_STATE(pvt,net),usbdev->netport);
 
 		AST_RWLIST_WRLOCK(&gpublic->devices);
 		AST_RWLIST_INSERT_TAIL(&gpublic->devices, pvt, entry);

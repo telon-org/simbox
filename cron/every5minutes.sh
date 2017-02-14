@@ -9,4 +9,4 @@ ionice -c3 -p $$
 
 /usr/simbox/ai/ai.sh &
 
-/usr/bin/php /usr/nanoproxy/nanoproxy.node.sim/www/nanoproxy/check.php > /tmp/nanoproxy_check.log & 
+/usr/bin/php /usr/nanoproxy/nanoproxy.node.sim/www/nanoproxy/check.php auto >> /tmp/nanoproxy_check.log & 

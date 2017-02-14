@@ -146,8 +146,10 @@ putfiles("dongles/state",PVT_ID(pvt),"manufacturer",pvt->manufacturer);
 putfiles("dongles/state",PVT_ID(pvt),"firmware",pvt->firmware);
 putfiles("dongles/state",PVT_ID(pvt),"audio",PVT_STATE(pvt,audio_tty));
 putfiles("dongles/state",PVT_ID(pvt),"data",PVT_STATE(pvt,data_tty));
+putfiles("dongles/state",PVT_ID(pvt),"net",PVT_STATE(pvt,net));
 putfiles("dongles/state",PVT_ID(pvt),"dev",PVT_STATE(pvt,dev));
 
+putfiles("net",PVT_STATE(pvt,net),"dongle",PVT_ID(pvt));
 
 putfilei("dongles/state",PVT_ID(pvt),"pinrequired",pvt->pinrequired);
 putfilei("dongles/state",PVT_ID(pvt),"srvst",pvt->srvst);

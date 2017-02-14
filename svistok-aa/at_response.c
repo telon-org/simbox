@@ -85,6 +85,8 @@ static const at_response_t at_responses_list[] = {
 	{ RES_RING,"RING",DEF_STR("RING\r") },
 
 	{ RES_RSSI,"^RSSI",DEF_STR("^RSSI:") },
+//	{ RES_DSFLOW,"^DSFLOW",DEF_STR("^DSFLOW:") },
+
 	{ RES_SMMEMFULL,"^SMMEMFULL",DEF_STR("^SMMEMFULL:") },
 	{ RES_SMS_PROMPT,"> ",DEF_STR("> ") },
 	{ RES_SRVST,"^SRVST",DEF_STR("^SRVST:") },

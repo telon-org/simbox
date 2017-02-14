@@ -432,8 +432,8 @@ foreach($data as $i=>$v){
 
 	if($mode=="") $m="<font size=1>-";
 	if($mode=="-1") $m="<font size=1>-";
-	if($mode=="3") $m="<font size=1>GSM";
-	if($mode=="5") $m="<font size=1>WCDMA";
+	if($mode=="3") $m="<font size=1>GSM/".$submode;
+	if($mode=="5") $m="<font size=1>WCDMA/".$submode;
 
 
 
