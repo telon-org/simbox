@@ -36,6 +36,18 @@
 #define CLCC_CALL_TYPE_DATA	1
 #define CLCC_CALL_TYPE_FAX	2
 
+/*
+^DSFLOWRPT: N1, N2, N3, N4, N5, N6, N7 
+        N1: Connection duration in seconds 
+        N2: measured upload speed 
+        N3: measured download speed 
+        N4: number of sent data 
+        N5: number of received data  
+        N6: connection, supported by the maximum upload speed
+        N7: connection, supported by a maximum download speed 
+*/
+
+
 /* magic!!! must be in same order as elements of enums in at_res_t */
 static const at_response_t at_responses_list[] = {
 	{ RES_PARSE_ERROR,"PARSE ERROR", 0, 0 },
@@ -73,6 +85,8 @@ static const at_response_t at_responses_list[] = {
 	{ RES_RING,"RING",DEF_STR("RING\r") },
 
 	{ RES_RSSI,"^RSSI",DEF_STR("^RSSI:") },
+//	{ RES_DSFLOW,"^DSFLOW",DEF_STR("^DSFLOW:") },
+
 	{ RES_SMMEMFULL,"^SMMEMFULL",DEF_STR("^SMMEMFULL:") },
 	{ RES_SMS_PROMPT,"> ",DEF_STR("> ") },
 	{ RES_SRVST,"^SRVST",DEF_STR("^SRVST:") },
@@ -2195,6 +2209,8 @@ static int at_response_cpin (struct pvt* pvt, char* str, size_t len)
 {
 	int rv = at_parse_cpin (str, len);
 
+	ast_log (LOG_ERROR, "[%s] rv %d\n", PVT_ID(pvt), rv);
+
 	switch(rv)
 	{
 		case 0:
@@ -2205,7 +2221,9 @@ static int at_response_cpin (struct pvt* pvt, char* str, size_t len)
 			    {
 				pvt->sim_start=1;
 				at_enque_initialization_sim (&pvt->sys_chan);
+
 			    }
+			    return rv; //AAA
 			}
 			if(pvt->cfun==5)
 			{
@@ -2372,10 +2390,13 @@ static int at_response_creg (struct pvt* pvt, char* str, size_t len)
 		ast_log (LOG_ERROR, "[%s] Error sending query for provider name\n", PVT_ID(pvt));
 	}
 
+//AAA
+/*
 	if (at_enque_spn (&pvt->sys_chan))
 	{
 		ast_log (LOG_ERROR, "[%s] Error sending query for provider name2\n", PVT_ID(pvt));
 	}
+*/
 
 	putfileslog("dongles/state",PVT_ID(pvt),"laccell",str);
 
@@ -2674,6 +2695,8 @@ static int at_response_cfun_v (struct pvt* pvt, const char* str)
 		    {
 			pvt->sim_ready=1;
 			//at_enque_cpin_v (&pvt->sys_chan);
+
+
 		    }
 		}
 
@@ -2694,6 +2717,14 @@ static int at_response_cfun_v (struct pvt* pvt, const char* str)
 			at_enque_cpin_v (&pvt->sys_chan);
 		    }
 		}
+
+///AAA
+			    if(pvt->sim_start==0)
+			    {
+				pvt->sim_start=1;
+				at_enque_initialization_sim (&pvt->sys_chan);
+			    }
+
 
 	    return 0;
 	} else if (pvt->cfun==4)

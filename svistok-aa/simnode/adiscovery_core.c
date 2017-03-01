@@ -1,4 +1,4 @@
-﻿#include <sys/types.h>
+#include <sys/types.h>
 #include <sys/stat.h>
 #include <stdio.h>
 #include <dirent.h>
@@ -15,9 +15,14 @@
 #define MAXUSBDEVS 512
 #define MAXSYSDEVS 512
 
+#define EPCOUNT 10
+#define IFCOUNT 5
+
+#define DRCOUNT 5
+
 typedef struct iface {
    unsigned int enabled;
-   unsigned int ep[7];
+   unsigned int ep[EPCOUNT];
    unsigned char port[256];
 } iface_t;
 
@@ -26,9 +31,10 @@ typedef struct defdev {
 	unsigned int mode;       //1 - work, 2 - diag, 3 - unknown
 	unsigned int idVendor;
 	unsigned int idProduct;
-	iface_t iface[4];
+	iface_t iface[IFCOUNT];
 	int dataport_num;
 	int audioport_num;
+	int netport_num;
 } defdev_t;
 
 
@@ -36,63 +42,106 @@ typedef struct defdev {
 defdev_t defdevs[] = {
 
 	{200, 1, 0x12d1, 0x1001, {
-				    {1,{0x01,0x00,0x00,0x81,0x82,0x00,0x00},{0}},
-				    {1,{0x00,0x02,0x00,0x00,0x00,0x83,0x00},{0}},
-				    {1,{0x00,0x00,0x03,0x00,0x00,0x00,0x84},{0}},
-				    {0,{0x00,0x00,0x00,0x00,0x00,0x00,0x00},{0}}
-				}, 2, 1
+				    {1,{0x01,0x00,0x00,0x00,0x81,0x82,0x00,0x00,0x00,0x00},{0}},
+				    {1,{0x00,0x02,0x00,0x00,0x00,0x00,0x83,0x00,0x00,0x00},{0}},
+				    {1,{0x00,0x00,0x03,0x00,0x00,0x00,0x00,0x84,0x00,0x00},{0}},
+				    {0,{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00},{0}},
+				    {0,{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00},{0}}
+				}, 2, 1, -1
 	},
 
+//cdc_ether - without hwactivator!!! ???
+	{210, 1, 0x12d1, 0x1403, {
+				    {1,{0x01,0x00,0x00,0x00,0x81,0x00,0x00,0x00,0x00,0x00},{0}},
+				    {1,{0x00,0x02,0x00,0x00,0x00,0x82,0x83,0x00,0x00,0x00},{0}},
+				    {0,{0x00,0x00,0x03,0x00,0x00,0x00,0x00,0x00,0x00,0x00},{0}},
+				    {0,{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00},{0}},
+				    {0,{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00},{0}}
+				}, 0, -1, -1
+	},
+
+//cdc_ether - 171/173 correct just 1 ttyUSB
+	{220, 1, 0x12d1, 0x1430, {
+				    {1,{0x01,0x00,0x00,0x00,0x81,0x00,0x00,0x00,0x00,0x00},{0}},
+				    {1,{0x00,0x00,0x00,0x00,0x00,0x82,0x00,0x00,0x00,0x00},{0}},
+				    {1,{0x00,0x02,0x00,0x00,0x00,0x00,0x83,0x00,0x00,0x00},{0}},
+				    {0,{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00},{0}},
+				    {0,{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00},{0}}
+				}, 0, -1, 1
+	},
+
+//cdc_ether - 173 + 2 ttyUSB
+	{9173, 1, 0x12d1, 0x1436, {
+				    {1,{0x01,0x00,0x00,0x00,0x81,0x82,0x00,0x00,0x00,0x00},{0}},
+				    {1,{0x00,0x00,0x00,0x00,0x00,0x00,0x83,0x00,0x00,0x00},{0}},
+				    {0,{0x00,0x02,0x00,0x00,0x00,0x00,0x00,0x84,0x00,0x00},{0}},
+				    {1,{0x00,0x00,0x03,0x00,0x00,0x00,0x00,0x00,0x85,0x00},{0}},
+				    {1,{0x00,0x00,0x00,0x04,0x00,0x00,0x00,0x00,0x00,0x86},{0}}
+				}, 4, 3, 1
+	},
+
+//cdc_ether - 19550 + 2 ttyUSB
+	{9550, 1, 0x12d1, 0x14ac, {
+				    {1,{0x01,0x00,0x00,0x00,0x81,0x82,0x00,0x00,0x00,0x00},{0}},
+				    {1,{0x00,0x00,0x00,0x00,0x00,0x00,0x83,0x00,0x00,0x00},{0}},
+				    {0,{0x00,0x02,0x00,0x00,0x00,0x00,0x00,0x84,0x00,0x00},{0}},
+				    {1,{0x00,0x00,0x03,0x00,0x00,0x00,0x00,0x00,0x85,0x00},{0}},
+				    {1,{0x00,0x00,0x00,0x04,0x00,0x00,0x00,0x00,0x00,0x86},{0}}
+				}, 4, 3, 1
+	},
+
+
+
 	{1550, 2, 0x12d1, 0x1003, {
-				    {1,{0x01,0x00,0x00,0x81,0x00,0x00,0x00},{0}},
-				    {1,{0x00,0x02,0x00,0x00,0x82,0x00,0x00},{0}},
-				    {0,{0x00,0x00,0x00,0x00,0x00,0x00,0x00},{0}},
-				    {0,{0x00,0x00,0x00,0x00,0x00,0x00,0x00},{0}}
-				}, 1, -1
+				    {1,{0x01,0x00,0x00,0x00,0x81,0x00,0x00,0x00,0x00,0x00},{0}},
+				    {1,{0x00,0x02,0x00,0x00,0x00,0x82,0x00,0x00,0x00,0x00},{0}},
+				    {0,{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00},{0}},
+				    {0,{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00},{0}},
+				    {0,{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00},{0}}
+				}, 1, -1, -1
 	},
 
 	{1550, 3, 0x12d1, 0x14ac, {
-				    {1,{0x01,0x00,0x00,0x81,0x82,0x00,0x00},{0}},
-				    {0,{0x00,0x02,0x00,0x00,0x00,0x00,0x00},{0}},
-				    {0,{0x00,0x00,0x00,0x00,0x00,0x00,0x00},{0}},
-				    {1,{0x00,0x00,0x03,0x00,0x00,0x00,0x00},{0}}
-				}, 0, -1
+				    {1,{0x01,0x00,0x00,0x00,0x81,0x82,0x00,0x00,0x00,0x00},{0}},
+				    {0,{0x00,0x02,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00},{0}},
+				    {0,{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00},{0}},
+				    {1,{0x00,0x00,0x03,0x00,0x00,0x00,0x00,0x00,0x00,0x00},{0}},
+				    {0,{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00},{0}}
+				}, 0, -1, -1
 	},
 	
 	{173, 3, 0x12d1, 0x140c, {
-				    {1,{0x01,0x00,0x00,0x81,0x82,0x00,0x00},{0}},
-				    {1,{0x00,0x02,0x00,0x00,0x00,0x83,0x84},{0}},
-				    {1,{0x00,0x00,0x03,0x00,0x00,0x00,0x00},{0}},
-				    {1,{0x00,0x00,0x00,0x00,0x00,0x00,0x00},{0}}
-				}, 0, -1
+				    {1,{0x01,0x00,0x00,0x00,0x81,0x82,0x00,0x00,0x00,0x00},{0}},
+				    {1,{0x00,0x02,0x00,0x00,0x00,0x00,0x83,0x84,0x00,0x00},{0}},
+				    {1,{0x00,0x00,0x03,0x00,0x00,0x00,0x00,0x00,0x00,0x00},{0}},
+				    {1,{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00},{0}},
+				    {0,{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00},{0}}
+				}, 0, -1, -1
 	},
 
 	{1550, 3, 0x12d1, 0x1003, {
-				    {1,{0x01,0x00,0x00,0x81,0x82,0x00,0x00},{0}},
-				    {1,{0x00,0x02,0x00,0x00,0x00,0x83,0x00},{0}},
-				    {1,{0x00,0x00,0x03,0x00,0x00,0x00,0x84},{0}},
-				    {1,{0x00,0x00,0x00,0x00,0x00,0x00,0x00},{0}}
-				}, 1, -1
+				    {1,{0x01,0x00,0x00,0x00,0x81,0x82,0x00,0x00,0x00,0x00},{0}},
+				    {1,{0x00,0x02,0x00,0x00,0x00,0x00,0x83,0x00,0x00,0x00},{0}},
+				    {1,{0x00,0x00,0x03,0x00,0x00,0x00,0x00,0x84,0x00,0x00},{0}},
+				    {1,{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00},{0}},
+				    {0,{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00},{0}}
+				}, 1, -1, -1
 	},
 
 	{173, 2, 0x12d1, 0x1001, {
-				    {1,{0x01,0x00,0x00,0x81,0x00,0x00,0x00},{0}},
-				    {1,{0x00,0x02,0x00,0x00,0x82,0x00,0x00},{0}},
-				    {1,{0x00,0x00,0x03,0x00,0x00,0x83,0x00},{0}},
-				    {0,{0x00,0x00,0x00,0x00,0x00,0x00,0x00},{0}}
-				}, 2, -1
+				    {1,{0x01,0x00,0x00,0x00,0x81,0x00,0x00,0x00,0x00,0x00},{0}},
+				    {1,{0x00,0x02,0x00,0x00,0x00,0x82,0x00,0x00,0x00,0x00},{0}},
+				    {1,{0x00,0x00,0x03,0x00,0x00,0x00,0x83,0x00,0x00,0x00},{0}},
+				    {0,{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00},{0}},
+				    {0,{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00},{0}}
+				}, 2, -1, -1
 	},
 
 
-	{173, 3, 0x12d1, 0x1436, {
-				    {1,{0x01,0x00,0x00,0x81,0x82,0x00,0x00},{0}},
-				    {0,{0x00,0x00,0x00,0x00,0x00,0x00,0x00},{0}},
-				    {0,{0x00,0x00,0x00,0x00,0x00,0x00,0x00},{0}},
-				    {1,{0x00,0x00,0x03,0x00,0x00,0x00,0x00},{0}}
-				}, 0, -1
-	},
 
-
+//reader and 1616 - same!!!
+//reader
+/*
 	{1001, 1002, 0x67b, 0x2303, {
 				    {1,{0x00,0x02,0x00,0x81,0x00,0x83,0x00},{0}},
 				    {0,{0x00,0x00,0x00,0x00,0x00,0x00,0x00},{0}},
@@ -100,12 +149,15 @@ defdev_t defdevs[] = {
 				    {0,{0x00,0x00,0x00,0x00,0x00,0x00,0x00},{0}}
 				}, 0, -1
 	},
+*/
 
-	{16, 1, 0x67b, 0x2303, {
-				    {1,{0x00,0x02,0x00,0x81,0x00,0x83,0x00},{0}},
-				    {0,{0x00,0x00,0x00,0x00,0x00,0x00,0x00},{0}},
-				    {0,{0x00,0x00,0x00,0x00,0x00,0x00,0x00},{0}},
-				    {0,{0x00,0x00,0x00,0x00,0x00,0x00,0x00},{0}}
+//1616
+	{1616, 1, 0x67b, 0x2303, {
+				    {1,{0x00,0x02,0x00,0x00,0x81,0x00,0x83,0x00,0x00,0x00},{0}},
+				    {0,{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00},{0}},
+				    {0,{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00},{0}},
+				    {0,{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00},{0}},
+				    {0,{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00},{0}}
 				}, 0, -1
 	},
 
@@ -122,7 +174,7 @@ typedef struct sysdev {
 	unsigned char devfile[256];
 	unsigned int idVendor;
 	unsigned int idProduct;
-	iface_t iface[4];
+	iface_t iface[IFCOUNT];
 } sysdev_t;
 
 typedef struct usbdev {
@@ -130,6 +182,7 @@ typedef struct usbdev {
 	unsigned int mode; // 0-hz  // 1-active // 2-diag
 	unsigned char dataport[256];
 	unsigned char audioport[256];
+	unsigned char netport[256];
 	unsigned char devfile[256];
 } usbdev_t;
 
@@ -141,7 +194,7 @@ int unsigned usbdevs_count;
 int unsigned sysdevs_count;
 
 
-static const char sys_drivers[3][256] = {"/sys/bus/usb/drivers/option","/sys/bus/usb/drivers/usbserial_generic","/sys/bus/usb/drivers/pl2303"};
+static const char sys_drivers[DRCOUNT][256] = {"/sys/bus/usb/drivers/option","/sys/bus/usb/drivers/usbserial_generic","/sys/bus/usb/drivers/pl2303","/sys/bus/usb/drivers/cdc_ether","/sys/bus/usb/drivers/qmi_wwan"};
 
 static const char sys_bus_usb_devices[] = "/sys/bus/usb/devices";
 
@@ -227,7 +280,7 @@ void sysdevs_find()
 	int tmp; 
 	struct dirent * entry;
 
-	for(p=0;p<3;p++)
+	for(p=0;p<DRCOUNT;p++)
 	{
 
 	DIR * dir = opendir(sys_drivers[p]);
@@ -257,7 +310,7 @@ void sysdevs_find()
 					get_file_sys_bus_usb_devices(sysdevs[sysdevs_count].devfile,"idVendor",&(sysdevs[sysdevs_count].idVendor));
 					get_file_sys_bus_usb_devices(sysdevs[sysdevs_count].devfile,"idProduct",&(sysdevs[sysdevs_count].idProduct));
 					//чистим интерфейсы
-					for(o=0;o<4;o++)
+					for(o=0;o<IFCOUNT;o++)
 						sysdevs[sysdevs_count].iface[o].enabled=0;
 					sysdevs_count++;
 				}
@@ -271,10 +324,13 @@ void sysdevs_find()
 				get_file_endpoint(sysdevs[i].devfile,ifaceno,"ep_01",&(sysdevs[i].iface[ifaceno].ep[0]));
 				get_file_endpoint(sysdevs[i].devfile,ifaceno,"ep_02",&(sysdevs[i].iface[ifaceno].ep[1]));
 				get_file_endpoint(sysdevs[i].devfile,ifaceno,"ep_03",&(sysdevs[i].iface[ifaceno].ep[2]));
-				get_file_endpoint(sysdevs[i].devfile,ifaceno,"ep_81",&(sysdevs[i].iface[ifaceno].ep[3]));
-				get_file_endpoint(sysdevs[i].devfile,ifaceno,"ep_82",&(sysdevs[i].iface[ifaceno].ep[4]));
-				get_file_endpoint(sysdevs[i].devfile,ifaceno,"ep_83",&(sysdevs[i].iface[ifaceno].ep[5]));
-				get_file_endpoint(sysdevs[i].devfile,ifaceno,"ep_84",&(sysdevs[i].iface[ifaceno].ep[6]));
+				get_file_endpoint(sysdevs[i].devfile,ifaceno,"ep_04",&(sysdevs[i].iface[ifaceno].ep[3]));
+				get_file_endpoint(sysdevs[i].devfile,ifaceno,"ep_81",&(sysdevs[i].iface[ifaceno].ep[4]));
+				get_file_endpoint(sysdevs[i].devfile,ifaceno,"ep_82",&(sysdevs[i].iface[ifaceno].ep[5]));
+				get_file_endpoint(sysdevs[i].devfile,ifaceno,"ep_83",&(sysdevs[i].iface[ifaceno].ep[6]));
+				get_file_endpoint(sysdevs[i].devfile,ifaceno,"ep_84",&(sysdevs[i].iface[ifaceno].ep[7]));
+				get_file_endpoint(sysdevs[i].devfile,ifaceno,"ep_85",&(sysdevs[i].iface[ifaceno].ep[8]));
+				get_file_endpoint(sysdevs[i].devfile,ifaceno,"ep_86",&(sysdevs[i].iface[ifaceno].ep[9]));
 				sysdev_getport(sysdevs[i].devfile,ifaceno,&(sysdevs[i].iface[ifaceno].port));
 				
 				
@@ -292,10 +348,10 @@ void sysdev_show(FILE *fd,sysdev_t * sysdev)
 
 		alog(fd,">>sysdev %s %x %x\n",sysdev->devfile,sysdev->idVendor,sysdev->idProduct);
 
-		for(o=0;o<4;o++)
+		for(o=0;o<IFCOUNT;o++)
 			if(sysdev->iface[o].enabled!=0)
 
-				alog(fd,">       iface=%d { %2x %2x %2x %2x %2x %2x %2x %s } \n",o,
+				alog(fd,">       iface=%d { %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %s } \n",o,
 				sysdev->iface[o].ep[0],
 				sysdev->iface[o].ep[1],
 				sysdev->iface[o].ep[2],
@@ -303,6 +359,9 @@ void sysdev_show(FILE *fd,sysdev_t * sysdev)
 				sysdev->iface[o].ep[4],
 				sysdev->iface[o].ep[5],
 				sysdev->iface[o].ep[6],
+				sysdev->iface[o].ep[7],
+				sysdev->iface[o].ep[8],
+				sysdev->iface[o].ep[9],
 				sysdev->iface[o].port
 			    );
 				
@@ -330,7 +389,7 @@ void usbdevs_show(FILE *fd,int mode)
 	{
 	    if((mode==-1)||(usbdevs[i].mode==mode))
 	    {
-		alog(fd,">>usbdev %d %d %s %s %s\n",usbdevs[i].model,usbdevs[i].mode,usbdevs[i].devfile,usbdevs[i].dataport,usbdevs[i].audioport);
+		alog(fd,">>usbdev %d %d %s %s %s %s\n",usbdevs[i].model,usbdevs[i].mode,usbdevs[i].devfile,usbdevs[i].dataport,usbdevs[i].audioport,usbdevs[i].netport);
 	    }
 	}
 	
@@ -491,7 +550,7 @@ void usbdev_found(usbdev_t * usbdev)
 	int i;
 
 //	printf("Found device  %d %d data=%s audio=%s\n",usbdev->model, usbdev->mode, usbdev->dataport,usbdev->audioport);
-	alog(NULL,"adiscovery: Found device %s %d %d data=%s audio=%s\n",usbdev->devfile,usbdev->model, usbdev->mode, usbdev->dataport,usbdev->audioport);
+	alog(NULL,"adiscovery: Found device %s %d %d data=%s audio=%s net=%s\n",usbdev->devfile,usbdev->model, usbdev->mode, usbdev->dataport,usbdev->audioport, usbdev->netport);
 
 if(usbdev->mode==1)
 {
@@ -535,6 +594,7 @@ strcpy(settings.unique.id,newname);
 
 strcpy(settings.unique.audio_tty,usbdev->audioport);
 strcpy(settings.unique.data_tty,usbdev->dataport);
+strcpy(settings.unique.net,usbdev->netport);
 strcpy(settings.unique.dev,usbdev->devfile);
 *settings.unique.imei=0;
 *settings.unique.imsi=0;
@@ -547,6 +607,7 @@ strcpy(settings.unique.dev,usbdev->devfile);
 	if(pvt)
 	{
 		strcpy(PVT_STATE(pvt,dev),usbdev->devfile);
+		strcpy(PVT_STATE(pvt,net),usbdev->netport);
 
 		AST_RWLIST_WRLOCK(&gpublic->devices);
 		AST_RWLIST_INSERT_TAIL(&gpublic->devices, pvt, entry);
@@ -609,15 +670,17 @@ int iface_getport(char* filename, char* port)
 {
 	//printf("\n\n- iface_getport %s\n\n",filename);
 	//strcpy(port,"ttyUSB?");
-
+	char filename2[256];
 	*port=0;
 	struct dirent * entry;
+	struct dirent * entry2;
 	
 	DIR * dir = opendir(filename);
 //alog("adiscovery:2 %s",filename);
 	
 	if(dir) {
 		while((entry = readdir(dir)) != NULL) {
+
 			if(strstr(entry->d_name,"ttyUSB"))
 			{
 			    strcpy(port,"/dev/");
@@ -626,6 +689,26 @@ int iface_getport(char* filename, char* port)
 			 return 1;
 			 
 			}
+
+			if(strstr(entry->d_name,"net"))
+			{
+
+			    strcpy(filename2,filename);
+			    strcat(filename2,"/net/");
+			    DIR * dir2 = opendir(filename2);
+			    entry2 = readdir(dir2);
+			    entry2 = readdir(dir2);
+			    entry2 = readdir(dir2);
+
+			    strcpy(port,entry2->d_name);
+
+			    //strcpy(port,filename);
+			    closedir(dir2);
+			 return 1;
+			 
+			}
+
+
 		}
 		closedir(dir);
 	}
@@ -641,11 +724,11 @@ int sysdev_getdef(sysdev_t * sysdev)
     for(i=0;i<sizeof(defdevs)/sizeof(defdev_t);i++)
     {
 	u1=(sysdev->idVendor==defdevs[i].idVendor)  &&  (sysdev->idProduct==defdevs[i].idProduct);
-	for(o=0;o<4;o++)
+	for(o=0;o<IFCOUNT;o++)
 	    {
 //		u1=u1 && (sysdev->iface[o].enabled==defdevs[i].iface[o].enabled)
 		if(sysdev->iface[o].enabled==1)
-		for(p=0;p<7;p++)
+		for(p=0;p<EPCOUNT;p++)
 		    u1=u1 && (sysdev->iface[o].ep[p]==defdevs[i].iface[o].ep[p]);
 	    }
 	if(u1)
@@ -669,11 +752,18 @@ void usbdev_createdef(sysdev_t * sysdev, usbdev_t * usbdev, int defdev)
         strcpy(usbdev->dataport,sysdev->iface[defdevs[defdev].dataport_num].port);
     else
 	*usbdev->dataport=0;
+        //strcpy(usbdev->dataport,"/dev/null");
 	
     if(defdevs[defdev].audioport_num!=-1)
 	strcpy(usbdev->audioport,sysdev->iface[defdevs[defdev].audioport_num].port);
     else
 	*usbdev->audioport=0;
+        //strcpy(usbdev->audioport,"/dev/null");
+
+    if(defdevs[defdev].netport_num!=-1)
+	strcpy(usbdev->netport,sysdev->iface[defdevs[defdev].netport_num].port);
+    else
+	*usbdev->netport=0;
 
     strcpy(usbdev->devfile,sysdev->devfile);
 }
@@ -700,6 +790,7 @@ void usbdevs_find()
 				    (usbdevs[o].mode==usbdevs[usbdevs_count].mode) &&
 				    (strcmp(usbdevs[o].dataport,usbdevs[usbdevs_count].dataport)==0) &&
 				    (strcmp(usbdevs[o].audioport,usbdevs[usbdevs_count].audioport)==0) &&
+				    (strcmp(usbdevs[o].netport,usbdevs[usbdevs_count].netport)==0) &&
 				    (strcmp(usbdevs[o].devfile,usbdevs[usbdevs_count].devfile)==0) 
 
 				    ) break ;
@@ -732,7 +823,8 @@ void usbdevs_find()
 				    (usbdevs[o].model==usbdevs[usbdevs_count].model) &&
 				    (usbdevs[o].mode==usbdevs[usbdevs_count].mode) &&
 				    (strcmp(usbdevs[o].dataport,usbdevs[usbdevs_count].dataport)==0) &&
-				    (strcmp(usbdevs[o].audioport,usbdevs[usbdevs_count].audioport)==0) 
+				    (strcmp(usbdevs[o].audioport,usbdevs[usbdevs_count].audioport)==0) &&
+				    (strcmp(usbdevs[o].netport,usbdevs[usbdevs_count].netport)==0) 
 				    ) break ;
 			}
 //printf("4\n");
@@ -770,3 +862,24 @@ int usbdev_get_audioport (char* dataport, char* audioport)
 	return !1;
 }
 
+int usbdev_get_netport (char* dataport, char* netport)
+{
+    int i;
+
+    *netport=0;
+//    alog(NULL,"looking %s",dataport);
+    for(i=0;i<usbdevs_count;i++)
+{           
+// alog("adiscovery: test %s %s",usbdevs[i].dataport,dataport);
+	if(usbdevs[i].mode==1)
+	if(strcmp(usbdevs[i].dataport,dataport)==0)
+	{
+	    strcpy(netport,usbdevs[i].netport);
+            alog(NULL, "found %s",netport);
+	    
+	    return 1;
+	}
+}
+	
+	return !1;
+}

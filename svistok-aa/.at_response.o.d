@@ -114,6 +114,8 @@ at_response.o: at_response.c /usr/include/stdc-predef.h config.h \
  export.h mutils.h at_queue.h at_command.h dc_config.h chan_dongle.h \
  mixbuffer.h ringbuffer.h cpvt.h select.h at_parse.h char_conv.h \
  manager.h channel.h dserial.c limits.c /usr/include/math.h \
+ /usr/include/i386-linux-gnu/bits/math-vector.h \
+ /usr/include/i386-linux-gnu/bits/libm-simd-decl-stubs.h \
  /usr/include/i386-linux-gnu/bits/huge_val.h \
  /usr/include/i386-linux-gnu/bits/huge_valf.h \
  /usr/include/i386-linux-gnu/bits/huge_vall.h \
@@ -500,6 +502,10 @@ dserial.c:
 limits.c:
 
 /usr/include/math.h:
+
+/usr/include/i386-linux-gnu/bits/math-vector.h:
+
+/usr/include/i386-linux-gnu/bits/libm-simd-decl-stubs.h:
 
 /usr/include/i386-linux-gnu/bits/huge_val.h:
 

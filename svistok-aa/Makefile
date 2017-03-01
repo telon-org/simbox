@@ -1,7 +1,8 @@
 PROJM =  chan_dongle.so
 PROJS =  chan_dongles.so
 
-chan_donglem_so_OBJS =  app.o at_command.o at_parse.o at_queue.o at_read.o at_response.o \
+
+chan_donglem_so_OBJS = app.o  at_command.o at_parse.o at_queue.o at_read.o at_response.o \
 	chan_dongle.o channel.o char_conv.o cli.o helpers.o manager.o \
 	memmem.o ringbuffer.o cpvt.o dc_config.o pdu.o mixbuffer.o pdiscovery.o
 
@@ -30,8 +31,8 @@ EXTRA_DIST = BUGS COPYRIGHT.txt LICENSE.txt README.txt TODO.txt INSTALL \
 
 BUILD_TOOLS = configure config.sub install-sh missing config.guess
 
-CC = gcc
-LD = gcc
+CC = gcc-4.8
+LD = gcc-4.8
 STRIP = strip
 RM = rm -fr
 INSTALL = /usr/bin/install -c

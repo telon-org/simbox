@@ -158,30 +158,31 @@ static int __attribute__ ((format(printf, 4, 5))) at_enque_generic (struct cpvt*
 EXPORT_DEF int at_enque_initialization_modem(struct cpvt* cpvt)
 {
 	static const at_queue_cmd_t st_cmds1[] = {
-//		ATQ_CMD_DECLARE_ST(CMD_AT, cmd_at),
-		ATQ_CMD_DECLARE_ST(CMD_AT_Z, cmd2),		/* optional,  reload configuration */
+		ATQ_CMD_DECLARE_ST(CMD_AT, cmd_at),
+//!!!		ATQ_CMD_DECLARE_ST(CMD_AT_Z, cmd2),		/* optional,  reload configuration */
 		ATQ_CMD_DECLARE_ST(CMD_AT_E, cmd3),		/* disable echo */
 
-		ATQ_CMD_DECLARE_ST(CMD_AT, cmd69),		// HANGUP
+//!!!		ATQ_CMD_DECLARE_ST(CMD_AT, cmd69),		// HANGUP
 
-		ATQ_CMD_DECLARE_ST(CMD_AT_U2DIAG, cmd80),		/* optional, Enable or disable some devices */
+//		ATQ_CMD_DECLARE_ST(CMD_AT_U2DIAG, cmd80),		/* optional, Enable or disable some devices */
 		ATQ_CMD_DECLARE_ST(CMD_AT_CGMI, cmd5),		/* Getting manufacturer info */
 
 		ATQ_CMD_DECLARE_ST(CMD_AT_CGMM, cmd7),		/* Get Product name */
 		ATQ_CMD_DECLARE_ST(CMD_AT_CGMR, cmd8),		/* Get software version */
 		ATQ_CMD_DECLARE_ST(CMD_AT_CMEE, cmd9),		/* set MS Error Report to 'ERROR' only  TODO: change to 1 or 2 and add support in response handlers */
 
-		ATQ_CMD_DECLARE_ST(CMD_AT_SN,   cmd99),		/* SN Read */
+//		ATQ_CMD_DECLARE_ST(CMD_AT_SN,   cmd99),		/* SN Read */
 
-		ATQ_CMD_DECLARE_ST(CMD_AT_CVOICE, cmd17),	/* read the current voice mode, and return sampling rate、data bit、frame period */
-		ATQ_CMD_DECLARE_ST(CMD_AT_CARDLOCK, cmd97),
+//		ATQ_CMD_DECLARE_ST(CMD_AT_CVOICE, cmd17),	/* read the current voice mode, and return sampling rate、data bit、frame period */
+//		ATQ_CMD_DECLARE_ST(CMD_AT_CARDLOCK, cmd97),
 
 		ATQ_CMD_DECLARE_ST(CMD_AT_CGSN, cmd10),		/* IMEI Read */ // Ne prochitalsya - rebutnut (vozmozhno posle pereproshivki)
 
-		ATQ_CMD_DECLARE_ST(CMD_AT_SYSINFO, cmd93),
-		ATQ_CMD_DECLARE_ST(CMD_AT_CFUN_V, cmd92),	/* check is password authentication requirement and the remainder validation times */
+//		ATQ_CMD_DECLARE_ST(CMD_AT_SYSINFO, cmd93),
+		//ATQ_CMD_DECLARE_ST(CMD_AT_CPIN, cmd12),		/* check is password authentication requirement and the remainder validation times */
 
-		ATQ_CMD_DECLARE_ST(CMD_AT_CPIN, cmd12),		/* check is password authentication requirement and the remainder validation times */
+		ATQ_CMD_DECLARE_ST(CMD_AT_CFUN_V, cmd92)	/* check CFUN */
+
 	};
 
 
@@ -206,13 +207,17 @@ EXPORT_DEF int at_enque_initialization_modem(struct cpvt* cpvt)
 }
 
 
-EXPORT_DEF int at_enque_initialization_sim(struct cpvt* cpvt)
+
+
+
+EXPORT_DEF int at_enque_initialization_sim_e(struct cpvt* cpvt)
 {
 	static const at_queue_cmd_t st_cmds2[] = {
 
+//		ATQ_CMD_DECLARE_ST(CMD_AT, cmd_at),
 		ATQ_CMD_DECLARE_ST(CMD_AT_SN,   cmd99),		/* SN Read */
 		ATQ_CMD_DECLARE_ST(CMD_AT_ICCID, cmd98),	/* ICCID Read */
-//		ATQ_CMD_DECLARE_ST(CMD_AT_SPN, cmd96),		/* Read operator from SIM */
+		ATQ_CMD_DECLARE_ST(CMD_AT_SPN, cmd96),		/* Read operator from SIM */
 
 
 
@@ -228,7 +233,7 @@ EXPORT_DEF int at_enque_initialization_sim(struct cpvt* cpvt)
 
 		ATQ_CMD_DECLARE_STI(CMD_AT_CREG_INIT,cmd14),	/* GSM registration status setting */
 		ATQ_CMD_DECLARE_ST(CMD_AT_CREG, cmd15),		/* GSM registration status */
-//		ATQ_CMD_DECLARE_ST(CMD_AT_CNUM, cmd16),		/* Get Subscriber number */
+		ATQ_CMD_DECLARE_ST(CMD_AT_CNUM, cmd16),		/* Get Subscriber number */
 
 
 //		ATQ_CMD_DECLARE_ST(CMD_AT_CSCA, cmd6),		/* Get SMS Service center address */
@@ -268,6 +273,81 @@ EXPORT_DEF int at_enque_initialization_sim(struct cpvt* cpvt)
 	if(out > 0)
 		return at_queue_insert(cpvt, cmds, out, 0);
 	return 0;
+}
+
+
+EXPORT_DEF int at_enque_initialization_sim_mb(struct cpvt* cpvt)
+{
+	static const at_queue_cmd_t st_cmds2[] = {
+
+//		ATQ_CMD_DECLARE_ST(CMD_AT, cmd_at),
+//		ATQ_CMD_DECLARE_ST(CMD_AT_SN,   cmd99),		/* SN Read */
+//		ATQ_CMD_DECLARE_ST(CMD_AT_ICCID, cmd98),	/* ICCID Read */
+//		ATQ_CMD_DECLARE_ST(CMD_AT_SPN, cmd96),		/* Read operator from SIM */
+
+
+
+		ATQ_CMD_DECLARE_ST(CMD_AT_CIMI, cmd11),		/* IMSI Read */
+
+//		ATQ_CMD_DECLARE_ST(CMD_AT_CFUN_V, cmd92),	/* CFUN? Read */
+
+
+// 		ATQ_CMD_DECLARE_ST(CMD_AT_FREQLOCK, cmd95),
+
+///		ATQ_CMD_DECLARE_ST(CMD_AT_COPS_INIT, cmd13),	/* Read operator name */
+
+
+		ATQ_CMD_DECLARE_STI(CMD_AT_CREG_INIT,cmd14),	/* GSM registration status setting */
+		ATQ_CMD_DECLARE_ST(CMD_AT_CREG, cmd15),		/* GSM registration status */
+//		ATQ_CMD_DECLARE_ST(CMD_AT_CNUM, cmd16),		/* Get Subscriber number */
+
+
+//		ATQ_CMD_DECLARE_ST(CMD_AT_CSCA, cmd6),		/* Get SMS Service center address */
+//		ATQ_CMD_DECLARE_ST(CMD_AT_CLIP, cmd18),		/* disable  Calling line identification presentation in unsolicited response +CLIP: <number>,<type>[,<subaddr>,<satype>[,[<alpha>][,<CLI validitity>]] */
+		ATQ_CMD_DECLARE_ST(CMD_AT_CSSN, cmd19),		/* activate Supplementary Service Notification with CSSI and CSSU */
+		ATQ_CMD_DECLARE_ST(CMD_AT_CMGF, cmd81),		/* Set Message Format */
+
+//		ATQ_CMD_DECLARE_STI(CMD_AT_CSCS, cmd21),	/* UCS-2 text encoding */
+
+//		ATQ_CMD_DECLARE_ST(CMD_AT_CPMS, cmd22),		/* SMS Storage Selection */
+			/* pvt->initialized = 1 after successful of CMD_AT_CNMI */
+		ATQ_CMD_DECLARE_ST(CMD_AT_CNMI, cmd23),		/* New SMS Notification Setting +CNMI=[<mode>[,<mt>[,<bm>[,<ds>[,<bfr>]]]]] */
+
+//		ATQ_CMD_DECLARE_ST(CMD_AT_SYSINFO, cmd93),
+
+//		ATQ_CMD_DECLARE_ST(CMD_AT_CCWA_SET, cmd70),
+
+		ATQ_CMD_DECLARE_ST(CMD_AT_CSQ, cmd24),		/* Query Signal quality */
+		ATQ_CMD_DECLARE_ST(CMD_AT_CSNR, cmd93),
+		};
+
+	unsigned in, out;
+	pvt_t * pvt = cpvt->pvt;
+
+	at_queue_cmd_t cmds[ITEMS_OF(st_cmds2)];
+
+	/* customize list */
+	out=0;
+	for(in = 0; in < ITEMS_OF(st_cmds2); in++)
+	{
+		memcpy(&cmds[out], &st_cmds2[in], sizeof(st_cmds2[in]));
+		out++;
+	}
+
+
+
+	if(out > 0)
+		return at_queue_insert(cpvt, cmds, out, 0);
+	return 0;
+}
+
+
+EXPORT_DEF int at_enque_initialization_sim(struct cpvt* cpvt)
+{
+if(strstr(cpvt->pvt->model,"MULTIBAND")==NULL)
+    at_enque_initialization_sim_e (cpvt);
+else
+    at_enque_initialization_sim_mb (cpvt);
 }
 
 
@@ -399,7 +479,9 @@ EXPORT_DEF int at_enque_cfun6 (struct cpvt* cpvt)
 
 EXPORT_DEF int at_enque_sysinfo (struct cpvt* cpvt)
 {
-        return at_enque_cmd_proc(cpvt, "AT^SYSINFO");
+	return;
+	//if(strstr(cpvt->pvt->model,"MULTIBAND")!=NULL)	return;
+        //return at_enque_cmd_proc(cpvt, "AT^SYSINFO");
 }
 
 
