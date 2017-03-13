@@ -1,9 +1,0 @@
-#!/bin/sh
-
-#echo "Status: 200 Ok"
-echo "Content-Type: text/plain"
-echo "Cache-Control: no-cache"
-echo "Expires: 0"
-echo ""
-reboot
-echo "DONE"

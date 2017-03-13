@@ -10,9 +10,9 @@ clear SMS
 </td></tr><tr><td>
 <?
 
-		$cmd='/usr/bin/php /usr/simbox/system/clearsms.sh >> /tmp/clearsms.log &';
+		$cmd='/usr/simbox/system/clearsms.sh >> /tmp/clearsms.log &';
 		echo($cmd."<br>");
-		$res=system("sudo ".$cmd);
+		$res=exec_delay("sudo ".$cmd);
 		echo($res);
 		echo("<br><br>");
 

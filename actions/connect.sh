@@ -6,9 +6,7 @@
 
 
 
-$ASTERISK -rx "dongle cmd $DONGLE AT+CFUN=1,1"
-#sleep 60
-#$ASTERISK -rx "dongle cmd $DONGLE AT^NDISDUP=1,1"
+$ASTERISK -rx "dongle cmd $DONGLE AT^NDISDUP=1,1"
 
 
 #if [ $NABOR -ne "" ] ; then 

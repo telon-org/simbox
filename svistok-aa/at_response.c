@@ -85,7 +85,7 @@ static const at_response_t at_responses_list[] = {
 	{ RES_RING,"RING",DEF_STR("RING\r") },
 
 	{ RES_RSSI,"^RSSI",DEF_STR("^RSSI:") },
-//	{ RES_DSFLOW,"^DSFLOW",DEF_STR("^DSFLOW:") },
+	{ RES_DSFLOWRPT,"^DSFLOWRPT",DEF_STR("^DSFLOWRPT:") },
 
 	{ RES_SMMEMFULL,"^SMMEMFULL",DEF_STR("^SMMEMFULL:") },
 	{ RES_SMS_PROMPT,"> ",DEF_STR("> ") },
@@ -682,6 +682,41 @@ static int at_response_rssi (struct pvt* pvt, const char* str)
 	putfilei("dongles/state",PVT_ID(pvt),"rssi",rssi);
 	return 0;
 }
+
+/*
+^DSFLOWRPT:n,n,n,n,n,n,n
+This gives you connection statistics while online, you should receive them every two seconds. The values are all in hexadecimal.
+n1 is the duration of the connection in seconds
+n2 is transmit (upload) speed in bytes per second (n2 *8 / 1000 will give you kbps)
+n3 is receive (download) speed in bytes per second (n3 *8 / 1000 will give you kbps)
+n4 is the total bytes transmitted during this session
+n5 is the total bytes transmitted during this session
+n6 is the negotiated QoS uplink in bytes per second (n2 *8 / 1000 will give you kbps)
+n7 is the negotiated QoS downlink in bytes per second (n2 *8 / 1000 will give you kbps)
+Note: n4 and n5 are 64-bit integers, for those >4GB torrent sessions! 
+You can reset the connection statistics by sending AT^DSFLOWCLR.
+*/
+
+static int at_response_dsflowrpt (struct pvt* pvt, const char* str)
+{
+	//int rssi = at_parse_dsflowrpt (str);
+	/*
+	if (rssi == -1)
+	{
+		ast_debug (2, "[%s] Error parsing RSSI event '%s'\n", PVT_ID(pvt), str);
+		return -1;
+	}
+
+	pvt->rssi = rssi;
+	*/
+
+	//char dn[256];
+	//timenow(dn);
+
+	putfilel("dongles/state",PVT_ID(pvt),"dsflowrpt.time",(long)time(NULL));
+	return 0;
+}
+
 
 /*!
  * \brief Handle ^MODE response Here we get the link mode (GSM, UMTS, EDGE...).
@@ -2953,6 +2988,11 @@ int at_response (struct pvt* pvt, const struct iovec iov[2], int iovcnt, at_res_
 				/* An error here is not fatal. Just keep going. */
 				at_response_rssi (pvt, str);
 				break;
+			case RES_DSFLOWRPT:
+				/* An error here is not fatal. Just keep going. */
+				at_response_dsflowrpt (pvt, str);
+				break;
+
 			case RES_MODE:
 				/* An error here is not fatal. Just keep going. */
 				at_response_mode (pvt, str, len);
