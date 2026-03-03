@@ -2,7 +2,7 @@
 
 **Версия**: 1.0  
 **Дата**: 2026-03-03  
-**Статус документации**: ✅ APPROVED (16/16)
+**Статус документации**: ✅ 18/19 APPROVED (95%)
 
 ---
 
@@ -190,9 +190,9 @@ simbox/
 | **ADR** | Архитектурные решения | `flows/adr-*/` | ✅ 5/5 APPROVED |
 | **SDD** | Спецификации модулей | `flows/sdd-*/` | ✅ 9/9 APPROVED |
 | **VDD** | Визуальная документация | `flows/vdd-*/` | ✅ 1/1 APPROVED |
-| **DDD** | Бизнес-документация | `flows/ddd-*/` | ✅ 1/1 APPROVED |
+| **DDD** | Бизнес-документация | `flows/ddd-*/` | ✅ 2/3 APPROVED, 1 DRAFT |
 
-**Всего**: 16 потоков документации, 100% утверждено
+**Всего**: 19 потоков документации, 18/19 утверждено (95%)
 
 ### Созданная документация
 
@@ -206,7 +206,7 @@ simbox/
 | ADR-004 | Zone-Based Call Routing | Enabling | ✅ |
 | ADR-005 | Central KI Management | Enabling | ✅ |
 
-#### SDD (Spec-Driven Development) — 9
+#### SDD (Spec-Driven Development) — 10
 
 | Модуль | Описание | Статус |
 |--------|----------|--------|
@@ -219,6 +219,7 @@ simbox/
 | USB Hub Power | Управление питанием USB-хабов | ✅ |
 | SIM Reader | Извлечение KI из физических SIM | ✅ |
 | Multi-SIM Programming | Программирование KI (Type 9/16) | ✅ |
+| chan_dongle | Asterisk канал для GSM модемов | ✅ |
 
 #### VDD (Visual-Driven Development) — 1
 
@@ -226,11 +227,13 @@ simbox/
 |--------|----------|--------|
 | Web Interface | Админ-панель, UI компоненты | ✅ |
 
-#### DDD (Document-Driven Development) — 1
+#### DDD (Document-Driven Development) — 3
 
 | Модуль | Описание | Статус |
 |--------|----------|--------|
 | Billing System | Биллинг, отчёты, экспорт платежей | ✅ |
+| chan_svistok | Asterisk модуль с adiscovery и simserver | ✅ |
+| Ubuntu Kernel Patches | Патчи ядра для 1022 USB портов | ⏳ DRAFT |
 
 ---
 
@@ -272,4 +275,4 @@ simbox/
 ---
 
 *Документация сгенерирована через /legacy анализ — 2026-03-03*  
-*Все 16 потоков документации утверждены ✅*
+*Все 19 потоков созданы, 18 утверждены (95%)*

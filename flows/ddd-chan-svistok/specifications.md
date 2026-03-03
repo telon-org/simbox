@@ -1,0 +1,164 @@
+# DDD: chan_svistok - Specifications
+
+**Дата**: 2026-03-03  
+**Статус**: APPROVED
+
+---
+
+## Technical Specifications
+
+### File Index
+
+| File | Purpose | Lines |
+|------|---------|-------|
+| svistok-aa/chan_dongle.c | Main driver (chan_svistok) | ~1967 |
+| svistok-aa/simnode/adiscovery_svistok.c | SIM discovery integration | ~50 |
+| svistok-aa/simnode/adiscovery_core.c | Discovery core logic | ~896 |
+| svistok-aa/simnode/adiscovery_core_new.c | New discovery version | ~790 |
+| svistok-aa/simnode/adiscovery_simnode.c | Standalone utility | ~100 |
+| svistok-aa/simnode/adiscovery_test.c | Test mode | ~100 |
+| svistok-aa/share.c | Common functions, locking | ~1032 |
+| svistok-aa/share_mysql.c | MySQL integration | ~590 |
+| svistok-aa/stat.c | Call statistics | ~406 |
+| svistok-aa/limits.c | Call limits management | ~150 |
+| system/send.sh | SMS/USSD sender | ~40 |
+| system/svistok/callendout.sh | Outbound call logging | ~200 |
+| system/svistok/callendin.sh | Inbound call logging | ~100 |
+| system/trycall.sh | Call attempt logging | ~20 |
+
+### Version Info
+
+```c
+// chan_dongle.c
+char svistok_version[64] = "1.1200";
+```
+
+### Call Statistics Fields
+
+| Field | File | Description |
+|-------|------|-------------|
+| stat_call_start | $imsi.stat_call_start | Call initiation timestamp |
+| stat_call_connected | $imsi.stat_call_connected | Answer timestamp |
+| stat_call_end | $imsi.stat_call_end | Hangup timestamp |
+| stat_call_fas | $imsi.stat_call_fas | First Answer Signal |
+| stat_call_pddc | $imsi.stat_call_pddc | Post Dial Delay Complete |
+| stat_call_saved | $imsi.stat_call_saved | Last stats save timestamp |
+
+### Limit Zones
+
+| Zone | Time Period | File |
+|------|-------------|------|
+| 0 | Night (00:00-06:00) | $imsi.limit.0 |
+| 1 | Morning (06:00-09:00) | $imsi.limit.1 |
+| 2 | Day (09:00-18:00) | $imsi.limit.2 |
+| 3 | Evening (18:00-23:00) | $imsi.limit.3 |
+| 4 | Weekends | $imsi.limit.4 |
+| 5 | Holidays | $imsi.limit.5 |
+
+### Log File Formats
+
+#### SMS/USSD Log
+
+**Path**: `/var/svistok/sim/log/$IMSI.smsussd2`
+
+```
+Format: TYPE|DIRECTION|TIMESTAMP|DONGLE|IMSI|NUMBER|TEXT(base64)
+
+Example:
+SMS|O|2026-03-03 10:15:30|dongle01|250201234567890|+79991234567|SGVsbG8=
+USSD|O|2026-03-03 10:16:00|dongle01|250201234567890|*105#|QmFsYW5jZQ==
+```
+
+#### Call Log (Outbound)
+
+**Endpoint**: `http://simserver:8122/svistok/callendout.php`
+
+| Parameter | Description | Example |
+|-----------|-------------|---------|
+| numberb | B-party number | 79991234567 |
+| numbera | A-party number | 78121234567 |
+| numbermy | Our SIM number | 7999000000 |
+| dongle | Dongle name | dongle01 |
+| imsi | SIM IMSI | 250201234567890 |
+| imei | Modem IMEI | 353456071234567 |
+| durationsec | Total duration | 180 |
+| billsec | Billed duration | 175 |
+| dialstatus | Call status | ANSWER |
+| lac | Location Area Code | 12345 |
+| cell | Cell ID | 6789 |
+| end_status | End status | 0 |
+| spec | Special mode | VIP |
+| uid | Unique ID | abc123 |
+
+#### Call Log (Inbound)
+
+**Endpoint**: `http://simserver:8122/svistok/callendin.php`
+
+| Parameter | Description |
+|-----------|-------------|
+| numberb | Caller number |
+| numbermy | Our number |
+| dongle | Dongle name |
+| imsi | SIM IMSI |
+| imei | Modem IMEI |
+| durationsec | Total duration |
+| billsec | Billed duration |
+| dialstatus | Call status |
+
+### Device Discovery Files
+
+```
+/var/svistok/lists/
+├── sysdevs.list           # System devices
+├── usbdevs_all.list       # All USB devices
+├── usbdevs_active.list    # Active devices (mode=1)
+├── usbdevs_diag.list      # Diagnostic mode (mode=2)
+├── usbdevs_unknown.list   # Unknown devices (mode=0)
+├── devices_diag.list      # Diag mode script
+└── readers.list           # SIM readers (vendor=1002)
+```
+
+### Device Mode Codes
+
+| Code | Mode | Description |
+|------|------|-------------|
+| 0 | Unknown | Unrecognized device |
+| 1 | Work | Active voice calls |
+| 2 | Diag | Diagnostic/flashing |
+| 3 | Normal | AT commands only |
+| 1002 | Reader | SIM card reader |
+
+### Supported Devices (defdevs[])
+
+| Model | Vendor | Product | Mode | Data | Audio |
+|-------|--------|---------|------|------|-------|
+| E1550 | 0x12d1 | 0x1001 | Work | 2 | 1 |
+| E1550 | 0x12d1 | 0x1003 | Diag | 1 | - |
+| E1550 | 0x12d1 | 0x14ac | Normal | 0 | - |
+| E173 | 0x12d1 | 0x140c | Normal | 0 | - |
+| E173 | 0x12d1 | 0x1436 | Normal | 0 | - |
+| PL2303 | 0x67b | 0x2303 | Reader | 0 | 0 |
+
+### MySQL Configuration (HARDCODED - SECURITY ISSUE)
+
+```c
+// share_mysql.c
+char mysql_host = "localhost";
+char mysql_user = "svistok";
+char mysql_pass = "svistok4385";  // ⚠️ SECURITY: Password in source
+char mysql_db = "svistok";
+```
+
+### Lock Tracking Files
+
+```
+/var/svistok/dongles/state/
+├── $dongle.lock_start       # Unix timestamp of lock acquisition
+├── $dongle.lock_filename    # Source file that acquired lock
+└── $dongle.lock_lineno      # Line number in source file
+```
+
+---
+
+*Generated by /legacy analysis — 2026-03-03*  
+*Updated with svistok-aa deep analysis*

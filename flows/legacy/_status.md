@@ -33,16 +33,16 @@
 
 ## Statistics
 
-- **Nodes created**: 11 (root + 5 children + 1 web + 1 ai + 3 details)
-- **Nodes completed**: 10
+- **Nodes created**: 14 (root + 5 children + 1 web + 1 ai + 3 details + 2 chan_* + 1 kernel)
+- **Nodes completed**: 13
 - **Max depth reached**: 2
-- **Flows created**: 16 (5 ADR + 9 SDD + 1 VDD + 1 DDD)
-- **Flows approved**: 16 (100%)
+- **Flows created**: 19 (5 ADR + 10 SDD + 1 VDD + 3 DDD)
+- **Flows approved**: 18 (95%)
 - **ADRs created**: 5 (all APPROVED)
-- **SDDs created**: 9 (all APPROVED)
+- **SDDs created**: 10 (all APPROVED)
 - **VDDs created**: 1 (APPROVED)
-- **DDDs created**: 1 (APPROVED)
-- **Pending review**: 0
+- **DDDs created**: 3 (2 APPROVED, 1 DRAFT)
+- **Pending review**: 1
 
 ## Analyzed Domains
 
@@ -58,11 +58,13 @@
 | usb-hub-power | DONE | SDD | flows/sdd-usb-hub-power/ |
 | sim-reader | DONE | SDD | flows/sdd-sim-reader/ |
 | multisim-programming | DONE | SDD | flows/sdd-multisim-programming/ |
+| chan-dongle | DONE | SDD | flows/sdd-chan-dongle/ |
+| chan-svistok | DONE | DDD | flows/ddd-chan-svistok/ |
 | billing | DONE | DDD | flows/ddd-billing/ |
+| ubuntu-kernel-patches | DONE | DDD | flows/ddd-ubuntu-kernel-patches/ |
 | voice-recognition | MERGED | - | Part of ai-automation |
 | automation | MERGED | - | Part of ai-automation |
-| chan-dongle | SKIPPED | - | - |
-| legacy-tools | SKIPPED | - | - |
+| legacy-tools | SKIPPED | - | May be deprecated |
 
 ## Generated ADRs
 

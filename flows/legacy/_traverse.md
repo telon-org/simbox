@@ -106,15 +106,16 @@ RECURSIVE-UNDERSTAND(node):
 
 | SDD | Module | Status |
 |-----|--------|--------|
-| SDD: Core Infrastructure | Base config, paths, utilities | DRAFT |
-| SDD: SIM Management | KI programming, balance tracking | DRAFT |
-| SDD: Dongle Control | USB modem management, AT commands | DRAFT |
-| SDD: Carrier Parsers | 9 carriers, USSD parsing | DRAFT |
-| SDD: Call Engine | Asterisk dialplan, zone routing | DRAFT |
-| SDD: AI & Automation | Voice recognition, autopilot, SMS, blocking | DRAFT |
-| SDD: USB Hub Power | USB hub power management | DRAFT |
-| SDD: SIM Reader | KI extraction from physical SIMs | DRAFT |
-| SDD: Multi-SIM Programming | KI programming for Type 9/16 adapters | DRAFT |
+| SDD: Core Infrastructure | Base config, paths, utilities | APPROVED |
+| SDD: SIM Management | KI programming, balance tracking | APPROVED |
+| SDD: Dongle Control | USB modem management, AT commands | APPROVED |
+| SDD: Carrier Parsers | 9 carriers, USSD parsing | APPROVED |
+| SDD: Call Engine | Asterisk dialplan, zone routing | APPROVED |
+| SDD: AI & Automation | Voice recognition, autopilot, SMS, blocking | APPROVED |
+| SDD: USB Hub Power | USB hub power management | APPROVED |
+| SDD: SIM Reader | KI extraction from physical SIMs | APPROVED |
+| SDD: Multi-SIM Programming | KI programming for Type 9/16 adapters | APPROVED |
+| SDD: chan_dongle | Asterisk channel driver for GSM modems | APPROVED |
 
 ### VDDs (Visual-Driven Development)
 
@@ -126,7 +127,9 @@ RECURSIVE-UNDERSTAND(node):
 
 | DDD | Module | Status |
 |-----|--------|--------|
-| DDD: Billing System | Stakeholder-facing billing | DRAFT |
+| DDD: Billing System | Stakeholder-facing billing | APPROVED |
+| DDD: chan_svistok | Asterisk module extension with adiscovery | APPROVED |
+| DDD: Ubuntu Kernel Patches | USB serial driver patches for 1022 ports | DRAFT |
 
 ---
 
