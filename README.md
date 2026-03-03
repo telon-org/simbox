@@ -1,7 +1,8 @@
 # SimBox — GSM SIM-Box Management System
 
 **Версия**: 1.0  
-**Дата**: 2026-03-03
+**Дата**: 2026-03-03  
+**Статус документации**: ✅ APPROVED (16/16)
 
 ---
 
@@ -184,35 +185,52 @@ simbox/
 
 Полная документация проекта доступна в директории `flows/`:
 
-| Тип | Описание | Путь |
-|-----|----------|------|
-| **ADR** | Архитектурные решения | `flows/adr-*/` |
-| **SDD** | Спецификации модулей | `flows/sdd-*/` |
-| **VDD** | Визуальная документация | `flows/vdd-*/` |
-| **DDD** | Бизнес-документация | `flows/ddd-*/` |
+| Тип | Описание | Путь | Статус |
+|-----|----------|------|--------|
+| **ADR** | Архитектурные решения | `flows/adr-*/` | ✅ 5/5 APPROVED |
+| **SDD** | Спецификации модулей | `flows/sdd-*/` | ✅ 9/9 APPROVED |
+| **VDD** | Визуальная документация | `flows/vdd-*/` | ✅ 1/1 APPROVED |
+| **DDD** | Бизнес-документация | `flows/ddd-*/` | ✅ 1/1 APPROVED |
+
+**Всего**: 16 потоков документации, 100% утверждено
 
 ### Созданная документация
 
-#### ADR (Architectural Decision Records)
-- ADR-001: File-Based State Storage
-- ADR-002: IMSI-Centric Data Model
-- ADR-003: Multi-SIM Adapter Support
-- ADR-004: Zone-Based Call Routing
-- ADR-005: Central KI Management
+#### ADR (Architectural Decision Records) — 5
 
-#### SDD (Spec-Driven Development)
-- Core Infrastructure
-- SIM Management
-- Dongle Control
-- Carrier Parsers
-- Call Engine
-- AI & Automation
+| # | Название | Тип | Статус |
+|---|----------|-----|--------|
+| ADR-001 | File-Based State Storage | Constraining | ✅ |
+| ADR-002 | IMSI-Centric Data Model | Constraining | ✅ |
+| ADR-003 | Multi-SIM Adapter Support | Enabling | ✅ |
+| ADR-004 | Zone-Based Call Routing | Enabling | ✅ |
+| ADR-005 | Central KI Management | Enabling | ✅ |
 
-#### VDD (Visual-Driven Development)
-- Web Interface
+#### SDD (Spec-Driven Development) — 9
 
-#### DDD (Document-Driven Development)
-- Billing System
+| Модуль | Описание | Статус |
+|--------|----------|--------|
+| Core Infrastructure | Базовая конфигурация, пути, утилиты | ✅ |
+| SIM Management | KI программирование, баланс, мультисим | ✅ |
+| Dongle Control | USB модемы, AT команды, IMEI | ✅ |
+| Carrier Parsers | 9 операторов, USSD парсинг | ✅ |
+| Call Engine | Asterisk dialplan, зонная маршрутизация | ✅ |
+| AI & Automation | Распознавание речи, автопилот, SMS, блокировка | ✅ |
+| USB Hub Power | Управление питанием USB-хабов | ✅ |
+| SIM Reader | Извлечение KI из физических SIM | ✅ |
+| Multi-SIM Programming | Программирование KI (Type 9/16) | ✅ |
+
+#### VDD (Visual-Driven Development) — 1
+
+| Модуль | Описание | Статус |
+|--------|----------|--------|
+| Web Interface | Админ-панель, UI компоненты | ✅ |
+
+#### DDD (Document-Driven Development) — 1
+
+| Модуль | Описание | Статус |
+|--------|----------|--------|
+| Billing System | Биллинг, отчёты, экспорт платежей | ✅ |
 
 ---
 
@@ -253,4 +271,5 @@ simbox/
 
 ---
 
-*Документация сгенерирована через /legacy анализ — 2026-03-03*
+*Документация сгенерирована через /legacy анализ — 2026-03-03*  
+*Все 16 потоков документации утверждены ✅*

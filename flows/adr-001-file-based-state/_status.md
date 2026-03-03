@@ -1,6 +1,6 @@
 # ADR-001: File-Based State Storage - Status
 
-**Status**: DRAFT  
+**Status**: APPROVED  
 **Type**: Constraining  
 **Date**: 2026-03-03
 
@@ -9,13 +9,13 @@
 - [x] Context documented
 - [x] Decision documented
 - [x] Consequences documented
-- [ ] Reviewed by team
-- [ ] Approved
+- [x] Reviewed by team
+- [x] Approved
 - [ ] Implemented (verification)
 
 ## Review Notes
 
-*Pending review*
+Approved on 2026-03-03
 
 ---
 
