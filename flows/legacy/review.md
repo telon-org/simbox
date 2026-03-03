@@ -26,6 +26,9 @@
 | SDD: Carrier Parsers | ⏳ Pending |
 | SDD: Call Engine | ⏳ Pending |
 | SDD: AI & Automation | ⏳ Pending |
+| SDD: USB Hub Power | ⏳ Pending |
+| SDD: SIM Reader | ⏳ Pending |
+| SDD: Multi-SIM Programming | ⏳ Pending |
 
 #### VDDs for Review
 
@@ -41,9 +44,9 @@
 
 ## Summary
 
-**Total Flows Created: 13**
+**Total Flows Created: 16**
 - 5 ADRs (Architectural Decision Records)
-- 6 SDDs (Spec-Driven Development)
+- 9 SDDs (Spec-Driven Development)
 - 1 VDD (Visual-Driven Development)
 - 1 DDD (Document-Driven Development)
 
@@ -55,17 +58,23 @@ All flows were created from code analysis without conflicts.
 
 ### Security Observations (Informational)
 
-1. **Yandex API Key**: Hardcoded in ai/recog/dorecog.php (`57eda14d-e0e2-4cdc-938c-b99844a07fd8`)
-2. **HTTP for sensitive data**: KI credentials and recognition results transmitted over unencrypted HTTP
-3. **No authentication**: Central server accepts requests without authentication
-4. **Web interface**: No visible authentication in analyzed code
-5. **File permissions**: KI files stored in plaintext
-6. **IMEI manipulation**: System includes IMEI changing capability
-7. **Auto-reboot**: Watchdog can trigger system reboot on Asterisk failure
+1. **KI exposed in multiple places**:
+   - HTTP transmission (simserver:8122)
+   - Plaintext files (/var/svistok/readers/sim/$ICCID.ki)
+   - Log files (/tmp/reader_*.log)
+   - set_ki.php arguments
+
+2. **No authentication**:
+   - Central server accepts requests without auth
+   - Web interface has no visible login
+   - Sudo commands without password
+
+3. **Physical security**:
+   - USB ports accessible
+   - SIM readers accessible via web
+   - Auto-reboot on watchdog failure
 
 ### Skipped Domains (Low Priority)
-
-The following domains were identified but not analyzed in detail:
 
 | Domain | Reason | Recommendation |
 |--------|--------|----------------|
@@ -74,7 +83,7 @@ The following domains were identified but not analyzed in detail:
 
 ## Next Steps
 
-1. **Review all 13 flows** for accuracy
+1. **Review all 16 flows** for accuracy
 2. **Decide on skipped domains**: Analyze chan-dongle, legacy-tools?
 3. **Create TDD flows** if test-critical modules identified
 4. **Approve flows** to move from DRAFT to APPROVED status

@@ -32,12 +32,12 @@
 
 ## Statistics
 
-- **Nodes created**: 8 (root + 5 children + 1 web + 1 ai)
-- **Nodes completed**: 7
-- **Max depth reached**: 1
-- **Flows created**: 13 (5 ADR + 6 SDD + 1 VDD + 1 DDD)
+- **Nodes created**: 11 (root + 5 children + 1 web + 1 ai + 3 details)
+- **Nodes completed**: 10
+- **Max depth reached**: 2
+- **Flows created**: 16 (5 ADR + 9 SDD + 1 VDD + 1 DDD)
 - **ADRs created**: 5
-- **SDDs created**: 6
+- **SDDs created**: 9
 - **VDDs created**: 1
 - **DDDs created**: 1
 - **Pending review**: 0
@@ -53,6 +53,10 @@
 | call-engine | DONE | SDD | flows/sdd-call-engine/ |
 | web-interface | DONE | VDD | flows/vdd-web-interface/ |
 | ai-automation | DONE | SDD | flows/sdd-ai-automation/ |
+| usb-hub-power | DONE | SDD | flows/sdd-usb-hub-power/ |
+| sim-reader | DONE | SDD | flows/sdd-sim-reader/ |
+| multisim-programming | DONE | SDD | flows/sdd-multisim-programming/ |
+| billing | DONE | DDD | flows/ddd-billing/ |
 | voice-recognition | MERGED | - | Part of ai-automation |
 | automation | MERGED | - | Part of ai-automation |
 | chan-dongle | SKIPPED | - | - |

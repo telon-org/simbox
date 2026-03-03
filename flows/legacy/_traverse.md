@@ -112,6 +112,9 @@ RECURSIVE-UNDERSTAND(node):
 | SDD: Carrier Parsers | 9 carriers, USSD parsing | DRAFT |
 | SDD: Call Engine | Asterisk dialplan, zone routing | DRAFT |
 | SDD: AI & Automation | Voice recognition, autopilot, SMS, blocking | DRAFT |
+| SDD: USB Hub Power | USB hub power management | DRAFT |
+| SDD: SIM Reader | KI extraction from physical SIMs | DRAFT |
+| SDD: Multi-SIM Programming | KI programming for Type 9/16 adapters | DRAFT |
 
 ### VDDs (Visual-Driven Development)
 
